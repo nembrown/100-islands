@@ -1,0 +1,23 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+Notes
+Photos
+Norah & Brian's cool collab collection
+*.csv
+Old scripts
+*.xlsx
+*.xls
+*.doc
+*.docx
+*.ppt
+*.pptx
+**/Plots
+**/Data by person
+**/IsoWeb2.1
+**/Output Files
+**/Ben.data
+.RDataTmp
+*.RDataTmp
+**/History and Environment
