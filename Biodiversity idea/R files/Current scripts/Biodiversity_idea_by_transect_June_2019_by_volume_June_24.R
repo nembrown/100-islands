@@ -1,5 +1,5 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
-#change to Norah if on work computer
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+#change to norahbrown if on work computer
 
 
 
@@ -7,6 +7,8 @@ setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 
 ben_fish_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_speciesabundance_20142018.csv")
+
+ben_pelagic_demersal_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_fishcodes_demersal_pelagic.csv")
 
 ben_bycatch_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_bycatch_20142018.csv")
 
@@ -61,6 +63,7 @@ head(ben_fish_data)
 #only summer months 
 ben_fish_data <- ben_fish_data %>% filter(between(month, 7,8))
 
+
 #make wide format to calculate number of species
 #use sum of abundance to reflect all species caught in a given summer 
 ben_fish_data_wide_year <-ben_fish_data %>% group_by(site, year, species) %>% 
@@ -86,6 +89,66 @@ ben_fish_data_wide_year_richness$fish_abundance_bym3<-ben_fish_data_wide_year_ri
 #average these values across years
 ben_fish_data_wide_year_richness <- ben_fish_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(ben_fish_data_wide_year_richness)
+
+###demersal vs. pelagic
+
+head(ben_fish_data)
+head(ben_pelagic_demersal_data)
+names(ben_pelagic_demersal_data)[1]<-"species"
+
+ben_pelagic_demersal_data<-merge(ben_pelagic_demersal_data,ben_fish_data, by="species" )
+ben_pelagic_data <- ben_pelagic_demersal_data %>% filter(Depth.Behaviour=="Pelagic")
+ben_demersal_data <- ben_pelagic_demersal_data %>% filter(Depth.Behaviour=="Demersal")
+
+ben_demersal_data_wide_year <-ben_demersal_data %>% group_by(site, year, species) %>% 
+  summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
+  spread( species, sum_abundance) %>% 
+  replace(is.na(.), 0) 
+
+head(ben_demersal_data_wide_year)
+
+#calculate richness & abundance  from the wide dataframe
+ben_demersal_data_wide_year_richness<-ben_demersal_data_wide_year[,c(1,2)]
+ben_demersal_data_wide_year_richness$demersal_richness<-specnumber(ben_demersal_data_wide_year[,-c(1,2)])
+#ben_demersal_data_wide_year_richness$demersal_diversity<-diversity(ben_demersal_data_wide_year[,-1], index="shannon")
+ben_demersal_data_wide_year_richness$demersal_abundance<-rowSums(ben_demersal_data_wide_year[,-c(1,2)],na.rm = TRUE)
+head(ben_demersal_data_wide_year_richness)
+
+#adjust richness and abundance by total volume seined at that site
+#bym3 is correcting problem that some sites were sampled more than others (aka species/Area curve)
+ben_demersal_data_wide_year_richness<-merge(ben_demersal_data_wide_year_richness, ben_netdimensions_summer)
+ben_demersal_data_wide_year_richness$demersal_richness_bym3<-ben_demersal_data_wide_year_richness$demersal_richness/(ben_demersal_data_wide_year_richness$sum_volume)
+ben_demersal_data_wide_year_richness$demersal_abundance_bym3<-ben_demersal_data_wide_year_richness$demersal_abundance/(ben_demersal_data_wide_year_richness$sum_volume)
+
+#average these values across years
+ben_demersal_data_wide_year_richness <- ben_demersal_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(ben_demersal_data_wide_year_richness)
+
+
+ben_pelagic_data_wide_year <-ben_pelagic_data %>% group_by(site, year, species) %>% 
+  summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
+  spread( species, sum_abundance) %>% 
+  replace(is.na(.), 0) 
+
+head(ben_pelagic_data_wide_year)
+
+#calculate richness & abundance  from the wide dataframe
+ben_pelagic_data_wide_year_richness<-ben_pelagic_data_wide_year[,c(1,2)]
+ben_pelagic_data_wide_year_richness$pelagic_richness<-specnumber(ben_pelagic_data_wide_year[,-c(1,2)])
+#ben_pelagic_data_wide_year_richness$pelagic_diversity<-diversity(ben_pelagic_data_wide_year[,-1], index="shannon")
+ben_pelagic_data_wide_year_richness$pelagic_abundance<-rowSums(ben_pelagic_data_wide_year[,-c(1,2)],na.rm = TRUE)
+head(ben_pelagic_data_wide_year_richness)
+
+#adjust richness and abundance by total volume seined at that site
+#bym3 is correcting problem that some sites were sampled more than others (aka species/Area curve)
+ben_pelagic_data_wide_year_richness<-merge(ben_pelagic_data_wide_year_richness, ben_netdimensions_summer)
+ben_pelagic_data_wide_year_richness$pelagic_richness_bym3<-ben_pelagic_data_wide_year_richness$pelagic_richness/(ben_pelagic_data_wide_year_richness$sum_volume)
+ben_pelagic_data_wide_year_richness$pelagic_abundance_bym3<-ben_pelagic_data_wide_year_richness$pelagic_abundance/(ben_pelagic_data_wide_year_richness$sum_volume)
+
+#average these values across years
+ben_pelagic_data_wide_year_richness <- ben_pelagic_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(ben_pelagic_data_wide_year_richness)
+
 
 # Bycatch data cleaning ---------------------------------------------------
 #data cleaning 
@@ -117,6 +180,7 @@ head(ben_bycatch_data_wide_year_richness)
 
 # Fish Biomass data cleaning ----------------------------------------------
 head(ben_size_data)
+#demersal and pelagic biomass add here too 
 #taking average length of a fish of given species at given site times the abundance at that site 
 #will give us "biomass" estimate = cm of fish of that species in total
 
@@ -155,12 +219,16 @@ head(ben_fish_data_wide_year_richness)
 head(ben_bycatch_data_wide_year_richness)
 head(ben_size_data_wide_year_richness)
 head(ben_biomass_data_wide_year_nf)
+head(ben_pelagic_data_wide_year_richness)
 
 fish_richness_merged_tran_year<-merge(ben_fish_data_wide_year_richness[,-4], ben_netdimensions_year, by="site", all=TRUE)
 fish_bycatch_richness_merged_tran_year<-merge(fish_richness_merged_tran_year, ben_bycatch_data_wide_year_richness[,-4], by="site", all=TRUE)
 fish_bycatch_richness_merged_tran_year[is.na(fish_bycatch_richness_merged_tran_year)] <- 0
 fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_size_data_wide_year_richness, by="site", all=TRUE)
 fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_biomass_data_wide_year_nf, by="site", all=TRUE)
+fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_pelagic_data_wide_year_richness[,-4], by="site", all=TRUE)
+fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_demersal_data_wide_year_richness[,-4], by="site", all=TRUE)
+
 head(fish_bycatch_richness_merged_tran_year)
 
 #correcting richness and abundance for average net dimensions at that site 
@@ -172,6 +240,10 @@ fish_bycatch_richness_merged_tran_year$fish_abundance_corrected<-((fish_bycatch_
 fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected<-((fish_bycatch_richness_merged_tran_year$bycatch_richness)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$fish_richness_corrected<-((fish_bycatch_richness_merged_tran_year$fish_richness)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$marine_richness_corrected<-(fish_bycatch_richness_merged_tran_year$fish_richness_corrected+fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected)
+fish_bycatch_richness_merged_tran_year$pelagic_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$pelagic_biomass)/fish_bycatch_richness_merged_tran_year$volume)
+fish_bycatch_richness_merged_tran_year$pelagic_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$pelagic_abundance)/fish_bycatch_richness_merged_tran_year$volume)
+fish_bycatch_richness_merged_tran_year$demersal_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$demersal_biomass)/fish_bycatch_richness_merged_tran_year$volume)
+fish_bycatch_richness_merged_tran_year$demersal_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$demersal_abundance)/fish_bycatch_richness_merged_tran_year$volume)
 
 
 #Calculating marine richness by combining fish and invertebrates
@@ -186,7 +258,7 @@ hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
 names(hakai_sites_distance_tran)[3]<-"unq_tran"
 names(hakai_sites_distance_tran)[6]<-"site"
-hakai_sites_distance_tran<- hakai_sites_distance_tran%>% filter(Distance < 1)
+hakai_sites_distance_tran<- hakai_sites_distance_tran%>% filter(Distance < 5)
 head(hakai_sites_distance_tran )
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran[,c(3,5,6)], by="site")
@@ -196,7 +268,7 @@ head(fish_bycatch_richness_merged_tran)
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Full 100 islands")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Full 100 islands")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -233,13 +305,19 @@ head(fish_bycatch_richness_merged_tran)
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran")
 fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
-head(fish_richness_merged_tran_isl)
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+View(fish_richness_merged_tran_isl)
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
 length(unique(fish_richness_merged_tran_isl$site))
 length(unique(fish_richness_merged_tran_isl$unq_tran))
+
+length(unique(fish_richness_merged_tran_isl_1k$site))
+length(unique(fish_richness_merged_tran_isl_1k$unq_tran))
+
+length(unique(fish_richness_merged_tran_isl_300$site))
+length(unique(fish_richness_merged_tran_isl_300$unq_tran))
 
 
 # Determining best scale of comparison -----------------------------------------
@@ -267,11 +345,28 @@ n15_300<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected
 n15_400<-ggplot(fish_richness_merged_tran_isl_400, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("400 m")
 n15_500<-ggplot(fish_richness_merged_tran_isl_500, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("500 m")
 n15_600<-ggplot(fish_richness_merged_tran_isl_600, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("600 m")
+n15_850<-ggplot(fish_richness_merged_tran_isl_850, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("850 m")
 n15_3k<-ggplot(fish_richness_merged_tran_isl_3k, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("3k")
 n15_2k<-ggplot(fish_richness_merged_tran_isl_2k, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("2k")
 n15_1000<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("1000 m")
-plot_grid(n15_100, n15_250, n15_300, n15_400, n15_500,n15_600,n15_3k,n15_2k, n15_1000, ncol=3)
+plot_grid(n15_100, n15_250, n15_300, n15_400, n15_500,n15_600,n15_850, n15_1000,n15_2k,n15_3k,  ncol=5)
 ggsave("C:Plots//Transect//Resources_terr_var//fish_richness_n15_scale_by_day_volume.png", width=40, height=20, unit="cm")
+
+#plotting the relationship between n15 and fish biomass at various distances
+n15_100<-ggplot(fish_richness_merged_tran_isl_100, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("100 m")
+n15_250<-ggplot(fish_richness_merged_tran_isl_250, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("250 m")
+n15_300<-ggplot(fish_richness_merged_tran_isl_300, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("300 m")
+n15_400<-ggplot(fish_richness_merged_tran_isl_400, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("400 m")
+n15_500<-ggplot(fish_richness_merged_tran_isl_500, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("500 m")
+n15_600<-ggplot(fish_richness_merged_tran_isl_600, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("600 m")
+n15_850<-ggplot(fish_richness_merged_tran_isl_850, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("850 m")
+n15_3k<-ggplot(fish_richness_merged_tran_isl_3k, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("3k")
+n15_2k<-ggplot(fish_richness_merged_tran_isl_2k, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("2k")
+n15_1000<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=log(fish_biomass_bym3+1), y=d15n))+geom_point()+geom_smooth(method="gam")+ggtitle("1000 m")
+plot_grid(n15_100, n15_250, n15_300, n15_400, n15_500,n15_600,n15_850, n15_1000,n15_2k,n15_3k,  ncol=5)
+ggsave("C:Plots//Transect//Resources_terr_var//fish_biomass_n15_scale_by_day_volume.png", width=40, height=20, unit="cm")
+
+
 
 #plotting the relationship between s and fish richness at various distances
 s_100<-ggplot(fish_richness_merged_tran_isl_100, aes(x=fish_richness_corrected, y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("100 m")
@@ -288,6 +383,22 @@ s_2k<-ggplot(fish_richness_merged_tran_isl_2k, aes(x=fish_richness_corrected, y=
 s_1000<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("1k")
 plot_grid(s_100, s_250, s_300, s_400, s_500,s_600,s_750,s_1000, s_2k,s_3k,s_4k,s_5k , ncol=6)
 ggsave("C:Plots//Transect//Resources_terr_var//fish_richness_s_scale_by_day_volume.png", width=40, height=20, unit="cm")
+
+
+s_100<-ggplot(fish_richness_merged_tran_isl_100, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("100 m")
+s_250<-ggplot(fish_richness_merged_tran_isl_250, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("250 m")
+s_300<-ggplot(fish_richness_merged_tran_isl_300, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("300 m")
+s_400<-ggplot(fish_richness_merged_tran_isl_400, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("400 m")
+s_500<-ggplot(fish_richness_merged_tran_isl_500, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("500 m")
+s_600<-ggplot(fish_richness_merged_tran_isl_600, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("600 m")
+s_750<-ggplot(fish_richness_merged_tran_isl_750, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("750 m")
+s_4k<-ggplot(fish_richness_merged_tran_isl_4k, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("4k")
+s_5k<-ggplot(fish_richness_merged_tran_isl_5k, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("5k")
+s_3k<-ggplot(fish_richness_merged_tran_isl_3k, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("3k")
+s_2k<-ggplot(fish_richness_merged_tran_isl_2k, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("2k")
+s_1000<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=log(fish_biomass_bym3+1), y=s))+geom_point()+geom_smooth(method="lm")+ggtitle("1k")
+plot_grid(s_100, s_250, s_300, s_400, s_500,s_600,s_750,s_1000, s_2k,s_3k,s_4k,s_5k , ncol=6)
+ggsave("C:Plots//Transect//Resources_terr_var//fish_biomass_s_scale_by_day_volume.png", width=40, height=20, unit="cm")
 
 ## For both marine indicators, 300m jumps out as tighest relationship
 ##but 1km might be more reasonable for otter feeding .. think about this. 
@@ -393,7 +504,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
@@ -494,29 +605,29 @@ ggsave("C:Plots//Transect//Resources_marine_var//resource_primary_subtidal_habit
 # Plotting Marine resources vs. terrestrial variables  ---------------------------------------
 
 # marine resources vs. n15 soilk
-n_marine1<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=log(bycatch_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
-n_marine2<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=bycatch_richness_corrected))+geom_point()+geom_smooth(method="gam")
-n_marine3<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=log(fish_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
-n_marine4<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=fish_richness_corrected))+geom_point()+geom_smooth(method="gam")
-n_marine5<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=log(fish_biomass_bym3+1)))+geom_point()+geom_smooth(method="gam")
-n_marine6<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=fish_length))+geom_point()+geom_smooth(method="gam")
-n_marine7<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=marine_richness_corrected))+geom_point()+geom_smooth(method="gam")
-n_marine8<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=d15n, x=fish_sd))+geom_point()+geom_smooth(method="gam")
+n_marine1<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=log(bycatch_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
+n_marine2<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=bycatch_richness_corrected))+geom_point()+geom_smooth(method="gam")
+n_marine3<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=log(fish_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
+n_marine4<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=fish_richness_corrected))+geom_point()+geom_smooth(method="gam")
+n_marine5<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=log(fish_biomass_bym3+1)))+geom_point()+geom_smooth(method="gam")
+n_marine6<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=fish_length))+geom_point()+geom_smooth(method="gam")
+n_marine7<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=marine_richness_corrected))+geom_point()+geom_smooth(method="gam")
+n_marine8<-ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=fish_sd))+geom_point()+geom_smooth(method="gam")
 
 plot_grid(n_marine4, n_marine5, n_marine7, n_marine3, n_marine2, n_marine1,n_marine6,n_marine8, ncol=4)
-ggsave("C:Plots//Transect//Resources_terr_var//d15n_marine_corrected.png")
+ggsave("C:Plots//Transect//Resources_terr_var//d15n_marine_corrected.png", width=30, height=20, unit="cm")
 
-s_marine1<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=log(bycatch_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
-s_marine2<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=bycatch_richness_corrected))+geom_point()+geom_smooth(method="gam")
-s_marine3<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=log(fish_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
-s_marine4<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=fish_richness_corrected))+geom_point()+geom_smooth(method="gam")
-s_marine5<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=log(fish_biomass_bym3+1)))+geom_point()+geom_smooth(method="gam")
-s_marine6<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=fish_length))+geom_point()+geom_smooth(method="gam")
-s_marine7<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=marine_richness_corrected))+geom_point()+geom_smooth(method="gam")
-s_marine8<-ggplot(fish_richness_merged_tran_isl_1k, aes(y=s, x=fish_sd))+geom_point()+geom_smooth(method="gam")
+s_marine1<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=log(bycatch_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
+s_marine2<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=bycatch_richness_corrected))+geom_point()+geom_smooth(method="gam")
+s_marine3<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=log(fish_abundance_bym3+1)))+geom_point()+geom_smooth(method="gam")
+s_marine4<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=fish_richness_corrected))+geom_point()+geom_smooth(method="gam")
+s_marine5<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=log(fish_biomass_bym3+1)))+geom_point()+geom_smooth(method="gam")
+s_marine6<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=fish_length))+geom_point()+geom_smooth(method="gam")
+s_marine7<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=marine_richness_corrected))+geom_point()+geom_smooth(method="gam")
+s_marine8<-ggplot(fish_richness_merged_tran_isl_300, aes(y=s, x=fish_sd))+geom_point()+geom_smooth(method="gam")
 
 plot_grid(s_marine4, s_marine5, s_marine7, s_marine3, s_marine2, s_marine1,s_marine6,s_marine8, ncol=4)
-ggsave("C:Plots//Transect//Resources_terr_var//s_marine_corrected.png")
+ggsave("C:Plots//Transect//Resources_terr_var//s_marine_corrected.png", width=30, height=20, unit="cm")
 
 
 # marine resources vs. n15 soil
@@ -655,7 +766,7 @@ hist_marine7<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_co
 hist_marine8<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_abundance_bym3))+geom_density()
 
 plot_grid(hist_marine4, hist_marine5, hist_marine6, hist_marine3, hist_marine2, hist_marine1, hist_marine7, ncol=4)
-ggsave("C:Plots//Transect//Resources_biogeog//histitude_marine.png")
+ggsave("C:Plots//Transect//Resources_biogeog//histogram_marine.png")
 
 
 
