@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Modelling practice")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, if there are multiple plots within transect they are averaged. 

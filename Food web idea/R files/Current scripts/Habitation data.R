@@ -1,5 +1,4 @@
-
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Modelling practice")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 
 library(tidyr)
 library(plyr)
@@ -12,10 +11,10 @@ library(ggplot2)
 
 
 # Read in Owen's data
-longform_plant_percentcover<-read.csv("c:Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 
 #Read in Pat's data for area
-islands_data<-read.csv("c:Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+islands_data<-read.csv("C:Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 head(islands_data)
 
 names(islands_data)[1]<-"unq_isl"
@@ -49,8 +48,11 @@ islands_plant<-islands_plant[!duplicated(islands_plant),]
 
 
 head(islands_plant)
-#summing across layers Owen
-islands_plant_sum<- islands_plant %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
+#summing across layers Owen but no T!!!! 
+islands_plant_noT <- islands_plant %>%  filter(layer!= "T")
+
+islands_plant_sum<- islands_plant_noT %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
+
 head(islands_plant_sum)
 islands_plant_sum[duplicated(islands_plant_sum),]
 
@@ -58,8 +60,12 @@ islands_plant_info<-islands_plant[,-c(9:11, 14)]
 head(islands_plant_info)
 islands_plant_info<-islands_plant_info[!duplicated(islands_plant_info),]
 
+
+
+
 islands_plant_filtered<-inner_join(islands_plant_sum, islands_plant_info, by=c("unq_plot")) 
 head(islands_plant_filtered)
+
 length(unique(islands_plant_filtered$unq_isl))
 #94
 
@@ -69,13 +75,13 @@ islands_plant_filtered[duplicated(islands_plant_filtered),]
 
 
 #read in Deb's data
-veg1x1_Deb_mod<-read.csv("c:Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
+veg1x1_Deb_mod<-read.csv("C:Data by person//Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(veg1x1_Deb_mod)
 length(unique(veg1x1_Deb_mod$unq_isl))
 #99 islands
 
 #adding shore dist to deb's veg
-Deb_interior<-read.csv("C:Deb.data//shoredist.csv", header=TRUE, sep=",")
+Deb_interior<-read.csv("C:Data by person//Deb.data//shoredist.csv", header=TRUE, sep=",")
 veg1x1_Deb_mod_interior<-merge(veg1x1_Deb_mod, Deb_interior, by="pcid")
 head(veg1x1_Deb_mod_interior)
 names(veg1x1_Deb_mod_interior)[11]<-"shore_dist"
@@ -101,7 +107,8 @@ veg1x1_Deb_mod_interior_size_info<-veg1x1_Deb_mod_interior_size_info[!duplicated
 head(veg1x1_Deb_mod_interior_size_info)
 
 #summing across layers (e.g. canopy, herbs) Deb
-veg1x1_Deb_mod_interior_size_sum<- veg1x1_Deb_mod_interior_size %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
+veg1x1_Deb_mod_interior_size_noT<-veg1x1_Deb_mod_interior_size %>% filter(layer!="T")
+veg1x1_Deb_mod_interior_size_sum<- veg1x1_Deb_mod_interior_size_noT %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
 head(veg1x1_Deb_mod_interior_size_sum)
 
 #add this back to the main dataframe without the "species, layer, cover, notes" categories
@@ -171,17 +178,30 @@ Deb_Owen_veg_combined<-Deb_Owen_veg_combined[!duplicated(Deb_Owen_veg_combined),
 # Filling 0s for each species ---------------------------------------------
 
 
-Deb_Owen_veg_combined_complete <- Deb_Owen_veg_combined%>% group_by(unq_plot)%>% complete(species, fill=list(cover=0))%>% group_by(unq_plot)%>% arrange(desc(cover), .by_group=TRUE)
+Deb_Owen_veg_combined_complete <- Deb_Owen_veg_combined%>% 
+                                    complete(unq_plot, species, fill=list(cover=0)) %>% 
+                                    group_by(unq_plot) %>% 
+                                    arrange(desc(cover), .by_group=TRUE)
 
 Deb_Owen_veg_combined_complete_filled<-Deb_Owen_veg_combined_complete %>% fill(everything())
+
+
 
 length(unique(Deb_Owen_veg_combined_complete_filled$unq_isl))
 #100
 
-head(Deb_Owen_veg_combined_complete_filled)
+##adding in info about shurb herb or tree
+plant_category<-read.csv("C:Data by person//Owen's data//100Islands_Fitzpatrick_species.csv", header=TRUE, sep=",")
+head(plant_category)
 
 
-write.csv(Deb_Owen_veg_combined_complete_filled, "C:Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled, plant_category[,c(1,4,5)], by.x="species")
+
+
+View(Deb_Owen_veg_combined_complete_filled)
+
+
+write.csv(Deb_Owen_veg_combined_complete_filled, "C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
 
 
 
@@ -251,6 +271,6 @@ head(Deb_Owen_veg_large)
 Veg_means_by_island<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_small, Deb_Owen_veg_large)
 head(Veg_means_by_island)
 
-write.csv(Veg_means_by_island, "C:Kalina.data/Veg_means_by_island.csv")
+write.csv(Veg_means_by_island, "C:Data by person//Kalina.data/Veg_means_by_island.csv")
 
 
