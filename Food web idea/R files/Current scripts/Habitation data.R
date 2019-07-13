@@ -178,14 +178,14 @@ Deb_Owen_veg_combined<-Deb_Owen_veg_combined[!duplicated(Deb_Owen_veg_combined),
 # Filling 0s for each species ---------------------------------------------
 
 
-Deb_Owen_veg_combined_complete <- Deb_Owen_veg_combined%>% 
+Deb_Owen_veg_combined_complete <- Deb_Owen_veg_combined%>% ungroup() %>% 
                                     complete(unq_plot, species, fill=list(cover=0)) %>% 
                                     group_by(unq_plot) %>% 
                                     arrange(desc(cover), .by_group=TRUE)
 
 Deb_Owen_veg_combined_complete_filled<-Deb_Owen_veg_combined_complete %>% fill(everything())
 
-
+View(Deb_Owen_veg_combined_complete_filled)
 
 length(unique(Deb_Owen_veg_combined_complete_filled$unq_isl))
 #100
@@ -195,10 +195,10 @@ plant_category<-read.csv("C:Data by person//Owen's data//100Islands_Fitzpatrick_
 head(plant_category)
 
 
-Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled, plant_category[,c(1,4,5)], by.x="species")
+Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled, plant_category[,c(1,4,5)], by="species")
 
 
-View(Deb_Owen_veg_combined_complete_filled)
+
 
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")

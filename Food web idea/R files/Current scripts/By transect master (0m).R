@@ -105,26 +105,32 @@ head(longform_plant_percentcover)
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
+head(longform_plant_percentcover_owen_0m)
 
 
-longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m%>% 
-  group_by(unq_tran,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
-  spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
-head(longform_plant_percentcover2_tran_0m)
+##### PROBLEM
+
+
+length(longform_plant_percentcover_owen_0m$unq_plot)
+length(longform_plant_percentcover_owen_0m_shrub$unq_plot)
+
+
+longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
+                                       group_by(unq_plot,species) %>% 
+                                       spread(species, cover)%>%  replace(is.na(.), 0)
+
 
 longform_plant_percentcover_owen_0m_shrub<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="shrub")
 longform_plant_percentcover_owen_0m_herb<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="herb")
 
-longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub%>% 
-  group_by(unq_tran,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
-  spread(species, cover_mean)%>%  replace(is.na(.), 0)
+longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub[,c(1:7)] %>% 
+  group_by(unq_plot,species) %>% 
+  spread(species, cover)%>%  replace(is.na(.), 0)
 
-longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb%>% 
-  group_by(unq_tran,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
-  spread(species, cover_mean)%>%  replace(is.na(.), 0)
-
-
+longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb[,c(1:7)] %>% 
+  group_by(unq_plot,species) %>% 
+  spread(species, cover)%>%  replace(is.na(.), 0)
 
 longform_plant_percentcover_species_tran_0m<-longform_plant_percentcover2_tran_0m
 head(longform_plant_percentcover_species_tran_0m)
@@ -133,24 +139,24 @@ which( colnames(longform_plant_percentcover2_tran_0m)=="gash" )
 which( colnames(longform_plant_percentcover2_tran_0m)=="midi" )
 
 
-longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(1,31,43)]
+longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(1,39,52)]
 head(longform_plant_percentcover3_tran_0m)
-longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-1])
-longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-1], index="shannon")
+longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-c(1:5)])
+longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-c(1:5)], index="shannon")
 longform_plant_percentcover3_tran_0m$plant_evenness<-longform_plant_percentcover3_tran_0m$plant_shannon.diversity/(log(longform_plant_percentcover3_tran_0m$plant_richness))
-longform_plant_percentcover3_tran_0m$total_cover<-rowSums(longform_plant_percentcover_species_tran_0m[,-1], na.rm=TRUE)
+longform_plant_percentcover3_tran_0m$total_cover<-rowSums(longform_plant_percentcover_species_tran_0m[,-c(1:5)], na.rm=TRUE)
 
-longform_plant_percentcover3_tran_0m$shrub_richness<-specnumber(longform_plant_percentcover2_tran_0m_shrub[,-1])
-longform_plant_percentcover3_tran_0m$shrub_cover<-rowSums(longform_plant_percentcover2_tran_0m_shrub[,-1], na.rm=TRUE)
-longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_percentcover2_tran_0m_herb[,-1])
-longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-1], na.rm=TRUE)
+longform_plant_percentcover3_tran_0m$shrub_richness<-specnumber(longform_plant_percentcover2_tran_0m_shrub[,-c(1:5)])
+longform_plant_percentcover3_tran_0m$shrub_cover<-rowSums(longform_plant_percentcover2_tran_0m_shrub[,-c(1:5)], na.rm=TRUE)
+longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)])
+longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)], na.rm=TRUE)
 
 
 longform_plant_percentcover2_tran_0m_shrub$unq_tran[!(longform_plant_percentcover3_tran_0m$unq_tran%in% longform_plant_percentcover2_tran_0m_shrub$unq_tran)]
 
 longform_plant_percentcover3_tran_0m$unq_tran<-strtrim(longform_plant_percentcover3_tran_0m$unq_tran, 5)
 
-
+View(longform_plant_percentcover_species_tran_0m)
 
 
 
