@@ -99,7 +99,6 @@ head(soil_merge_0m)
 
 longform_plant_percentcover<-read.csv("C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
-head(longform_plant_percentcover)
 
 #longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
 
@@ -112,8 +111,8 @@ head(longform_plant_percentcover_owen_0m)
 ##### PROBLEM
 
 
-length(longform_plant_percentcover_owen_0m$unq_plot)
-length(longform_plant_percentcover_owen_0m_shrub$unq_plot)
+length(unique(longform_plant_percentcover_owen_0m$unq_plot))
+length(unique(longform_plant_percentcover_owen_0m_shrub$unq_plot))
 
 
 longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
@@ -139,7 +138,7 @@ which( colnames(longform_plant_percentcover2_tran_0m)=="gash" )
 which( colnames(longform_plant_percentcover2_tran_0m)=="midi" )
 
 
-longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(1,39,52)]
+longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(1,41,56)]
 head(longform_plant_percentcover3_tran_0m)
 longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-c(1:5)], index="shannon")
