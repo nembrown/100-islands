@@ -22,7 +22,7 @@ library(betapart)
 library(bipartite)
 library(viridis)
 library(cowplot)
-install.packages("forcats")
+#install.packages("forcats")
 library(forcats)
 
 
@@ -227,7 +227,19 @@ becky_trees_wide_richness$tree_evenness<-becky_trees_wide_richness$tree_diversit
 becky_trees_wide_richness$tree_abundance<-rowSums(becky_trees_wide[,-1],na.rm = TRUE)
 head(becky_trees_wide_richness)
 
-habitat_soil_by_isl<-merge(habitat_soil_by_isl,becky_trees_wide_richness, by.x="unq_isl", all=TRUE)
+
+#summed total basal area of all species in that island= "cover" type thing 
+becky_trees_2<-becky_trees %>% group_by(unq_isl) %>% 
+  summarise(sum_basal = sum(ba.tot, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0) 
+
+
+head(becky_trees_2)
+becky_trees_wide_richness<-merge(becky_trees_wide_richness, becky_trees_2)
+
+
+
+habitat_soil_by_isl<-merge(habitat_soil_by_isl,becky_trees_wide_richness, by="unq_isl", all=TRUE)
 head(habitat_soil_by_isl)
 length(habitat_soil_by_isl$unq_isl)
 
@@ -885,6 +897,17 @@ nan4<-ggplot(by_isl_master, aes(y=bird.richness, x=log_Area, colour=d15n.cat, fi
 nan5<-ggplot(by_isl_master, aes(y=mammal_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nan0,nan3,nan2,nan1,nan4,nan5, ncol=3)
 ggsave("C:Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
+
+
+ggplot(by_isl_master, aes(y=shrub_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=shrub_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=herb_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+
+ggplot(by_isl_master, aes(y=tree_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+
+
 
 
 

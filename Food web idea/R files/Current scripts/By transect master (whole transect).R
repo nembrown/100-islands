@@ -99,37 +99,42 @@ soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
-becky_trees<-becky_trees[,-1]
-head(becky_trees)
-names(becky_trees)[1]<-"unq_isl"
-names(becky_trees)[3]<-"species"
-becky_trees<-as.data.frame(becky_trees)
+becky_trees_tran<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees_tran<-becky_trees_tran[,-1]
+head(becky_trees_tran)
+names(becky_trees_tran)[1]<-"unq_isl"
+names(becky_trees_tran)[3]<-"species"
+becky_trees_tran<-as.data.frame(becky_trees_tran)
 
-becky_trees$tran<-strtrim(becky_trees$tran, 1)
-becky_trees$unq_tran<- paste(becky_trees$unq_isl,becky_trees$tran)
-becky_trees$unq_tran<-gsub(" ", "", becky_trees$unq_tran, fixed = TRUE)
+becky_trees_tran$tran<-strtrim(becky_trees_tran$tran, 1)
+becky_trees_tran$unq_tran<- paste(becky_trees_tran$unq_isl,becky_trees_tran$tran)
+becky_trees_tran$unq_tran<-gsub(" ", "", becky_trees_tran$unq_tran, fixed = TRUE)
+head(becky_trees_tran)
 
-
-becky_trees_wide <-becky_trees %>% group_by(unq_tran, species) %>% 
+becky_trees_tran_wide <-becky_trees_tran %>% group_by(unq_tran, species) %>% 
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
   spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
-head(becky_trees_wide)
+head(becky_trees_tran_wide)
 
 
 #just getting absolute abundance ... what about relative? 
 #what about basal area? cover? what should be included? 
-becky_trees_wide_richness_tran<-becky_trees_wide[,1]
-becky_trees_wide_richness_tran$tree_richness<-specnumber(becky_trees_wide[,-1])
-becky_trees_wide_richness_tran$tree_diversity<-diversity(becky_trees_wide[,-1], index="shannon")
+becky_trees_wide_richness_tran<-becky_trees_tran_wide[,1]
+becky_trees_wide_richness_tran$tree_richness<-specnumber(becky_trees_tran_wide[,-1])
+becky_trees_wide_richness_tran$tree_diversity<-diversity(becky_trees_tran_wide[,-1], index="shannon")
 becky_trees_wide_richness_tran$tree_evenness<-becky_trees_wide_richness_tran$tree_diversity/(log(becky_trees_wide_richness_tran$tree_richness))
+becky_trees_wide_richness_tran$tree_abundance<-rowSums(becky_trees_tran_wide[,-1],na.rm = TRUE)
+
+#summed total basal area of all species in that transect = "cover" type thing 
+becky_trees_tran_2<-becky_trees_tran %>% group_by(unq_tran) %>% 
+  summarise(sum_basal = sum(ba.tot, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0) 
 
 
-
-becky_trees_wide_richness_tran$tree_abundance<-rowSums(becky_trees_wide[,-1],na.rm = TRUE)
-head(becky_trees_wide_richness_tran)
-
+head(becky_trees_tran_2)
+becky_trees_wide_richness_tran<-merge(becky_trees_tran_wide_richness_tran, becky_trees_tran_2)
+  
 habitat_soil_by_tran<-merge(soil_merge_mean,becky_trees_wide_richness_tran, by="unq_tran", all=TRUE)
 head(habitat_soil_by_tran)
 

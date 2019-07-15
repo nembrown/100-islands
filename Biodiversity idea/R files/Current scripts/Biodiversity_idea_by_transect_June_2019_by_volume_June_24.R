@@ -354,7 +354,16 @@ by_tran_master<-read.csv("C:Data by person\\Norah.data\\by_tran_master.csv")
 head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 which( colnames(by_tran_master)=="tree_richness" )
-which( colnames(by_tran_master)=="mammal_richness")
+which( colnames(by_tran_master)=="tree_abundance")
+# which( colnames(by_tran_master)=="shrub_richness" )
+# which( colnames(by_tran_master)=="shrub_cover")
+# which( colnames(by_tran_master)=="herb_richness" )
+# which( colnames(by_tran_master)=="herb_cover")
+
+by_tran_master_subset<-by_tran_master[,c(1,15,18)]
+head(by_tran_master_subset)
+
+
 
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Data by person\\Owen's data//by_isl_master.csv")
@@ -376,11 +385,11 @@ paste(
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,84,44,89,85,19,20,14,15,17,18,13)]
+by_isl_master_subset<-by_isl_master[,c(1,86,46,91,87,19,20,14,15,17,18,13)]
 head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl")
-by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master[,c(1,15,16,17,18)], by="unq_tran")
+by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran")
 
 
 head(by_tran_master_0m_with_isl)
@@ -398,13 +407,6 @@ write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_t
 #how many beachseine sites - 12, how many transects - 106
 length(unique(fish_richness_merged_tran_isl$site))
 length(unique(fish_richness_merged_tran_isl$unq_tran))
-
-length(unique(fish_richness_merged_tran_isl_1k$site))
-length(unique(fish_richness_merged_tran_isl_1k$unq_tran))
-
-length(unique(fish_richness_merged_tran_isl_300$site))
-length(unique(fish_richness_merged_tran_isl_300$unq_tran))
-
 
 # Determining best scale of comparison -----------------------------------------
 
@@ -560,7 +562,7 @@ ggsave("C:Plots//Transect//Chemistry//marine_richness_isopods.png", width=40, he
 # Terrestrial ecology and marine richness ---------------------------------
 head(fish_richness_merged_tran_isl_300)
 
-ggplot(fish_richness_merged_tran_isl_300, aes(x=log(fish_abundance_bym3), y=gash))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
 
 
 #transect level
@@ -572,6 +574,11 @@ marine_insect<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_c
 marine_insectabund<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=log(insect_abundance)))+geom_point()+geom_smooth(method="lm")
 plot_grid(marine_plant,marine_pc1, marine_tree,marine_treeabun,marine_insect,marine_insectabund,ncol=3)
 ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial.png", width=40, height=20, unit="cm")
+
+
+
+
+
 
 ###Just insects # wait until I get the beetle data - b/c can't do it w/o beetles/weevils
 # marine_beetles<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=log(insect_abundance)))+geom_point()+geom_smooth(method="lm")
