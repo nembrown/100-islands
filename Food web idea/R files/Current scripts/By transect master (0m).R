@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, but only the 0 m plots
@@ -105,11 +105,6 @@ longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
 head(longform_plant_percentcover_owen_0m)
-
-
-
-##### PROBLEM
-
 
 length(unique(longform_plant_percentcover_owen_0m$unq_plot))
 length(unique(longform_plant_percentcover_owen_0m_shrub$unq_plot))

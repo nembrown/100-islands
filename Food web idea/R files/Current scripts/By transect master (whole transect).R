@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, if there are multiple plots within transect they are averaged. 
@@ -36,7 +36,7 @@ library(cowplot)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("c:Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -50,21 +50,21 @@ names(soil_clean)[7]<-"d15n"
 head(soil_clean)
 
 #Owen's key data
-owen_key<-read.csv("c:Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_tran))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("c:Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
 owen_key_expanded<-merge(owen_key, hakai_plot, by="unq_plot", all=TRUE)
-View(owen_key_expanded)
+head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_tran))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("c:Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
 head(owen_coords)
 owen_coords<-owen_coords[,c(1:9)]
 head(owen_coords)
@@ -94,12 +94,12 @@ soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
 
 #head(soil_merge_0m)
 
-#write.csv(soil_merge_0m, "C:Norah.data\\soil_merge_0m.csv")
+#write.csv(soil_merge_0m, "C:Data by person//Norah.data\\soil_merge_0m.csv")
 
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees<-read.csv("c:Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
 becky_trees<-becky_trees[,-1]
 head(becky_trees)
 names(becky_trees)[1]<-"unq_isl"
@@ -138,85 +138,70 @@ head(habitat_soil_by_tran)
 
 #this loads data from "Habitation data" R script
 
-longform_plant_percentcover<-read.csv("C:Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 head(longform_plant_percentcover)
 
 #longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
+head(longform_plant_percentcover_owen)
+longform_plant_percentcover_owen$cover<-as.numeric(longform_plant_percentcover_owen$cover)
 
-longform_plant_percentcover2_tran <- longform_plant_percentcover_owen%>% 
-  group_by(unq_tran,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
+longform_plant_percentcover2_tran <- longform_plant_percentcover_owen[,c(1:7)] %>% 
+                                     group_by(unq_tran,species) %>% 
+                                    summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
+                                    spread(species, cover_mean)%>%  replace(is.na(.), 0)
+
+
+longform_plant_percentcover_owen_shrub<- longform_plant_percentcover_owen %>% filter(herb_shrub=="shrub")
+longform_plant_percentcover_owen_herb<- longform_plant_percentcover_owen %>% filter(herb_shrub=="herb")
+
+longform_plant_percentcover2_tran_shrub <- longform_plant_percentcover_owen_shrub[,c(1:7)] %>% 
+  group_by(unq_tran,species) %>% 
+  summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
+longform_plant_percentcover2_tran_herb <- longform_plant_percentcover_owen_herb[,c(1:7)] %>% 
+  group_by(unq_tran,species) %>% 
+  summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
+  spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
-head(longform_plant_percentcover2_tran)
-
-longform_plant_percentcover2_tran$marine<-longform_plant_percentcover2_tran$driftwood+longform_plant_percentcover2_tran$shell
-longform_plant_percentcover2_tran$free_space<-longform_plant_percentcover2_tran$`bare ground`+longform_plant_percentcover2_tran$`sandy soil`+longform_plant_percentcover2_tran$`o soil`+longform_plant_percentcover2_tran$gravel+longform_plant_percentcover2_tran$rock
-longform_plant_percentcover2_tran$grass<-longform_plant_percentcover2_tran$`grass 1`
-longform_plant_percentcover2_tran$sedge_final<-longform_plant_percentcover2_tran$`sedge 1`
-longform_plant_percentcover2_tran$unknown_lily<-longform_plant_percentcover2_tran$'unk lily'
-longform_plant_percentcover2_tran$unknown_monocot<-longform_plant_percentcover2_tran$'unk mono'+ longform_plant_percentcover2_tran$'unk monocot'
-
-
-
-paste(
-which( colnames(longform_plant_percentcover2_tran)=="marine" ),
-which( colnames(longform_plant_percentcover2_tran)=="free_space" ),
-which( colnames(longform_plant_percentcover2_tran)=="bare" ),
-which( colnames(longform_plant_percentcover2_tran)=="bare ground" ),
-which( colnames(longform_plant_percentcover2_tran)=="woody debris" ),
-which( colnames(longform_plant_percentcover2_tran)=="wood" ),
-which( colnames(longform_plant_percentcover2_tran)=="sandy soil" ),
-which( colnames(longform_plant_percentcover2_tran)=="o soil" ),
-which( colnames(longform_plant_percentcover2_tran)=="shell" ),
-which( colnames(longform_plant_percentcover2_tran)=="gravel" ),
-which( colnames(longform_plant_percentcover2_tran)=="rock" ),
-which( colnames(longform_plant_percentcover2_tran)=="marine remains" ),
-which( colnames(longform_plant_percentcover2_tran)=="abalone shell" ),
-which( colnames(longform_plant_percentcover2_tran)=="driftwood" ),
-which( colnames(longform_plant_percentcover2_tran)=="feather" ),
-which( colnames(longform_plant_percentcover2_tran)=="grass 1" ),
-which( colnames(longform_plant_percentcover2_tran)=="grass sp" ),
-which( colnames(longform_plant_percentcover2_tran)=="sedge" ),
-which( colnames(longform_plant_percentcover2_tran)=="sedge1" ),
-which( colnames(longform_plant_percentcover2_tran)=="sedge 1" ),
-which( colnames(longform_plant_percentcover2_tran)=="sedge sp" ),
-which( colnames(longform_plant_percentcover2_tran)=="unk forb" ),
-which( colnames(longform_plant_percentcover2_tran)=="unidentified forb" ),
-which( colnames(longform_plant_percentcover2_tran)=="unk lily" ),
-which( colnames(longform_plant_percentcover2_tran)=="unk lily sp" ),
-which( colnames(longform_plant_percentcover2_tran)=="unk mono" ),
-which( colnames(longform_plant_percentcover2_tran)=="unk monocot" ),sep=","
-)
-
-longform_plant_percentcover_species_tran<-longform_plant_percentcover2_tran[,-c(1,138,139,11,137,136,95,69,97,49,89,33,48,96,121,123,126)]
+longform_plant_percentcover_species_tran<-longform_plant_percentcover2_tran
 head(longform_plant_percentcover_species_tran)
 
 which( colnames(longform_plant_percentcover2_tran)=="gash" )
 which( colnames(longform_plant_percentcover2_tran)=="midi" )
 
 
-longform_plant_percentcover3_tran<-longform_plant_percentcover2_tran[,c(1,43,66)]
+longform_plant_percentcover3_tran<-longform_plant_percentcover2_tran[,c(1,37,52)]
 head(longform_plant_percentcover3_tran)
-longform_plant_percentcover3_tran$plant_richness<-specnumber(longform_plant_percentcover_species_tran)
-longform_plant_percentcover3_tran$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran, index="shannon")
+longform_plant_percentcover3_tran$plant_richness<-specnumber(longform_plant_percentcover_species_tran[,-c(1:5)])
+longform_plant_percentcover3_tran$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran[,-c(1:5)], index="shannon")
 longform_plant_percentcover3_tran$plant_evenness<-longform_plant_percentcover3_tran$plant_shannon.diversity/(log(longform_plant_percentcover3_tran$plant_richness))
-longform_plant_percentcover3_tran$total_cover<-rowSums(longform_plant_percentcover_species_tran, na.rm=TRUE)
+longform_plant_percentcover3_tran$total_cover<-rowSums(longform_plant_percentcover_species_tran[,-c(1:5)], na.rm=TRUE)
+
+longform_plant_percentcover3_tran$shrub_richness<-specnumber(longform_plant_percentcover2_tran_shrub[,-c(1:5)])
+longform_plant_percentcover3_tran$shrub_cover<-rowSums(longform_plant_percentcover2_tran_shrub[,-c(1:5)], na.rm=TRUE)
+longform_plant_percentcover3_tran$herb_richness<-specnumber(longform_plant_percentcover2_tran_herb[,-c(1:5)])
+longform_plant_percentcover3_tran$herb_cover<-rowSums(longform_plant_percentcover2_tran_herb[,-c(1:5)], na.rm=TRUE)
 
 longform_plant_percentcover3_tran$unq_tran<-strtrim(longform_plant_percentcover3_tran$unq_tran, 5)
 
+head(longform_plant_percentcover3_tran)
 
-habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcover3_tran, by.x="unq_tran", all=TRUE)
+
+head(soil_merge)
+
+habitat_veg_soil_by_tran<-merge(soil_merge[,-8], longform_plant_percentcover3_tran, by="unq_tran", all=TRUE)
 head(habitat_veg_soil_by_tran)
+
 
 
 # Vegetation isotopes -----------------------------------------------------
 
 
-owen.veg_tran<-read.csv("C:Owen's data\\foliar_clean_sorted_merge_meta.csv")
+owen.veg_tran<-read.csv("C:Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
 head(owen.veg_tran)
 owen.veg_tran<-owen.veg_tran[,-1]
 
@@ -259,7 +244,7 @@ head(habitat_veg_soil_by_tran)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
-seawrack_key<-read.csv("c:Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
+seawrack_key<-read.csv("C:Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
 seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
 seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
@@ -267,7 +252,7 @@ seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
 head(seawrack_key)
 
 
-sara_habitat<-read.csv("c:Sara's data//sara_habitat.csv", header=TRUE, sep=",")
+sara_habitat<-read.csv("C:Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
 head(sara_habitat_merged)
@@ -275,7 +260,7 @@ which( colnames(sara_habitat_merged)=="unq_isl" )
 sara_habitat_merged<-sara_habitat_merged[,-62]
 
 #### Seaweed composition
-sara_composition<-read.csv("c:Sara's data//sara_composition.csv", header=TRUE, sep=",")
+sara_composition<-read.csv("C:Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 head(sara_composition)
 #this is by transect
 
@@ -304,9 +289,9 @@ head(habitat_veg_wrack_soil_by_tran)
 
 # Chris insects diversity -----------------------------------------------------------
 # 
-# chris_beeetles_2015<-read.csv("c:Chris.data//ce_observation2015.csv", header=TRUE, sep=",")
-# chris_beeetles_2016<-read.csv("c:Chris.data//ce_observation2016.csv", header=TRUE, sep=",")
-# chris_beeetles_2017<-read.csv("c:Chris.data//ce_observation2017.csv", header=TRUE, sep=",")
+# chris_beeetles_2015<-read.csv("C:Data by person//Chris.data//ce_observation2015.csv", header=TRUE, sep=",")
+# chris_beeetles_2016<-read.csv("C:Data by person//Chris.data//ce_observation2016.csv", header=TRUE, sep=",")
+# chris_beeetles_2017<-read.csv("C:Data by person//Chris.data//ce_observation2017.csv", header=TRUE, sep=",")
 # 
 # 
 # str(chris_beeetles_2015)
@@ -332,7 +317,7 @@ head(habitat_veg_wrack_soil_by_tran)
 # head(chris_beetles_wide_richness)
 
 ###collembola
-chris_collembola<-read.csv("c:Chris.data//collembola_ey.csv", header=TRUE, sep=",")
+chris_collembola<-read.csv("C:Data by person//Chris.data//collembola_ey.csv", header=TRUE, sep=",")
 head(chris_collembola)
 
 
@@ -365,7 +350,7 @@ head(chris_collembola_wide_tran_richness)
 
 
 ##hymenoptera
-chris_hymenoptera<-read.csv("c:Chris.data//hymenoptera_ey.csv", header=TRUE, sep=",")
+chris_hymenoptera<-read.csv("C:Data by person//Chris.data//hymenoptera_ey.csv", header=TRUE, sep=",")
 head(chris_hymenoptera)
 
 
@@ -391,7 +376,7 @@ chris_hymenoptera_wide_tran_richness$hymenoptera_abundance<-rowSums(chris_hymeno
 head(chris_hymenoptera_wide_tran_richness)
 
 ##diptera
-chris_diptera<-read.csv("c:Chris.data//diptera_ey.csv", header=TRUE, sep=",")
+chris_diptera<-read.csv("C:Data by person//Chris.data//diptera_ey.csv", header=TRUE, sep=",")
 head(chris_diptera)
 
 chris_diptera$Island.Number<-sprintf("%02d", chris_diptera$Island.Number)
@@ -418,7 +403,7 @@ head(chris_diptera_wide_tran_richness)
 
 
 ##gastropoda
-chris_gastropoda<-read.csv("c:Chris.data//gastropoda_ey.csv", header=TRUE, sep=",")
+chris_gastropoda<-read.csv("C:Data by person//Chris.data//gastropoda_ey.csv", header=TRUE, sep=",")
 head(chris_gastropoda)
 
 chris_gastropoda$Island.Number<-sprintf("%02d", chris_gastropoda$IslandNumber)
@@ -444,7 +429,7 @@ chris_gastropoda_wide_tran_richness$gastropoda_abundance<-rowSums(chris_gastropo
 head(chris_gastropoda_wide_tran_richness)
 
 ##spiders
-chris_spiders<-read.csv("c:Chris.data//spiders_ey.csv", header=TRUE, sep=",")
+chris_spiders<-read.csv("C:Data by person//Chris.data//spiders_ey.csv", header=TRUE, sep=",")
 head(chris_spiders)
 
 chris_spiders$Island.Number<-sprintf("%02d", chris_spiders$Island.Number)
@@ -471,7 +456,7 @@ head(chris_spiders_wide_tran_richness)
 
 #myriapoda
 
-chris_myriapod<-read.csv("c:Chris.data//myriapoda_ey.csv", header=TRUE, sep=",")
+chris_myriapod<-read.csv("C:Data by person//Chris.data//myriapoda_ey.csv", header=TRUE, sep=",")
 head(chris_myriapod)
 
 chris_myriapod$Island.Number<-sprintf("%02d", chris_myriapod$Island.Number)
@@ -519,7 +504,7 @@ head(chris_myriapod_wide_tran_richness)
 
 
 #Otherinsects
-chris_miscinsects<-read.csv("c:Chris.data//misc_insects_ey.csv", header=TRUE, sep=",")
+chris_miscinsects<-read.csv("C:Data by person//Chris.data//misc_insects_ey.csv", header=TRUE, sep=",")
 head(chris_miscinsects)
 
 chris_miscinsects$Island.Number<-sprintf("%02d", chris_miscinsects$Island.Number)
@@ -588,7 +573,7 @@ head(by_tran_master)
 # Insect isotopes  ---------------------------------------------------------
 
 
-chris.isotopes<-read.csv("c:Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
+chris.isotopes<-read.csv("C:Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
 head(chris.isotopes)
 chris.isotopes$s<-as.numeric(chris.isotopes$s)
 
@@ -634,4 +619,4 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 # Tidying up -------------------------------------------------------------
 
 head(by_tran_master)
-write.csv(by_tran_master, "C:Norah.data/by_tran_master.csv")
+write.csv(by_tran_master, "C:Data by person//Norah.data/by_tran_master.csv")
