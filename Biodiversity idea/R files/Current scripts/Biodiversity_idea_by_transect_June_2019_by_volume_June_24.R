@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 #change to norahbrown if on work computer
 
 
@@ -344,7 +344,7 @@ head(fish_bycatch_richness_merged_tran)
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -353,7 +353,8 @@ by_tran_master_0m<-by_tran_master_0m[,-1]
 by_tran_master<-read.csv("C:Data by person\\Norah.data\\by_tran_master.csv")
 head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
-
+which( colnames(by_tran_master)=="tree_richness" )
+which( colnames(by_tran_master)=="mammal_richness")
 
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Data by person\\Owen's data//by_isl_master.csv")
@@ -391,7 +392,7 @@ head(fish_bycatch_richness_merged_tran)
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran")
 fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
@@ -593,7 +594,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))

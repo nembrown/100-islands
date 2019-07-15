@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Modelling practice")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to norahbrown if on work computer
 
 #read in necessary packages
@@ -22,7 +22,8 @@ library(betapart)
 library(bipartite)
 library(viridis)
 library(cowplot)
-
+install.packages("forcats")
+library(forcats)
 
 
 
@@ -32,13 +33,13 @@ library(cowplot)
 
 ##### DEB
 #Deb's soil data and Deb's shore dist
-i.soil.all<-read.csv("C:Deb.data//i-soil-all.csv")
+i.soil.all<-read.csv("C:Data by person//Deb.data//i-soil-all.csv")
 #this is isotopes
 
-shoredist.deb<-read.csv("C:Deb.data//shoredist.csv")
+shoredist.deb<-read.csv("C:Data by person//Deb.data//shoredist.csv")
 #this is the point count to distance to shore data
 
-pointcount.gps<-read.csv("C:Deb.data//pointcounts.csv")
+pointcount.gps<-read.csv("C:Data by person//Deb.data//pointcounts.csv")
 head(pointcount.gps)
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
@@ -65,7 +66,7 @@ head(soil.deb)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("c:Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -77,12 +78,12 @@ names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
 #Owen's key data
-owen_key<-read.csv("c:Owen's data//key_mod.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_isl))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("c:Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
@@ -91,51 +92,51 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_isl))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("c:Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
 head(owen_coords)
 
 owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
 owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
 
-owen_coords<-owen_coords[,c(3,4, 11)]
+owen_coords<-owen_coords[,c(3,4, 14)]
 head(owen_coords)
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
 
-owen_key_expanded<-merge(owen_key_expanded, owen_coords, by.x="unq_tran", all=TRUE)
+owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
 head(owen_key_expanded)
 
 
 #put isotope data together with the key
-soil_merge<-merge(soil_clean, owen_key_expanded, by.x="unq_plot")
-head(soil_merge)
+soil_merge_isl<-merge(soil_clean, owen_key_expanded, by.x="unq_plot")
+head(soil_merge_isl)
 
 
-soil_merge[duplicated(soil_merge$unq_plot),]
-length(unique(soil_merge$unq_isl))
+soil_merge_isl[duplicated(soil_merge_isl$unq_plot),]
+length(unique(soil_merge_isl$unq_isl))
 #there are a bunch of extras but will wait first to see how to deal with them ... 
 
 
 # Combining Owen and Deb's soil data --------------------------------------
 
 paste(
-which( colnames(soil_merge)=="unq_plot" ),
-which( colnames(soil_merge)=="unq_isl" ),
-which( colnames(soil_merge)=="shore_dist" ),
-which( colnames(soil_merge)=="d13c" ),
-which( colnames(soil_merge)=="d15n" ),
-which( colnames(soil_merge)=="c" ),
-which( colnames(soil_merge)=="n" ),
-which( colnames(soil_merge)=="s" ),
-which( colnames(soil_merge)=="cn" ),
-# which( colnames(soil_merge)=="pc1" )
-# which( colnames(soil_merge)=="plant.richness" )
-# which( colnames(soil_merge)=="fs_pc1" )
-# which( colnames(soil_merge)=="sm_av" )
-# which( colnames(soil_merge)=="slope" )
- which( colnames(soil_merge)=="node" ),
- which( colnames(soil_merge)=="easting" ),
- which( colnames(soil_merge)=="northing" ), sep=","
+which( colnames(soil_merge_isl)=="unq_plot" ),
+which( colnames(soil_merge_isl)=="unq_isl" ),
+which( colnames(soil_merge_isl)=="shore_dist" ),
+which( colnames(soil_merge_isl)=="d13c" ),
+which( colnames(soil_merge_isl)=="d15n" ),
+which( colnames(soil_merge_isl)=="c" ),
+which( colnames(soil_merge_isl)=="n" ),
+which( colnames(soil_merge_isl)=="s" ),
+which( colnames(soil_merge_isl)=="cn" ),
+# which( colnames(soil_merge_isl)=="pc1" )
+# which( colnames(soil_merge_isl)=="plant.richness" )
+# which( colnames(soil_merge_isl)=="fs_pc1" )
+# which( colnames(soil_merge_isl)=="sm_av" )
+# which( colnames(soil_merge_isl)=="slope" )
+ which( colnames(soil_merge_isl)=="node" ),
+ which( colnames(soil_merge_isl)=="easting" ),
+ which( colnames(soil_merge_isl)=="northing" ), sep=","
 )
 
 paste(
@@ -158,11 +159,11 @@ which( colnames(soil.deb)=="cn" ),
  which( colnames(soil.deb)=="northing" ), sep=","
 )
 
-soil_owen_deb<-rbind(soil_merge[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
+soil_owen_deb<-rbind(soil_merge_isl[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
 head(soil_owen_deb)
 
 length(soil.deb$unq_plot)
-length(soil_merge$unq_plot)
+length(soil_merge_isl$unq_plot)
 length(soil_owen_deb$unq_plot)
 length(unique(soil_owen_deb$unq_isl))
 #this just adds the two together... 
@@ -182,11 +183,11 @@ length(soil_owen_deb_by_isl$unq_isl)
 
 # Adding habitat class and island characteristics -------------------------
 
-habitat_class<-read.csv("c:Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+habitat_class<-read.csv("C:Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 head(habitat_class)
 length(habitat_class$unq_isl)
 
-island_data_wiebe<-read.csv("c:Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
+island_data_wiebe<-read.csv("C:Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
 head(island_data_wiebe)
 names(island_data_wiebe)[1]<-"unq_isl"
 
@@ -200,7 +201,7 @@ str(habitat_soil_by_isl)
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees<-read.csv("c:Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
 becky_trees<-becky_trees[,-1]
 head(becky_trees)
 names(becky_trees)[1]<-"unq_isl"
@@ -235,81 +236,108 @@ length(habitat_soil_by_isl$unq_isl)
 
 #this loads data from "Habitation data" R script
 
-longform_plant_percentcover<-read.csv("C:Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 head(longform_plant_percentcover)
 
-longform_plant_percentcover2 <- longform_plant_percentcover%>% 
+longform_plant_percentcover$unq_isl<-fct_explicit_na(longform_plant_percentcover$unq_isl)
+
+longform_plant_percentcover2 <- longform_plant_percentcover[,c(1:7)]%>% 
   group_by(unq_isl,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
+#copmmented outt his section, I think the source file changed so there is no longer random "marine" etc remains. Need to check habitation file to see what happened
+# head(longform_plant_percentcover2)
+# 
+# longform_plant_percentcover2$marine<-longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
+# longform_plant_percentcover2$free_space<-longform_plant_percentcover2$bare+longform_plant_percentcover2$`bare ground`+longform_plant_percentcover2$`sandy soil`+longform_plant_percentcover2$`o soil`+longform_plant_percentcover2$gravel+longform_plant_percentcover2$rock
+# longform_plant_percentcover2$grass<-longform_plant_percentcover2$`grass 1`+longform_plant_percentcover2$`grass sp`
+# longform_plant_percentcover2$sedge_final<-longform_plant_percentcover2$`sedge 1`+longform_plant_percentcover2$`sedge sp`+longform_plant_percentcover2$sedge+longform_plant_percentcover2$sedge1
+# longform_plant_percentcover2$unknown_forb<-longform_plant_percentcover2$'unk forb'+ longform_plant_percentcover2$'unidentified forb'
+# longform_plant_percentcover2$unknown_lily<-longform_plant_percentcover2$'unk lily'+ longform_plant_percentcover2$'unk lily sp'
+# longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk mono'+ longform_plant_percentcover2$'unk monocot'
+# 
+# 
+# 
+# paste(
+# which( colnames(longform_plant_percentcover2)=="marine" ),
+# which( colnames(longform_plant_percentcover2)=="free_space" ),
+# which( colnames(longform_plant_percentcover2)=="bare" ),
+# which( colnames(longform_plant_percentcover2)=="bare ground" ),
+# which( colnames(longform_plant_percentcover2)=="woody debris" ),
+# which( colnames(longform_plant_percentcover2)=="wood" ),
+# which( colnames(longform_plant_percentcover2)=="sandy soil" ),
+# which( colnames(longform_plant_percentcover2)=="o soil" ),
+# which( colnames(longform_plant_percentcover2)=="shell" ),
+# which( colnames(longform_plant_percentcover2)=="gravel" ),
+# which( colnames(longform_plant_percentcover2)=="rock" ),
+# which( colnames(longform_plant_percentcover2)=="marine remains" ),
+# which( colnames(longform_plant_percentcover2)=="abalone shell" ),
+# which( colnames(longform_plant_percentcover2)=="driftwood" ),
+# which( colnames(longform_plant_percentcover2)=="feather" ),
+# which( colnames(longform_plant_percentcover2)=="grass 1" ),
+# which( colnames(longform_plant_percentcover2)=="grass sp" ),
+# which( colnames(longform_plant_percentcover2)=="sedge" ),
+# which( colnames(longform_plant_percentcover2)=="sedge1" ),
+# which( colnames(longform_plant_percentcover2)=="sedge 1" ),
+# which( colnames(longform_plant_percentcover2)=="sedge sp" ),
+# which( colnames(longform_plant_percentcover2)=="unk forb" ),
+# which( colnames(longform_plant_percentcover2)=="unidentified forb" ),
+# which( colnames(longform_plant_percentcover2)=="unk lily" ),
+# which( colnames(longform_plant_percentcover2)=="unk lily sp" ),
+# which( colnames(longform_plant_percentcover2)=="unk mono" ),
+# which( colnames(longform_plant_percentcover2)=="unk monocot" ),sep=","
+# )
+# 
+# longform_plant_percentcover_species<-longform_plant_percentcover2[,-c(1,172,173,13,14,171,170,115,88,122,61,109,81,2,39, 48, 59, 60,118,121,119,120,137,134,151,153,154,157)]
+# head(longform_plant_percentcover_species)
 
-head(longform_plant_percentcover2)
 
-longform_plant_percentcover2$marine<-longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
-longform_plant_percentcover2$free_space<-longform_plant_percentcover2$bare+longform_plant_percentcover2$`bare ground`+longform_plant_percentcover2$`sandy soil`+longform_plant_percentcover2$`o soil`+longform_plant_percentcover2$gravel+longform_plant_percentcover2$rock
-longform_plant_percentcover2$grass<-longform_plant_percentcover2$`grass 1`+longform_plant_percentcover2$`grass sp`
-longform_plant_percentcover2$sedge_final<-longform_plant_percentcover2$`sedge 1`+longform_plant_percentcover2$`sedge sp`+longform_plant_percentcover2$sedge+longform_plant_percentcover2$sedge1
-longform_plant_percentcover2$unknown_forb<-longform_plant_percentcover2$'unk forb'+ longform_plant_percentcover2$'unidentified forb'
-longform_plant_percentcover2$unknown_lily<-longform_plant_percentcover2$'unk lily'+ longform_plant_percentcover2$'unk lily sp'
-longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk mono'+ longform_plant_percentcover2$'unk monocot'
+longform_plant_percentcover_shrub<- longform_plant_percentcover%>% filter(herb_shrub=="shrub")
+longform_plant_percentcover_herb<- longform_plant_percentcover %>% filter(herb_shrub=="herb")
 
+longform_plant_percentcover2_isl_shrub <- longform_plant_percentcover_shrub[,c(1:7)] %>% 
+  group_by(unq_isl,species) %>% 
+  summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
+  spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
+longform_plant_percentcover2_isl_herb <- longform_plant_percentcover_herb[,c(1:7)] %>% 
+  group_by(unq_isl,species) %>% 
+  summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
+  spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
-paste(
-which( colnames(longform_plant_percentcover2)=="marine" ),
-which( colnames(longform_plant_percentcover2)=="free_space" ),
-which( colnames(longform_plant_percentcover2)=="bare" ),
-which( colnames(longform_plant_percentcover2)=="bare ground" ),
-which( colnames(longform_plant_percentcover2)=="woody debris" ),
-which( colnames(longform_plant_percentcover2)=="wood" ),
-which( colnames(longform_plant_percentcover2)=="sandy soil" ),
-which( colnames(longform_plant_percentcover2)=="o soil" ),
-which( colnames(longform_plant_percentcover2)=="shell" ),
-which( colnames(longform_plant_percentcover2)=="gravel" ),
-which( colnames(longform_plant_percentcover2)=="rock" ),
-which( colnames(longform_plant_percentcover2)=="marine remains" ),
-which( colnames(longform_plant_percentcover2)=="abalone shell" ),
-which( colnames(longform_plant_percentcover2)=="driftwood" ),
-which( colnames(longform_plant_percentcover2)=="feather" ),
-which( colnames(longform_plant_percentcover2)=="grass 1" ),
-which( colnames(longform_plant_percentcover2)=="grass sp" ),
-which( colnames(longform_plant_percentcover2)=="sedge" ),
-which( colnames(longform_plant_percentcover2)=="sedge1" ),
-which( colnames(longform_plant_percentcover2)=="sedge 1" ),
-which( colnames(longform_plant_percentcover2)=="sedge sp" ),
-which( colnames(longform_plant_percentcover2)=="unk forb" ),
-which( colnames(longform_plant_percentcover2)=="unidentified forb" ),
-which( colnames(longform_plant_percentcover2)=="unk lily" ),
-which( colnames(longform_plant_percentcover2)=="unk lily sp" ),
-which( colnames(longform_plant_percentcover2)=="unk mono" ),
-which( colnames(longform_plant_percentcover2)=="unk monocot" ),sep=","
-)
-
-longform_plant_percentcover_species<-longform_plant_percentcover2[,-c(1,172,173,13,14,171,170,115,88,122,61,109,81,2,39, 48, 59, 60,118,121,119,120,137,134,151,153,154,157)]
-head(longform_plant_percentcover_species)
+longform_plant_percentcover_species_isl<-longform_plant_percentcover2
+head(longform_plant_percentcover_species_isl)
 
 which( colnames(longform_plant_percentcover2)=="gash" )
 which( colnames(longform_plant_percentcover2)=="midi" )
 
 
-longform_plant_percentcover3<-longform_plant_percentcover2[,c(1,172,173,54,83)]
-head(longform_plant_percentcover3)
-longform_plant_percentcover3$plant_richness<-specnumber(longform_plant_percentcover_species)
-longform_plant_percentcover3$plant_shannon.diversity<-diversity(longform_plant_percentcover_species, index="shannon")
-longform_plant_percentcover3$plant_evenness<-longform_plant_percentcover3$plant_shannon.diversity/(log(longform_plant_percentcover3$plant_richness))
-longform_plant_percentcover3$total_cover<-rowSums(longform_plant_percentcover_species, na.rm=TRUE)
+longform_plant_percentcover3_isl<-longform_plant_percentcover2[,c(1,37,52)]
+head(longform_plant_percentcover3_isl)
+longform_plant_percentcover3_isl$plant_richness<-specnumber(longform_plant_percentcover_species_isl[,-c(1)])
+longform_plant_percentcover3_isl$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_isl[,-c(1)], index="shannon")
+longform_plant_percentcover3_isl$plant_evenness<-longform_plant_percentcover3_isl$plant_shannon.diversity/(log(longform_plant_percentcover3_isl$plant_richness))
+longform_plant_percentcover3_isl$total_cover<-rowSums(longform_plant_percentcover_species_isl[,-c(1)], na.rm=TRUE)
+
+longform_plant_percentcover3_isl$shrub_richness<-specnumber(longform_plant_percentcover2_isl_shrub[,-c(1)])
+longform_plant_percentcover3_isl$shrub_cover<-rowSums(longform_plant_percentcover2_isl_shrub[,-c(1)], na.rm=TRUE)
+longform_plant_percentcover3_isl$herb_richness<-specnumber(longform_plant_percentcover2_isl_herb[,-c(1)])
+longform_plant_percentcover3_isl$herb_cover<-rowSums(longform_plant_percentcover2_isl_herb[,-c(1)], na.rm=TRUE)
+
+head(longform_plant_percentcover3_isl)
 
 
-habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3, by.x="unq_isl", all=TRUE)
+head(soil_merge)
+
+habitat_veg_soil_by_isl<-merge(soil_merge[,-8], longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
 head(habitat_veg_soil_by_isl)
-
 
 
 
 # Adding in bird richness -------------------------------------------------
 
-birdrichness<-read.csv("C:Deb.data//bird-summary.csv", header=TRUE, sep=",")
+birdrichness<-read.csv("C:Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
 head(birdrichness)
 names(birdrichness)[1]<-"unq_isl"
 names(birdrichness)[6]<-"bird.richness"
@@ -324,7 +352,7 @@ head(habitat_veg_bird_soil_by_isl)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
-seawrack_key<-read.csv("c:Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
+seawrack_key<-read.csv("C:Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
 seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
 seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
@@ -332,7 +360,7 @@ seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
 head(seawrack_key)
 
 
-sara_habitat<-read.csv("c:Sara's data//sara_habitat.csv", header=TRUE, sep=",")
+sara_habitat<-read.csv("C:Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
 head(sara_habitat_merged)
@@ -366,7 +394,7 @@ str(sara_habitat_merged_by_isl )
 
 
 #### Seaweed composition
-sara_composition<-read.csv("c:Sara's data//sara_composition.csv", header=TRUE, sep=",")
+sara_composition<-read.csv("C:Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 head(sara_composition)
 #this is by transect
 
@@ -403,7 +431,7 @@ head(habitat_veg_bird_wrack_soil_by_isl)
 # Adding in eagles and ravens pointcounts ---------------------------------------------
 
 
-ravens <- read.csv("C:Deb.data/ravens.csv")
+ravens <- read.csv("C:Data by person//Deb.data/ravens.csv")
 
 cora.isls <- unique(ravens$island)
 cora.isls <- as.data.frame(cora.isls)
@@ -412,7 +440,7 @@ names(cora.isls) <- c("unq_isl", "ravens")
 
 by_isl_master<-merge(habitat_veg_bird_wrack_soil_by_isl, cora.isls, by.x="unq_isl", all=TRUE)
 
-eagles <- read.csv("C:Deb.data/eagles.csv")
+eagles <- read.csv("C:Data by person//Deb.data/eagles.csv")
 baea.isls <- unique(eagles$island)
 baea.isls <- as.data.frame(baea.isls)
 baea.isls$eagles <- 1
@@ -429,7 +457,7 @@ head(by_isl_master)
 
 
 #can do the same thing for SOSP if we want ... 
-# pc<- read.csv("C:Deb.data/pointcounts.csv")
+# pc<- read.csv("C:Data by person//Deb.data/pointcounts.csv")
 # head(pc)
 # sosp <- pc[pc$spp == "SOSP", ]
 # head(sosp)
@@ -450,9 +478,9 @@ head(by_isl_master)
 
 # Chris insects -----------------------------------------------------------
 # 
-# chris_beeetles_2015<-read.csv("c:Chris.data//ce_observation2015.csv", header=TRUE, sep=",")
-# chris_beeetles_2016<-read.csv("c:Chris.data//ce_observation2016.csv", header=TRUE, sep=",")
-# chris_beeetles_2017<-read.csv("c:Chris.data//ce_observation2017.csv", header=TRUE, sep=",")
+# chris_beeetles_2015<-read.csv("C:Data by person//Chris.data//ce_observation2015.csv", header=TRUE, sep=",")
+# chris_beeetles_2016<-read.csv("C:Data by person//Chris.data//ce_observation2016.csv", header=TRUE, sep=",")
+# chris_beeetles_2017<-read.csv("C:Data by person//Chris.data//ce_observation2017.csv", header=TRUE, sep=",")
 # 
 # 
 # str(chris_beeetles_2015)
@@ -478,7 +506,7 @@ head(by_isl_master)
 # head(chris_beetles_wide_richness)
 
 ###collembola
-chris_collembola<-read.csv("c:Chris.data//collembola_ey.csv", header=TRUE, sep=",")
+chris_collembola<-read.csv("C:Data by person//Chris.data//collembola_ey.csv", header=TRUE, sep=",")
 head(chris_collembola)
 
 
@@ -507,7 +535,7 @@ head(chris_collembola_wide_richness)
 
 
 ##hymenoptera
-chris_hymenoptera<-read.csv("c:Chris.data//hymenoptera_ey.csv", header=TRUE, sep=",")
+chris_hymenoptera<-read.csv("C:Data by person//Chris.data//hymenoptera_ey.csv", header=TRUE, sep=",")
 head(chris_hymenoptera)
 
 chris_hymenoptera$Island.Number<-sprintf("%02d", chris_hymenoptera$Island.Number)
@@ -528,7 +556,7 @@ chris_hymenoptera_wide_richness$hymenoptera_abundance<-rowSums(chris_hymenoptera
 head(chris_hymenoptera_wide_richness)
 
 ##diptera
-chris_diptera<-read.csv("c:Chris.data//diptera_ey.csv", header=TRUE, sep=",")
+chris_diptera<-read.csv("C:Data by person//Chris.data//diptera_ey.csv", header=TRUE, sep=",")
 head(chris_diptera)
 
 chris_diptera$Island.Number<-sprintf("%02d", chris_diptera$Island.Number)
@@ -551,7 +579,7 @@ chris_diptera_wide_richness$diptera_abundance<-rowSums(chris_diptera_wide[,-1],n
 head(chris_diptera_wide_richness)
 
 ##gastropoda
-chris_gastropoda<-read.csv("c:Chris.data//gastropoda_ey.csv", header=TRUE, sep=",")
+chris_gastropoda<-read.csv("C:Data by person//Chris.data//gastropoda_ey.csv", header=TRUE, sep=",")
 head(chris_gastropoda)
 
 chris_gastropoda$IslandNumber<-sprintf("%02d", chris_gastropoda$IslandNumber)
@@ -574,7 +602,7 @@ chris_gastropoda_wide_richness$gastropoda_abundance<-rowSums(chris_gastropoda_wi
 head(chris_gastropoda_wide_richness)
 
 ##spiders
-chris_spiders<-read.csv("c:Chris.data//spiders_ey.csv", header=TRUE, sep=",")
+chris_spiders<-read.csv("C:Data by person//Chris.data//spiders_ey.csv", header=TRUE, sep=",")
 head(chris_spiders)
 
 chris_spiders$Island.Number<-sprintf("%02d", chris_spiders$Island.Number)
@@ -598,7 +626,7 @@ head(chris_spiders_wide_richness)
 
 #myriapoda
 
-chris_myriapod<-read.csv("c:Chris.data//myriapoda_ey.csv", header=TRUE, sep=",")
+chris_myriapod<-read.csv("C:Data by person//Chris.data//myriapoda_ey.csv", header=TRUE, sep=",")
 head(chris_myriapod)
 chris_myriapod$Island.Number<-sprintf("%02d", chris_myriapod$Island.Number)
 chris_myriapod$unq_isl <- paste(chris_myriapod$Island,chris_myriapod$Island.Number)
@@ -642,7 +670,7 @@ head(chris_myriapod_wide_richness)
 
 
 #Otherinsects
-chris_miscinsects<-read.csv("c:Chris.data//misc_insects_ey.csv", header=TRUE, sep=",")
+chris_miscinsects<-read.csv("C:Data by person//Chris.data//misc_insects_ey.csv", header=TRUE, sep=",")
 head(chris_miscinsects)
 chris_miscinsects$Island.Number<-sprintf("%02d", chris_miscinsects$Island.Number)
 chris_miscinsects$unq_isl <- paste(chris_miscinsects$Island,chris_miscinsects$Island.Number)
@@ -706,7 +734,7 @@ by_isl_master<-merge(by_isl_master, chris_insects, by="unq_isl", all=TRUE)
 
 # Mammal richness ---------------------------------------------------------
 
-katie_mammals<-read.csv("c:Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
+katie_mammals<-read.csv("C:Data by person//Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
 head(katie_mammals)
 names(katie_mammals)[2]<-"unq_isl"
 katie_mammals_simple<-katie_mammals[,-c(1,3, 13)]
@@ -765,7 +793,7 @@ node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(by_isl_master, "C:Owen's data/by_isl_master.csv")
+write.csv(by_isl_master, "C:Data by person//Owen's data/by_isl_master.csv")
 
 
 # Plotting correlations ---------------------------------------------------
@@ -837,7 +865,7 @@ na3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.ca
 na4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 na5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(na0,na3,na2,na1,na4,na5, ncol=3)
-ggsave("C:Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
+ggsave("C:Data by person//Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
 
 nam0<-ggplot(by_isl_master, aes(y=total_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.75))
 nam1<-ggplot(by_isl_master, aes(y=insect_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,350)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+theme(legend.position="none")
@@ -846,7 +874,7 @@ nam3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.c
 nam4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nam5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nam0,nam3,nam2,nam1,nam4,nam5, ncol=3)
-ggsave("C:Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
+ggsave("C:Data by person//Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
 
 
 nan0<-ggplot(by_isl_master, aes(y=total_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.15))
@@ -856,7 +884,7 @@ nan3<-ggplot(by_isl_master, aes(y=plant_richness, x=log_Area, colour=d15n.cat, f
 nan4<-ggplot(by_isl_master, aes(y=bird.richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nan5<-ggplot(by_isl_master, aes(y=mammal_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nan0,nan3,nan2,nan1,nan4,nan5, ncol=3)
-ggsave("C:Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
+ggsave("C:Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
 
 
 
@@ -875,7 +903,7 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=d15n))+geom_point()
 insects7<-ggplot(by_isl_master, aes(y=crustacea_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2,insects7,  ncol=4)
-ggsave("C:Plots//Species_nut//Insects_d15n.png")
+ggsave("C:Data by person//Plots//Species_nut//Insects_d15n.png")
 
 
 
@@ -889,7 +917,7 @@ abund.insects6<-ggplot(by_isl_master, aes(y=gastropoda_abundance, x=d15n))+geom_
 #abund.insects7<-ggplot(by_isl_master, aes(y=log(beetles_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "gaussian"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(abund.insects0,abund.insects1,abund.insects6,abund.insects3,abund.insects4,abund.insects5,abund.insects2, ncol=4)
-ggsave("C:Plots//Species_nut//Insects_Abundance_d15n.png")
+ggsave("C:Data by person//Plots//Species_nut//Insects_Abundance_d15n.png")
 
 
 ##### Plotting insects
@@ -903,7 +931,7 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=log_Area))+geom_poi
 #insects7<-ggplot(by_isl_master, aes(y=beetles_richness, x=log_Area))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2, ncol=4)
-ggsave("C:Plots//Species_nut//Insects_Area.png")
+ggsave("C:Data by person//Plots//Species_nut//Insects_Area.png")
 
 
 
@@ -912,13 +940,13 @@ ggsave("C:Plots//Species_nut//Insects_Area.png")
 
 head(by_isl_master)
 
-write.csv(by_isl_master, "C:Owen's data/by_isl_master.csv")
+write.csv(by_isl_master, "C:Data by person//Owen's data/by_isl_master.csv")
 
 
-feathers.key<-read.csv("c:Deb.data//banding-all.csv", header=TRUE, sep=",")
+feathers.key<-read.csv("C:Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
 head(feathers.key)
 
-i.feathers.all<-read.csv("C:Deb.data//i-feathers-all (1).csv")
+i.feathers.all<-read.csv("C:Data by person//Deb.data//i-feathers-all (1).csv")
 head(i.feathers.all)
 length(unique(i.feathers.all$unq_isl))
 
@@ -1035,11 +1063,11 @@ ggbiplot(multi.marine.pca, ellipse = TRUE, groups = by_isl_multivariate_env$node
 
 ### not sure about this::: 
 #Adding in information about seaweed, eagles, otters
-wrack.sara<-read.csv("C:Sara's data//wrack.isotopes.cn.csv")
-wrack.key<-read.csv("C:Sara's data//wrack.key.csv")
-ang.seaweed<-read.csv("C:Ang's data//chokedpass_macrophytes_AMO2015.csv", header=TRUE, sep=",")
-becky.eagles<-read.csv("c:Becky.data//becky.isotopes.csv", header=TRUE, sep=",")
-otter_chris<-read.csv("C:Chris.data//otter_sia.csv")
+wrack.sara<-read.csv("C:Data by person//Sara's data//wrack.isotopes.cn.csv")
+wrack.key<-read.csv("C:Data by person//Sara's data//wrack.key.csv")
+ang.seaweed<-read.csv("C:Data by person//Ang's data//chokedpass_macrophytes_AMO2015.csv", header=TRUE, sep=",")
+becky.eagles<-read.csv("C:Data by person//Becky.data//becky.isotopes.csv", header=TRUE, sep=",")
+otter_chris<-read.csv("C:Data by person//Chris.data//otter_sia.csv")
 
 
 #otter isotopes
@@ -1074,7 +1102,7 @@ names(becky.eagles.tree)[5]<-"d15n"
 
 
 #### plotting soil at 0m, on sites without likely wrack (machine learning)
-wrackfree<-read.csv("c:Pat.data//wrackfree.csv", header=TRUE, sep=",")
+wrackfree<-read.csv("C:Data by person//Pat.data//wrackfree.csv", header=TRUE, sep=",")
 head(wrackfree)
 
 

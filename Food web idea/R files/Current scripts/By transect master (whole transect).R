@@ -176,15 +176,15 @@ which( colnames(longform_plant_percentcover2_tran)=="midi" )
 
 longform_plant_percentcover3_tran<-longform_plant_percentcover2_tran[,c(1,37,52)]
 head(longform_plant_percentcover3_tran)
-longform_plant_percentcover3_tran$plant_richness<-specnumber(longform_plant_percentcover_species_tran[,-c(1:5)])
-longform_plant_percentcover3_tran$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran[,-c(1:5)], index="shannon")
+longform_plant_percentcover3_tran$plant_richness<-specnumber(longform_plant_percentcover_species_tran[,-c(1)])
+longform_plant_percentcover3_tran$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran[,-c(1)], index="shannon")
 longform_plant_percentcover3_tran$plant_evenness<-longform_plant_percentcover3_tran$plant_shannon.diversity/(log(longform_plant_percentcover3_tran$plant_richness))
-longform_plant_percentcover3_tran$total_cover<-rowSums(longform_plant_percentcover_species_tran[,-c(1:5)], na.rm=TRUE)
+longform_plant_percentcover3_tran$total_cover<-rowSums(longform_plant_percentcover_species_tran[,-c(1)], na.rm=TRUE)
 
-longform_plant_percentcover3_tran$shrub_richness<-specnumber(longform_plant_percentcover2_tran_shrub[,-c(1:5)])
-longform_plant_percentcover3_tran$shrub_cover<-rowSums(longform_plant_percentcover2_tran_shrub[,-c(1:5)], na.rm=TRUE)
-longform_plant_percentcover3_tran$herb_richness<-specnumber(longform_plant_percentcover2_tran_herb[,-c(1:5)])
-longform_plant_percentcover3_tran$herb_cover<-rowSums(longform_plant_percentcover2_tran_herb[,-c(1:5)], na.rm=TRUE)
+longform_plant_percentcover3_tran$shrub_richness<-specnumber(longform_plant_percentcover2_tran_shrub[,-c(1)])
+longform_plant_percentcover3_tran$shrub_cover<-rowSums(longform_plant_percentcover2_tran_shrub[,-c(1)], na.rm=TRUE)
+longform_plant_percentcover3_tran$herb_richness<-specnumber(longform_plant_percentcover2_tran_herb[,-c(1)])
+longform_plant_percentcover3_tran$herb_cover<-rowSums(longform_plant_percentcover2_tran_herb[,-c(1)], na.rm=TRUE)
 
 longform_plant_percentcover3_tran$unq_tran<-strtrim(longform_plant_percentcover3_tran$unq_tran, 5)
 
