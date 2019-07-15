@@ -133,7 +133,7 @@ becky_trees_tran_2<-becky_trees_tran %>% group_by(unq_tran) %>%
 
 
 head(becky_trees_tran_2)
-becky_trees_wide_richness_tran<-merge(becky_trees_tran_wide_richness_tran, becky_trees_tran_2)
+becky_trees_wide_richness_tran<-merge(becky_trees_wide_richness_tran, becky_trees_tran_2)
   
 habitat_soil_by_tran<-merge(soil_merge_mean,becky_trees_wide_richness_tran, by="unq_tran", all=TRUE)
 head(habitat_soil_by_tran)
