@@ -193,7 +193,7 @@ head(longform_plant_percentcover3_tran)
 
 head(soil_merge)
 
-habitat_veg_soil_by_tran<-merge(soil_merge[,-8], longform_plant_percentcover3_tran, by="unq_tran", all=TRUE)
+habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcover3_tran, by="unq_tran", all=TRUE)
 head(habitat_veg_soil_by_tran)
 
 
