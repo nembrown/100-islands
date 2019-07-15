@@ -330,7 +330,7 @@ head(longform_plant_percentcover3_isl)
 
 head(soil_merge)
 
-habitat_veg_soil_by_isl<-merge(soil_merge[,-8], longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
+habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
 head(habitat_veg_soil_by_isl)
 
 
