@@ -806,7 +806,7 @@ by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
 write.csv(by_isl_master, "C:Data by person//Owen's data/by_isl_master.csv")
-
+head(by_isl_master)
 
 # Plotting correlations ---------------------------------------------------
 
@@ -900,13 +900,15 @@ ggsave("C:Data by person//Plots//Richness_nut//Richness_area_d15n_category.png",
 
 
 ggplot(by_isl_master, aes(y=shrub_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
-ggplot(by_isl_master, aes(y=shrub_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=shrub_cover, x=d15n))+geom_point()+geom_smooth(method="lm")
 ggplot(by_isl_master, aes(y=herb_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
-ggplot(by_isl_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="lm")
 
 ggplot(by_isl_master, aes(y=tree_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
-ggplot(by_isl_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_isl_master, aes(y=tree_abundance, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_isl_master, aes(y=sum_basal, x=d15n))+geom_point()+geom_smooth(method="lm")
 
+ggplot(by_isl_master, aes(y=NDVI_mean, x=d15n))+geom_point()+geom_smooth(method="lm")
 
 
 
