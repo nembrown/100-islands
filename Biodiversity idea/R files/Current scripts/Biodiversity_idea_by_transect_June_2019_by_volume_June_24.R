@@ -388,7 +388,7 @@ paste(
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,86,46,91,87,19,20,14,15,17,18,13)]
+by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13)]
 head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl")
