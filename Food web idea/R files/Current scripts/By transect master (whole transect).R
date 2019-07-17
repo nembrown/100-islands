@@ -330,8 +330,8 @@ names(chris_insects_master_by_trap_tran_beat)[3]<-"insect_beat_av_abundance"
 chris_insects_master_by_trap_tran_pitfall<-chris_insects_master_by_trap_tran %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall)[3]<-"insect_pitfall_av_abundance"
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_beat[,c(1,3)])
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_pitfall[,c(1,3)])
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_beat[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_pitfall[,c(1,3)], all=TRUE)
 
 head(chris_insects_master_wide_tran_richness)
 
@@ -360,10 +360,10 @@ names(chris_insects_master_by_trap_tran_beat_birdfood)[3]<-"insect_beat_birdfood
 chris_insects_master_by_trap_tran_pitfall_birdfood<-chris_insects_master_by_trap_tran_birdfood %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_birdfood)[3]<-"insect_pitfall_birdfood_av_abundance"
 
-chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_beat_birdfood[,c(1,3)])
-chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_pitfall_birdfood[,c(1,3)])
+chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_beat_birdfood[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_pitfall_birdfood[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_birdfood_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_birdfood_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 ### Trophic Group and trophic diversity
@@ -391,10 +391,10 @@ names(chris_insects_master_by_trap_tran_beat_herbivore)[3]<-"insect_beat_herbivo
 chris_insects_master_by_trap_tran_pitfall_herbivore<-chris_insects_master_by_trap_tran_herbivore %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_herbivore)[3]<-"insect_pitfall_herbivore_av_abundance"
 
-chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_beat_herbivore[,c(1,3)])
-chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_pitfall_herbivore[,c(1,3)])
+chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_beat_herbivore[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_pitfall_herbivore[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_herbivore_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_herbivore_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -420,10 +420,10 @@ names(chris_insects_master_by_trap_tran_beat_omnivore)[3]<-"insect_beat_omnivore
 chris_insects_master_by_trap_tran_pitfall_omnivore<-chris_insects_master_by_trap_tran_omnivore %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_omnivore)[3]<-"insect_pitfall_omnivore_av_abundance"
 
-chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_beat_omnivore[,c(1,3)])
-chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_pitfall_omnivore[,c(1,3)])
+chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_beat_omnivore[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_pitfall_omnivore[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_omnivore_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_omnivore_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -449,10 +449,10 @@ names(chris_insects_master_by_trap_tran_beat_carnivore)[3]<-"insect_beat_carnivo
 chris_insects_master_by_trap_tran_pitfall_carnivore<-chris_insects_master_by_trap_tran_carnivore %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_carnivore)[3]<-"insect_pitfall_carnivore_av_abundance"
 
-chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_beat_carnivore[,c(1,3)])
-chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_pitfall_carnivore[,c(1,3)])
+chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_beat_carnivore[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_pitfall_carnivore[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_carnivore_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_carnivore_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -478,10 +478,10 @@ names(chris_insects_master_by_trap_tran_beat_detritivore)[3]<-"insect_beat_detri
 chris_insects_master_by_trap_tran_pitfall_detritivore<-chris_insects_master_by_trap_tran_detritivore %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_detritivore)[3]<-"insect_pitfall_detritivore_av_abundance"
 
-chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_beat_detritivore[,c(1,3)])
-chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_pitfall_detritivore[,c(1,3)])
+chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_beat_detritivore[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_pitfall_detritivore[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_detritivore_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_detritivore_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -507,10 +507,10 @@ names(chris_insects_master_by_trap_tran_beat_parasite)[3]<-"insect_beat_parasite
 chris_insects_master_by_trap_tran_pitfall_parasite<-chris_insects_master_by_trap_tran_parasite %>%  filter(Trap=="Pitfall")
 names(chris_insects_master_by_trap_tran_pitfall_parasite)[3]<-"insect_pitfall_parasite_av_abundance"
 
-chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_beat_parasite[,c(1,3)])
-chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_pitfall_parasite[,c(1,3)])
+chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_beat_parasite[,c(1,3)], all=TRUE)
+chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_pitfall_parasite[,c(1,3)], all=TRUE)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_parasite_richness)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_parasite_richness, all=TRUE)
 head(chris_insects_master_wide_tran_richness)
 
 head(habitat_veg_wrack_soil_by_tran)
