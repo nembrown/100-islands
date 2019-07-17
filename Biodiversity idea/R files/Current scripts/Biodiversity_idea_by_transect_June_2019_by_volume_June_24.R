@@ -273,7 +273,9 @@ head(ben_pelagic_size_data_wide_year_richness)
 ben_pelagic_size_data_wide_year_richness <- ben_pelagic_size_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(ben_pelagic_size_data_wide_year_richness)
 
-#####HAVING A PROBLEM WITH THIS LINE also why is it minues 1,2,3,4,5??? need to check on that for ALL not just pelagic etc ... 
+#There is no size data for any fish gog4 2015, need to create some based on averages.... they did not measure (was too windy)
+#it's just herring that is missing (I think) 
+
 
 #combining size and abundance to get "pelagic_biomass" estimate
 ben_pelagic_biomass_data_wide_year<-(ben_pelagic_size_data_wide_year[,-c(1,2)])*(ben_pelagic_data_wide_year[,-c(1,2)])
@@ -318,9 +320,9 @@ fish_bycatch_richness_merged_tran_year$fish_abundance_corrected<-((fish_bycatch_
 fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected<-((fish_bycatch_richness_merged_tran_year$bycatch_richness)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$fish_richness_corrected<-((fish_bycatch_richness_merged_tran_year$fish_richness)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$marine_richness_corrected<-(fish_bycatch_richness_merged_tran_year$fish_richness_corrected+fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected)
-fish_bycatch_richness_merged_tran_year$pelagic_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$pelagic_biomass)/fish_bycatch_richness_merged_tran_year$volume)
+fish_bycatch_richness_merged_tran_year$pelagic_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$fish_pelagic_biomass)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$pelagic_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$pelagic_abundance)/fish_bycatch_richness_merged_tran_year$volume)
-fish_bycatch_richness_merged_tran_year$demersal_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$demersal_biomass)/fish_bycatch_richness_merged_tran_year$volume)
+fish_bycatch_richness_merged_tran_year$demersal_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$fish_demersal_biomass)/fish_bycatch_richness_merged_tran_year$volume)
 fish_bycatch_richness_merged_tran_year$demersal_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$demersal_abundance)/fish_bycatch_richness_merged_tran_year$volume)
 
 
@@ -567,6 +569,24 @@ head(fish_richness_merged_tran_isl_300)
 
 ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
 ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_birdfood_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_carnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_herbivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_parasite_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_omnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=log(insect_abs_abundance+1), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_beat_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_pitfall_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+
 
 
 #transect level
