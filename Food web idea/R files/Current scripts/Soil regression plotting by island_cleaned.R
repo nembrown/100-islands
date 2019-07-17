@@ -489,259 +489,232 @@ head(by_isl_master)
 
 
 # Chris insects -----------------------------------------------------------
-# 
-# chris_beeetles_2015<-read.csv("C:Data by person//Chris.data//ce_observation2015.csv", header=TRUE, sep=",")
-# chris_beeetles_2016<-read.csv("C:Data by person//Chris.data//ce_observation2016.csv", header=TRUE, sep=",")
-# chris_beeetles_2017<-read.csv("C:Data by person//Chris.data//ce_observation2017.csv", header=TRUE, sep=",")
-# 
-# 
-# str(chris_beeetles_2015)
-# str(chris_beeetles_2016)
-# str(chris_beeetles_2017)
-# chris_beetles<-rbind(chris_beeetles_2015[,-6], chris_beeetles_2016[,-6], chris_beeetles_2017[,-6])
-# head(chris_beetles)
-# 
-# chris_beetles$unq_isl<-gsub('.{1}$', '',chris_beetles$Trapline )
-# 
-# chris_beetles_wide <-chris_beetles %>% group_by(unq_isl, Trap, SpeciesID) %>% 
-#   summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-#   group_by(unq_isl, SpeciesID) %>% 
-#   summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-#   spread( SpeciesID, sum_abundance) %>% 
-#   replace(is.na(.), 0) 
-# head(chris_beetles_wide)
-# 
-# chris_beetles_wide_richness<-chris_beetles_wide[,1]
-# chris_beetles_wide_richness$beetles_richness<-specnumber(chris_beetles_wide[,-1])
-# chris_beetles_wide_richness$beetles_abundance<-rowSums(chris_beetles_wide[,-1],na.rm = TRUE)
-# 
-# head(chris_beetles_wide_richness)
 
-###collembola
-chris_collembola<-read.csv("C:Data by person//Chris.data//collembola_ey.csv", header=TRUE, sep=",")
-head(chris_collembola)
+#new data July 2019 
+chris_insects_master<-read.csv("C:Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
+head(chris_insects_master)
+chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
+chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
+chris_insects_master$plot<-substr(chris_insects_master$Trapline, 5, 5)
+head(chris_insects_master)
+
+# I still want to divde by groups BUT I will do all insects as a whole first then break into groups
+
+# For each island there are 4 transects and one interior plot
+#My understanding is that there is only one pitfall or one beat per "transect".. if that's not true I will need to change script. 
+
+chris_insects_master_wide <-chris_insects_master %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide)
+#659 Species!!! 
+
+chris_insects_master_wide_richness<-chris_insects_master_wide[,1]
+chris_insects_master_wide_richness$insect_richness<-specnumber(chris_insects_master_wide[,-1])
+chris_insects_master_wide_richness$insect_abs_abundance<-rowSums(chris_insects_master_wide[,-1],na.rm = TRUE)
+chris_insects_master_wide_richness$insect_diversity<-diversity(chris_insects_master_wide[,-1],index="shannon")
+chris_insects_master_wide_richness$insect_evenness<-chris_insects_master_wide_richness$insect_diversity/(log(chris_insects_master_wide_richness$insect_richness))
+head(chris_insects_master_wide_richness)
 
 
-chris_collembola$Island.Number<-sprintf("%02d", chris_collembola$Island.Number)
-chris_collembola$unq_isl <- paste(chris_collembola$Island,chris_collembola$Island.Number)
-chris_collembola$unq_isl<-gsub(" ", "", chris_collembola$unq_isl, fixed = TRUE)
+#now a more standardized abundance measure per beat or pitfall trap on the island
+chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-#incorporate Direction if need to have unq_tran... but if want to just get per island average across 5 points
-#also trap type .. maybe just combine beat and pitfall = SUM
-#okay here we collapsed transects (did mean) and then summed across bet and pitfall ... not sure which is the bvest way to do it
-#It's fine for richness but might need to fine tune for abudnance
+chris_insects_master_by_trap_beat<-chris_insects_master_by_trap %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat)[3]<-"insect_beat_av_abundance"
+chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall)[3]<-"insect_pitfall_av_abundance"
 
-chris_collembola_wide <-chris_collembola %>% group_by(unq_isl, Trap.Type, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_collembola_wide)
-chris_collembola_wide<-chris_collembola_wide[,-c(2,3)]
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_beat[,c(1,3)])
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_pitfall[,c(1,3)])
 
-chris_collembola_wide_richness<-chris_collembola_wide[,1]
-chris_collembola_wide_richness$collembola_richness<-specnumber(chris_collembola_wide[,-1])
-chris_collembola_wide_richness$collembola_abundance<-rowSums(chris_collembola_wide[,-1],na.rm = TRUE)
-head(chris_collembola_wide_richness)
+head(chris_insects_master_wide_richness)
 
+#########now the same measures but for a few different categories. 
+head(chris_insects_master)
 
-##hymenoptera
-chris_hymenoptera<-read.csv("C:Data by person//Chris.data//hymenoptera_ey.csv", header=TRUE, sep=",")
-head(chris_hymenoptera)
+###Are they eaten by birds or not? 
+chris_insects_master_wide_birdfood <-chris_insects_master %>% filter(BirdFood=="Yes") %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_birdfood)
+#359 Species that are potential birdfood!!! 
 
-chris_hymenoptera$Island.Number<-sprintf("%02d", chris_hymenoptera$Island.Number)
-chris_hymenoptera$unq_isl <- paste(chris_hymenoptera$Island,chris_hymenoptera$Island.Number)
-chris_hymenoptera$unq_isl<-gsub(" ", "", chris_hymenoptera$unq_isl, fixed = TRUE)
+chris_insects_master_wide_birdfood_richness<-chris_insects_master_wide_birdfood[,1]
+chris_insects_master_wide_birdfood_richness$insect_birdfood_richness<-specnumber(chris_insects_master_wide_birdfood[,-1])
+chris_insects_master_wide_birdfood_richness$insect_birdfood_abs_abundance<-rowSums(chris_insects_master_wide_birdfood[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_birdfood_richness)
 
-chris_hymenoptera_wide <-chris_hymenoptera %>% group_by(unq_isl, Trap.Type, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_hymenoptera_wide)
+#now a standardized abundance
+chris_insects_master_by_trap_birdfood<-chris_insects_master %>% filter(BirdFood=="Yes") %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-chris_hymenoptera_wide_richness<-chris_hymenoptera_wide[,1]
-chris_hymenoptera_wide_richness$hymenoptera_richness<-specnumber(chris_hymenoptera_wide[,-1])
-chris_hymenoptera_wide_richness$hymenoptera_abundance<-rowSums(chris_hymenoptera_wide[,-1],na.rm = TRUE)
-head(chris_hymenoptera_wide_richness)
+chris_insects_master_by_trap_beat_birdfood<-chris_insects_master_by_trap_birdfood %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_birdfood)[3]<-"insect_beat_birdfood_av_abundance"
+chris_insects_master_by_trap_pitfall_birdfood<-chris_insects_master_by_trap_birdfood %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_birdfood)[3]<-"insect_pitfall_birdfood_av_abundance"
 
-##diptera
-chris_diptera<-read.csv("C:Data by person//Chris.data//diptera_ey.csv", header=TRUE, sep=",")
-head(chris_diptera)
+chris_insects_master_wide_birdfood_richness<-merge(chris_insects_master_wide_birdfood_richness, chris_insects_master_by_trap_beat_birdfood[,c(1,3)])
+chris_insects_master_wide_birdfood_richness<-merge(chris_insects_master_wide_birdfood_richness, chris_insects_master_by_trap_pitfall_birdfood[,c(1,3)])
 
-chris_diptera$Island.Number<-sprintf("%02d", chris_diptera$Island.Number)
-chris_diptera$unq_isl <- paste(chris_diptera$Island,chris_diptera$Island.Number)
-chris_diptera$unq_isl<-gsub(" ", "", chris_diptera$unq_isl, fixed = TRUE)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_birdfood_richness)
+head(chris_insects_master_wide_richness)
 
-chris_diptera_wide <-chris_diptera %>% group_by(unq_isl, Trap.Type, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_diptera_wide)
-
-chris_diptera_wide<-chris_diptera_wide[,-c(2,3)]
-
-chris_diptera_wide_richness<-chris_diptera_wide[,1]
-chris_diptera_wide_richness$diptera_richness<-specnumber(chris_diptera_wide[,-1])
-chris_diptera_wide_richness$diptera_abundance<-rowSums(chris_diptera_wide[,-1],na.rm = TRUE)
-head(chris_diptera_wide_richness)
-
-##gastropoda
-chris_gastropoda<-read.csv("C:Data by person//Chris.data//gastropoda_ey.csv", header=TRUE, sep=",")
-head(chris_gastropoda)
-
-chris_gastropoda$IslandNumber<-sprintf("%02d", chris_gastropoda$IslandNumber)
-chris_gastropoda$unq_isl <- paste(chris_gastropoda$Island,chris_gastropoda$IslandNumber)
-chris_gastropoda$unq_isl<-gsub(" ", "", chris_gastropoda$unq_isl, fixed = TRUE)
-
-chris_gastropoda_wide <-chris_gastropoda %>% group_by(unq_isl, TrapType, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_gastropoda_wide)
-chris_gastropoda_wide<-chris_gastropoda_wide[,-c(2)]
+### Trophic Group and trophic diversity
 
 
-chris_gastropoda_wide_richness<-chris_gastropoda_wide[,1]
-chris_gastropoda_wide_richness$gastropoda_richness<-specnumber(chris_gastropoda_wide[,-1])
-chris_gastropoda_wide_richness$gastropoda_abundance<-rowSums(chris_gastropoda_wide[,-1],na.rm = TRUE)
-head(chris_gastropoda_wide_richness)
+### Start with Herbivores
+chris_insects_master_wide_herbivore <-chris_insects_master %>% filter(Trophic=="Herbivore") %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_herbivore)
+#359 Species that are potential herbivore!!! 
 
-##spiders
-chris_spiders<-read.csv("C:Data by person//Chris.data//spiders_ey.csv", header=TRUE, sep=",")
-head(chris_spiders)
+chris_insects_master_wide_herbivore_richness<-chris_insects_master_wide_herbivore[,1]
+chris_insects_master_wide_herbivore_richness$insect_herbivore_richness<-specnumber(chris_insects_master_wide_herbivore[,-1])
+chris_insects_master_wide_herbivore_richness$insect_herbivore_abs_abundance<-rowSums(chris_insects_master_wide_herbivore[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_herbivore_richness)
 
-chris_spiders$Island.Number<-sprintf("%02d", chris_spiders$Island.Number)
-chris_spiders$unq_isl <- paste(chris_spiders$Island,chris_spiders$Island.Number)
-chris_spiders$unq_isl<-gsub(" ", "", chris_spiders$unq_isl, fixed = TRUE)
+#now a standardized abundance
+chris_insects_master_by_trap_herbivore<-chris_insects_master %>% filter(Trophic=="Herbivore") %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-chris_spiders_wide <-chris_spiders %>% group_by(unq_isl, Trap.Type, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_spiders_wide)
-chris_spiders_wide<-chris_spiders_wide[,-c(2)]
+chris_insects_master_by_trap_beat_herbivore<-chris_insects_master_by_trap_herbivore %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_herbivore)[3]<-"insect_beat_herbivore_av_abundance"
+chris_insects_master_by_trap_pitfall_herbivore<-chris_insects_master_by_trap_herbivore %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_herbivore)[3]<-"insect_pitfall_herbivore_av_abundance"
 
+chris_insects_master_wide_herbivore_richness<-merge(chris_insects_master_wide_herbivore_richness, chris_insects_master_by_trap_beat_herbivore[,c(1,3)])
+chris_insects_master_wide_herbivore_richness<-merge(chris_insects_master_wide_herbivore_richness, chris_insects_master_by_trap_pitfall_herbivore[,c(1,3)])
 
-chris_spiders_wide_richness<-chris_spiders_wide[,1]
-chris_spiders_wide_richness$spiders_richness<-specnumber(chris_spiders_wide[,-1])
-chris_spiders_wide_richness$spiders_abundance<-rowSums(chris_spiders_wide[,-1],na.rm = TRUE)
-head(chris_spiders_wide_richness)
-
-#myriapoda
-
-chris_myriapod<-read.csv("C:Data by person//Chris.data//myriapoda_ey.csv", header=TRUE, sep=",")
-head(chris_myriapod)
-chris_myriapod$Island.Number<-sprintf("%02d", chris_myriapod$Island.Number)
-chris_myriapod$unq_isl <- paste(chris_myriapod$Island,chris_myriapod$Island.Number)
-chris_myriapod$unq_isl<-gsub(" ", "", chris_myriapod$unq_isl, fixed = TRUE)
-head(chris_myriapod)
-
-chris_crustacea <- chris_myriapod %>%  filter(Subphylum=="Crustacea")
-head(chris_crustacea)
-chris_myriapoda <- chris_myriapod %>%  filter(Subphylum=="Myriapoda")
-
-#
-chris_crustacea_wide <-chris_crustacea %>% group_by(unq_isl, Trap.Type, Genus.Species) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl,Genus.Species) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Genus.Species, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_crustacea_wide)
-chris_crustacea_wide<-chris_crustacea_wide[,-c(2)]
-
-chris_crustacea_wide_richness<-chris_crustacea_wide[,1]
-chris_crustacea_wide_richness$crustacea_richness<-specnumber(chris_crustacea_wide[,-1])
-chris_crustacea_wide_richness$crustacea_abundance<-rowSums(chris_crustacea_wide[,-1],na.rm = TRUE)
-head(chris_crustacea_wide_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_herbivore_richness)
+head(chris_insects_master_wide_richness)
 
 
-#myriapoda
-chris_myriapod_wide <-chris_myriapoda %>% group_by(unq_isl, Trap.Type, Genus.Species) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl,Genus.Species) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Genus.Species, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_myriapod_wide)
-chris_myriapod_wide<-chris_myriapod_wide[,-c(2)]
+### Omnivores
+chris_insects_master_wide_omnivore <-chris_insects_master %>% filter(Trophic=="Omnivore") %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_omnivore)
+#359 Species that are potential omnivore!!! 
 
-chris_myriapod_wide_richness<-chris_myriapod_wide[,1]
-chris_myriapod_wide_richness$myriapod_richness<-specnumber(chris_myriapod_wide[,-1])
-chris_myriapod_wide_richness$myriapod_abundance<-rowSums(chris_myriapod_wide[,-1],na.rm = TRUE)
-head(chris_myriapod_wide_richness)
+chris_insects_master_wide_omnivore_richness<-chris_insects_master_wide_omnivore[,1]
+chris_insects_master_wide_omnivore_richness$insect_omnivore_richness<-specnumber(chris_insects_master_wide_omnivore[,-1])
+chris_insects_master_wide_omnivore_richness$insect_omnivore_abs_abundance<-rowSums(chris_insects_master_wide_omnivore[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_omnivore_richness)
 
+#now a standardized abundance
+chris_insects_master_by_trap_omnivore<-chris_insects_master %>% filter(Trophic=="Omnivore") %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-#Otherinsects
-chris_miscinsects<-read.csv("C:Data by person//Chris.data//misc_insects_ey.csv", header=TRUE, sep=",")
-head(chris_miscinsects)
-chris_miscinsects$Island.Number<-sprintf("%02d", chris_miscinsects$Island.Number)
-chris_miscinsects$unq_isl <- paste(chris_miscinsects$Island,chris_miscinsects$Island.Number)
-chris_miscinsects$unq_isl<-gsub(" ", "", chris_miscinsects$unq_isl, fixed = TRUE)
+chris_insects_master_by_trap_beat_omnivore<-chris_insects_master_by_trap_omnivore %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_omnivore)[3]<-"insect_beat_omnivore_av_abundance"
+chris_insects_master_by_trap_pitfall_omnivore<-chris_insects_master_by_trap_omnivore %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_omnivore)[3]<-"insect_pitfall_omnivore_av_abundance"
 
-#incorporate Direction if need to have unq_tran... but if want to just get per island average across 5 points
-#also trap type .. maybe just combine beat and pitfall = SUM
-#okay here we collapsed transects (did mean) and then summed across bet and pitfall ... not sure which is the bvest way to do it
-#It's fine for richness but might need to fine tune for abudnance
+chris_insects_master_wide_omnivore_richness<-merge(chris_insects_master_wide_omnivore_richness, chris_insects_master_by_trap_beat_omnivore[,c(1,3)])
+chris_insects_master_wide_omnivore_richness<-merge(chris_insects_master_wide_omnivore_richness, chris_insects_master_by_trap_pitfall_omnivore[,c(1,3)])
 
-chris_miscinsects_wide <-chris_miscinsects %>% group_by(unq_isl, Trap.Type, Identification) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) %>% 
-  group_by(unq_isl, Identification) %>% 
-  summarise(sum_abundance = sum(mean_abundance, na.rm=TRUE)) %>% 
-  spread( Identification, sum_abundance) %>% 
-  replace(is.na(.), 0) 
-head(chris_miscinsects_wide)
-chris_miscinsects_wide<-chris_miscinsects_wide[,-2]
-
-chris_miscinsects_wide_richness<-chris_miscinsects_wide[,1]
-chris_miscinsects_wide_richness$miscinsects_richness<-specnumber(chris_miscinsects_wide[,-1])
-chris_miscinsects_wide_richness$miscinsects_abundance<-rowSums(chris_miscinsects_wide[,-1],na.rm = TRUE)
-head(chris_miscinsects_wide_richness)
-
-#merge insects
-
-chris_insects<-merge(chris_miscinsects_wide_richness, chris_collembola_wide_richness, by.y ="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_diptera_wide_richness, by.x="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_spiders_wide_richness, by.x="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_gastropoda_wide_richness, by.x="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_hymenoptera_wide_richness, by.x="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_myriapod_wide_richness, by.x="unq_isl", all=TRUE)
-chris_insects<-merge(chris_insects, chris_crustacea_wide_richness, by.x="unq_isl", all=TRUE)
-#chris_insects<-merge(chris_insects, chris_beetles_wide_richness, by.x="unq_isl", all=TRUE)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_omnivore_richness)
+head(chris_insects_master_wide_richness)
 
 
-##getting evenness
-chris_insects_wide<-merge(chris_miscinsects_wide, chris_collembola_wide, by.y ="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_hymenoptera_wide, by.x="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_diptera_wide, by.x="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_spiders_wide, by.x="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_gastropoda_wide, by.x="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_myriapod_wide, by.x="unq_isl", all=TRUE)
-chris_insects_wide<-merge(chris_insects_wide, chris_crustacea_wide, by.x="unq_isl", all=TRUE)
-#chris_insects_wide<-merge(chris_insects_wide, chris_beetles_wide, by.x="unq_isl", all=TRUE)
-head(chris_insects_wide)
-chris_insects_wide[is.na(chris_insects_wide)] <- 0
+### carnivores
+chris_insects_master_wide_carnivore <-chris_insects_master %>% filter(Trophic=="Carnivore") %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_carnivore)
+#359 Species that are potential carnivore!!! 
 
-chris_insects$insect_richness<-specnumber(chris_insects_wide[,-1])
-chris_insects$insect_diversity<-diversity(chris_insects_wide[,-1],index="shannon")
-chris_insects$insect_evenness<-chris_insects$insect_diversity/(log(chris_insects$insect_richness))
-chris_insects$insect_abundance<-rowSums(chris_insects_wide[,-1],na.rm = TRUE)
+chris_insects_master_wide_carnivore_richness<-chris_insects_master_wide_carnivore[,1]
+chris_insects_master_wide_carnivore_richness$insect_carnivore_richness<-specnumber(chris_insects_master_wide_carnivore[,-1])
+chris_insects_master_wide_carnivore_richness$insect_carnivore_abs_abundance<-rowSums(chris_insects_master_wide_carnivore[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_carnivore_richness)
 
-head(chris_insects)
-chris_insects[is.na(chris_insects)] <- 0
-length(chris_insects$unq_isl)
+#now a standardized abundance
+chris_insects_master_by_trap_carnivore<-chris_insects_master %>% filter(Trophic=="Carnivore") %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-head(by_isl_master)
-by_isl_master<-merge(by_isl_master, chris_insects, by="unq_isl", all=TRUE)
+chris_insects_master_by_trap_beat_carnivore<-chris_insects_master_by_trap_carnivore %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_carnivore)[3]<-"insect_beat_carnivore_av_abundance"
+chris_insects_master_by_trap_pitfall_carnivore<-chris_insects_master_by_trap_carnivore %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_carnivore)[3]<-"insect_pitfall_carnivore_av_abundance"
+
+chris_insects_master_wide_carnivore_richness<-merge(chris_insects_master_wide_carnivore_richness, chris_insects_master_by_trap_beat_carnivore[,c(1,3)])
+chris_insects_master_wide_carnivore_richness<-merge(chris_insects_master_wide_carnivore_richness, chris_insects_master_by_trap_pitfall_carnivore[,c(1,3)])
+
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_carnivore_richness)
+head(chris_insects_master_wide_richness)
+
+
+### detritivores
+chris_insects_master_wide_detritivore <-chris_insects_master %>% filter(Trophic=="Detritivore") %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_detritivore)
+#359 Species that are potential detritivore!!! 
+
+chris_insects_master_wide_detritivore_richness<-chris_insects_master_wide_detritivore[,1]
+chris_insects_master_wide_detritivore_richness$insect_detritivore_richness<-specnumber(chris_insects_master_wide_detritivore[,-1])
+chris_insects_master_wide_detritivore_richness$insect_detritivore_abs_abundance<-rowSums(chris_insects_master_wide_detritivore[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_detritivore_richness)
+
+#now a standardized abundance
+chris_insects_master_by_trap_detritivore<-chris_insects_master %>% filter(Trophic=="Detritivore") %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+
+chris_insects_master_by_trap_beat_detritivore<-chris_insects_master_by_trap_detritivore %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_detritivore)[3]<-"insect_beat_detritivore_av_abundance"
+chris_insects_master_by_trap_pitfall_detritivore<-chris_insects_master_by_trap_detritivore %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_detritivore)[3]<-"insect_pitfall_detritivore_av_abundance"
+
+chris_insects_master_wide_detritivore_richness<-merge(chris_insects_master_wide_detritivore_richness, chris_insects_master_by_trap_beat_detritivore[,c(1,3)])
+chris_insects_master_wide_detritivore_richness<-merge(chris_insects_master_wide_detritivore_richness, chris_insects_master_by_trap_pitfall_detritivore[,c(1,3)])
+
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_detritivore_richness)
+head(chris_insects_master_wide_richness)
+
+
+### parasites
+chris_insects_master_wide_parasite <-chris_insects_master %>% filter(Trophic %in% c("Parasitic","Parasitoid")) %>% group_by(unq_isl, SpeciesID) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
+  spread(SpeciesID, sum_abundance) %>% 
+  replace(is.na(.), 0)
+head(chris_insects_master_wide_parasite)
+#359 Species that are potential parasite!!! 
+
+chris_insects_master_wide_parasite_richness<-chris_insects_master_wide_parasite[,1]
+chris_insects_master_wide_parasite_richness$insect_parasite_richness<-specnumber(chris_insects_master_wide_parasite[,-1])
+chris_insects_master_wide_parasite_richness$insect_parasite_abs_abundance<-rowSums(chris_insects_master_wide_parasite[,-1],na.rm = TRUE)
+head(chris_insects_master_wide_parasite_richness)
+
+#now a standardized abundance
+chris_insects_master_by_trap_parasite<-chris_insects_master %>%filter(Trophic %in% c("Parasitic","Parasitoid")) %>% group_by(unq_isl, Trap) %>% 
+  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+
+chris_insects_master_by_trap_beat_parasite<-chris_insects_master_by_trap_parasite %>%  filter(Trap=="Beat")
+names(chris_insects_master_by_trap_beat_parasite)[3]<-"insect_beat_parasite_av_abundance"
+chris_insects_master_by_trap_pitfall_parasite<-chris_insects_master_by_trap_parasite %>%  filter(Trap=="Pitfall")
+names(chris_insects_master_by_trap_pitfall_parasite)[3]<-"insect_pitfall_parasite_av_abundance"
+
+chris_insects_master_wide_parasite_richness<-merge(chris_insects_master_wide_parasite_richness, chris_insects_master_by_trap_beat_parasite[,c(1,3)])
+chris_insects_master_wide_parasite_richness<-merge(chris_insects_master_wide_parasite_richness, chris_insects_master_by_trap_pitfall_parasite[,c(1,3)])
+
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_parasite_richness)
+head(chris_insects_master_wide_richness)
+
+
+#New branch here, deleting the previous work on separating into taxonomic groups - that's more for Chris to work on. 
+
+
+by_isl_master<-merge(by_isl_master, chris_insects_master_wide_richness, by="unq_isl", all=TRUE)
 
 
 # Mammal richness ---------------------------------------------------------
@@ -914,6 +887,19 @@ ggplot(by_isl_master, aes(y=NDVI_mean, x=d15n))+geom_point()+geom_smooth(method=
 
 
 # Plotting insects by species ---------------------------------------------
+ggplot(by_isl_master, aes(y=insect_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_birdfood_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_detritivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_carnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_herbivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_parasite_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=insect_omnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+
+
+
+ggplot(by_isl_master, aes(y=log(insect_abs_abundance+1), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=(insect_beat_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=(insect_pitfall_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
 
 
