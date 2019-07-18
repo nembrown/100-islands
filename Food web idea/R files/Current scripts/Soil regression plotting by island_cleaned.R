@@ -524,6 +524,7 @@ chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
 chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
 head(chris_trapline_data)
+<<<<<<< HEAD
 
 #sum number of insects found on that trapline/traptype
 chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
@@ -547,6 +548,31 @@ chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(T
                                     replace(is.na(.), 0)
 
 
+=======
+
+#sum number of insects found on that trapline/traptype
+chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
+                            summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
+
+chris_insects_master_by_trap<-merge(chris_insects_master_by_trap, chris_trapline_data[,-c(2:15)], by="unq_tran")
+
+head(chris_insects_master_by_trap)
+
+chris_insects_master_by_trap$insect_beat_abundance<-chris_insects_master_by_trap$sum_abundance/chris_insects_master_by_trap$BeatTime
+
+chris_insects_master_by_trap_beat<-chris_insects_master_by_trap %>%  filter(Trap=="Beat") %>% 
+                                    group_by(unq_isl) %>% 
+                                    summarise(insect_beat_av_abundance = mean(insect_beat_abundance, na.rm=TRUE)) %>% 
+                                    replace(is.na(.), 0)
+
+chris_insects_master_by_trap$insect_pitfall_abundance<-chris_insects_master_by_trap$sum_abundance/chris_insects_master_by_trap$PitfallsCount
+chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(Trap=="Pitfall") %>% 
+                                    group_by(unq_isl) %>% 
+                                    summarise(insect_pitfall_av_abundance = mean(insect_pitfall_abundance, na.rm=TRUE)) %>% 
+                                    replace(is.na(.), 0)
+
+
+>>>>>>> 1cd6cfa6f7d9e8f206d46d36111a1a5af97892f5
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_pitfall, all=TRUE)
 
