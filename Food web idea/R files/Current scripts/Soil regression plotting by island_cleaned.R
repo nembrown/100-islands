@@ -567,7 +567,8 @@ chris_insects_master_wide_birdfood_richness<-chris_insects_master_wide_birdfood[
 chris_insects_master_wide_birdfood_richness$insect_birdfood_richness<-specnumber(chris_insects_master_wide_birdfood[,-1])
 chris_insects_master_wide_birdfood_richness$insect_birdfood_abs_abundance<-rowSums(chris_insects_master_wide_birdfood[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_birdfood_richness)
-
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_birdfood_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 chris_insects_master_by_trap_birdfood<-chris_insects_master %>% filter(BirdFood=="Yes")%>% group_by(unq_tran, Trap) %>% 
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
@@ -608,6 +609,8 @@ chris_insects_master_wide_herbivore_richness<-chris_insects_master_wide_herbivor
 chris_insects_master_wide_herbivore_richness$insect_herbivore_richness<-specnumber(chris_insects_master_wide_herbivore[,-1])
 chris_insects_master_wide_herbivore_richness$insect_herbivore_abs_abundance<-rowSums(chris_insects_master_wide_herbivore[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_herbivore_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_herbivore_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_herbivore<-chris_insects_master %>% filter(Trophic=="Herbivore")%>% group_by(unq_tran, Trap) %>% 
@@ -647,6 +650,8 @@ chris_insects_master_wide_omnivore_richness<-chris_insects_master_wide_omnivore[
 chris_insects_master_wide_omnivore_richness$insect_omnivore_richness<-specnumber(chris_insects_master_wide_omnivore[,-1])
 chris_insects_master_wide_omnivore_richness$insect_omnivore_abs_abundance<-rowSums(chris_insects_master_wide_omnivore[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_omnivore_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_omnivore_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_omnivore<-chris_insects_master %>% filter(Trophic=="Omnivore")%>% group_by(unq_tran, Trap) %>% 
@@ -685,6 +690,8 @@ chris_insects_master_wide_carnivore_richness<-chris_insects_master_wide_carnivor
 chris_insects_master_wide_carnivore_richness$insect_carnivore_richness<-specnumber(chris_insects_master_wide_carnivore[,-1])
 chris_insects_master_wide_carnivore_richness$insect_carnivore_abs_abundance<-rowSums(chris_insects_master_wide_carnivore[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_carnivore_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_carnivore_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_carnivore<-chris_insects_master %>% filter(Trophic=="Carnivore")%>% group_by(unq_tran, Trap) %>% 
@@ -723,6 +730,8 @@ chris_insects_master_wide_detritivore_richness<-chris_insects_master_wide_detrit
 chris_insects_master_wide_detritivore_richness$insect_detritivore_richness<-specnumber(chris_insects_master_wide_detritivore[,-1])
 chris_insects_master_wide_detritivore_richness$insect_detritivore_abs_abundance<-rowSums(chris_insects_master_wide_detritivore[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_detritivore_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_detritivore_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_detritivore<-chris_insects_master %>% filter(Trophic=="Detritivore")%>% group_by(unq_tran, Trap) %>% 
@@ -761,6 +770,8 @@ chris_insects_master_wide_parasite_richness<-chris_insects_master_wide_parasite[
 chris_insects_master_wide_parasite_richness$insect_parasite_richness<-specnumber(chris_insects_master_wide_parasite[,-1])
 chris_insects_master_wide_parasite_richness$insect_parasite_abs_abundance<-rowSums(chris_insects_master_wide_parasite[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_parasite_richness)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_parasite_richness, all=TRUE)
+head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_parasite<-chris_insects_master %>% filter(Trophic %in% c("Parasitic","Parasitoid"))%>% group_by(unq_tran, Trap) %>% 
