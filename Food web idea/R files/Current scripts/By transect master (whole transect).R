@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, if there are multiple plots within transect they are averaged. 
@@ -322,16 +322,36 @@ head(chris_insects_master_wide_tran_richness)
 
 
 #now a more standardized abundance measure per beat or pitfall trap on the island
+chris_trapline_data<-read.csv("C:Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
+chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
+chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
+chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
+head(chris_trapline_data)
+
+#sum number of insects found on that trapline/traptype
 chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat<-chris_insects_master_by_trap_tran %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat)[3]<-"insect_beat_av_abundance"
-chris_insects_master_by_trap_tran_pitfall<-chris_insects_master_by_trap_tran %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall)[3]<-"insect_pitfall_av_abundance"
+chris_insects_master_by_trap_tran<-merge(chris_insects_master_by_trap_tran, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_beat[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_pitfall[,c(1,3)], all=TRUE)
+head(chris_insects_master_by_trap_tran)
+
+chris_insects_master_by_trap_tran$insect_beat_abundance<-chris_insects_master_by_trap_tran$sum_abundance/chris_insects_master_by_trap_tran$BeatTime
+
+chris_insects_master_by_trap_tran_beat<-chris_insects_master_by_trap_tran %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_beat_av_abundance = mean(insect_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+chris_insects_master_by_trap_tran$insect_pitfall_abundance<-chris_insects_master_by_trap_tran$sum_abundance/chris_insects_master_by_trap_tran$PitfallsCount
+chris_insects_master_by_trap_tran_pitfall<-chris_insects_master_by_trap_tran %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_pitfall_av_abundance = mean(insect_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_pitfall, all=TRUE)
 
 head(chris_insects_master_wide_tran_richness)
 
@@ -351,20 +371,28 @@ chris_insects_master_wide_tran_birdfood_richness$insect_birdfood_richness<-specn
 chris_insects_master_wide_tran_birdfood_richness$insect_birdfood_abs_abundance<-rowSums(chris_insects_master_wide_tran_birdfood[,-1],na.rm = TRUE)
 head(chris_insects_master_wide_tran_birdfood_richness)
 
-#now a standardized abundance
-chris_insects_master_by_trap_tran_birdfood<-chris_insects_master %>% filter(BirdFood=="Yes") %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
 
-chris_insects_master_by_trap_tran_beat_birdfood<-chris_insects_master_by_trap_tran_birdfood %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_birdfood)[3]<-"insect_beat_birdfood_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_birdfood<-chris_insects_master_by_trap_tran_birdfood %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_birdfood)[3]<-"insect_pitfall_birdfood_av_abundance"
+chris_insects_master_by_trap_tran_birdfood<-chris_insects_master %>% filter(BirdFood=="Yes")%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
+chris_insects_master_by_trap_tran_birdfood<-merge(chris_insects_master_by_trap_tran_birdfood, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_beat_birdfood[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_birdfood_richness<-merge(chris_insects_master_wide_tran_birdfood_richness, chris_insects_master_by_trap_tran_pitfall_birdfood[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_birdfood$insect_birdfood_beat_abundance<-chris_insects_master_by_trap_tran_birdfood$sum_abundance/chris_insects_master_by_trap_tran_birdfood$BeatTime
+chris_insects_master_by_trap_tran_birdfood_beat<-chris_insects_master_by_trap_tran_birdfood %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_birdfood_beat_av_abundance = mean(insect_birdfood_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_birdfood_richness, all=TRUE)
+chris_insects_master_by_trap_tran_birdfood$insect_birdfood_pitfall_abundance<-chris_insects_master_by_trap_tran_birdfood$sum_abundance/chris_insects_master_by_trap_tran_birdfood$PitfallsCount
+chris_insects_master_by_trap_tran_birdfood_pitfall<-chris_insects_master_by_trap_tran_birdfood %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_birdfood_pitfall_av_abundance = mean(insect_birdfood_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_birdfood_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_birdfood_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
+
 
 ### Trophic Group and trophic diversity
 
@@ -383,19 +411,29 @@ chris_insects_master_wide_tran_herbivore_richness$insect_herbivore_abs_abundance
 head(chris_insects_master_wide_tran_herbivore_richness)
 
 #now a standardized abundance
-chris_insects_master_by_trap_tran_herbivore<-chris_insects_master %>% filter(Trophic=="Herbivore") %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_insects_master_by_trap_tran_herbivore<-chris_insects_master %>% filter(Trophic=="Herbivore")%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat_herbivore<-chris_insects_master_by_trap_tran_herbivore %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_herbivore)[3]<-"insect_beat_herbivore_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_herbivore<-chris_insects_master_by_trap_tran_herbivore %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_herbivore)[3]<-"insect_pitfall_herbivore_av_abundance"
+chris_insects_master_by_trap_tran_herbivore<-merge(chris_insects_master_by_trap_tran_herbivore, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_beat_herbivore[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_herbivore_richness<-merge(chris_insects_master_wide_tran_herbivore_richness, chris_insects_master_by_trap_tran_pitfall_herbivore[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_herbivore$insect_herbivore_beat_abundance<-chris_insects_master_by_trap_tran_herbivore$sum_abundance/chris_insects_master_by_trap_tran_herbivore$BeatTime
+chris_insects_master_by_trap_tran_herbivore_beat<-chris_insects_master_by_trap_tran_herbivore %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_herbivore_beat_av_abundance = mean(insect_herbivore_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_herbivore_richness, all=TRUE)
+chris_insects_master_by_trap_tran_herbivore$insect_herbivore_pitfall_abundance<-chris_insects_master_by_trap_tran_herbivore$sum_abundance/chris_insects_master_by_trap_tran_herbivore$PitfallsCount
+chris_insects_master_by_trap_tran_herbivore_pitfall<-chris_insects_master_by_trap_tran_herbivore %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_herbivore_pitfall_av_abundance = mean(insect_herbivore_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_herbivore_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_herbivore_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
+
 
 
 ### Omnivores
@@ -412,18 +450,27 @@ chris_insects_master_wide_tran_omnivore_richness$insect_omnivore_abs_abundance<-
 head(chris_insects_master_wide_tran_omnivore_richness)
 
 #now a standardized abundance
-chris_insects_master_by_trap_tran_omnivore<-chris_insects_master %>% filter(Trophic=="Omnivore") %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_insects_master_by_trap_tran_omnivore<-chris_insects_master %>% filter(Trophic=="Omnivore")%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat_omnivore<-chris_insects_master_by_trap_tran_omnivore %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_omnivore)[3]<-"insect_beat_omnivore_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_omnivore<-chris_insects_master_by_trap_tran_omnivore %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_omnivore)[3]<-"insect_pitfall_omnivore_av_abundance"
+chris_insects_master_by_trap_tran_omnivore<-merge(chris_insects_master_by_trap_tran_omnivore, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_beat_omnivore[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_omnivore_richness<-merge(chris_insects_master_wide_tran_omnivore_richness, chris_insects_master_by_trap_tran_pitfall_omnivore[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_omnivore$insect_omnivore_beat_abundance<-chris_insects_master_by_trap_tran_omnivore$sum_abundance/chris_insects_master_by_trap_tran_omnivore$BeatTime
+chris_insects_master_by_trap_tran_omnivore_beat<-chris_insects_master_by_trap_tran_omnivore %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_omnivore_beat_av_abundance = mean(insect_omnivore_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_omnivore_richness, all=TRUE)
+chris_insects_master_by_trap_tran_omnivore$insect_omnivore_pitfall_abundance<-chris_insects_master_by_trap_tran_omnivore$sum_abundance/chris_insects_master_by_trap_tran_omnivore$PitfallsCount
+chris_insects_master_by_trap_tran_omnivore_pitfall<-chris_insects_master_by_trap_tran_omnivore %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_omnivore_pitfall_av_abundance = mean(insect_omnivore_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_omnivore_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_omnivore_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -441,18 +488,27 @@ chris_insects_master_wide_tran_carnivore_richness$insect_carnivore_abs_abundance
 head(chris_insects_master_wide_tran_carnivore_richness)
 
 #now a standardized abundance
-chris_insects_master_by_trap_tran_carnivore<-chris_insects_master %>% filter(Trophic=="Carnivore") %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_insects_master_by_trap_tran_carnivore<-chris_insects_master %>% filter(Trophic=="Carnivore")%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat_carnivore<-chris_insects_master_by_trap_tran_carnivore %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_carnivore)[3]<-"insect_beat_carnivore_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_carnivore<-chris_insects_master_by_trap_tran_carnivore %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_carnivore)[3]<-"insect_pitfall_carnivore_av_abundance"
+chris_insects_master_by_trap_tran_carnivore<-merge(chris_insects_master_by_trap_tran_carnivore, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_beat_carnivore[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_carnivore_richness<-merge(chris_insects_master_wide_tran_carnivore_richness, chris_insects_master_by_trap_tran_pitfall_carnivore[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_carnivore$insect_carnivore_beat_abundance<-chris_insects_master_by_trap_tran_carnivore$sum_abundance/chris_insects_master_by_trap_tran_carnivore$BeatTime
+chris_insects_master_by_trap_tran_carnivore_beat<-chris_insects_master_by_trap_tran_carnivore %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_carnivore_beat_av_abundance = mean(insect_carnivore_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_carnivore_richness, all=TRUE)
+chris_insects_master_by_trap_tran_carnivore$insect_carnivore_pitfall_abundance<-chris_insects_master_by_trap_tran_carnivore$sum_abundance/chris_insects_master_by_trap_tran_carnivore$PitfallsCount
+chris_insects_master_by_trap_tran_carnivore_pitfall<-chris_insects_master_by_trap_tran_carnivore %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_carnivore_pitfall_av_abundance = mean(insect_carnivore_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_carnivore_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_carnivore_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -470,18 +526,27 @@ chris_insects_master_wide_tran_detritivore_richness$insect_detritivore_abs_abund
 head(chris_insects_master_wide_tran_detritivore_richness)
 
 #now a standardized abundance
-chris_insects_master_by_trap_tran_detritivore<-chris_insects_master %>% filter(Trophic=="Detritivore") %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_insects_master_by_trap_tran_detritivore<-chris_insects_master %>% filter(Trophic=="Detritivore")%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat_detritivore<-chris_insects_master_by_trap_tran_detritivore %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_detritivore)[3]<-"insect_beat_detritivore_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_detritivore<-chris_insects_master_by_trap_tran_detritivore %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_detritivore)[3]<-"insect_pitfall_detritivore_av_abundance"
+chris_insects_master_by_trap_tran_detritivore<-merge(chris_insects_master_by_trap_tran_detritivore, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_beat_detritivore[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_detritivore_richness<-merge(chris_insects_master_wide_tran_detritivore_richness, chris_insects_master_by_trap_tran_pitfall_detritivore[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_detritivore$insect_detritivore_beat_abundance<-chris_insects_master_by_trap_tran_detritivore$sum_abundance/chris_insects_master_by_trap_tran_detritivore$BeatTime
+chris_insects_master_by_trap_tran_detritivore_beat<-chris_insects_master_by_trap_tran_detritivore %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_detritivore_beat_av_abundance = mean(insect_detritivore_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_detritivore_richness, all=TRUE)
+chris_insects_master_by_trap_tran_detritivore$insect_detritivore_pitfall_abundance<-chris_insects_master_by_trap_tran_detritivore$sum_abundance/chris_insects_master_by_trap_tran_detritivore$PitfallsCount
+chris_insects_master_by_trap_tran_detritivore_pitfall<-chris_insects_master_by_trap_tran_detritivore %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_detritivore_pitfall_av_abundance = mean(insect_detritivore_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_detritivore_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_detritivore_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
 
 
@@ -499,22 +564,32 @@ chris_insects_master_wide_tran_parasite_richness$insect_parasite_abs_abundance<-
 head(chris_insects_master_wide_tran_parasite_richness)
 
 #now a standardized abundance
-chris_insects_master_by_trap_tran_parasite<-chris_insects_master %>%filter(Trophic %in% c("Parasitic","Parasitoid")) %>% group_by(unq_tran, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_insects_master_by_trap_tran_parasite<-chris_insects_master %>% filter(Trophic %in% c("Parasitic","Parasitoid"))%>% group_by(unq_tran, Trap) %>% 
+  summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_by_trap_tran_beat_parasite<-chris_insects_master_by_trap_tran_parasite %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_tran_beat_parasite)[3]<-"insect_beat_parasite_av_abundance"
-chris_insects_master_by_trap_tran_pitfall_parasite<-chris_insects_master_by_trap_tran_parasite %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_tran_pitfall_parasite)[3]<-"insect_pitfall_parasite_av_abundance"
+chris_insects_master_by_trap_tran_parasite<-merge(chris_insects_master_by_trap_tran_parasite, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_beat_parasite[,c(1,3)], all=TRUE)
-chris_insects_master_wide_tran_parasite_richness<-merge(chris_insects_master_wide_tran_parasite_richness, chris_insects_master_by_trap_tran_pitfall_parasite[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap_tran_parasite$insect_parasite_beat_abundance<-chris_insects_master_by_trap_tran_parasite$sum_abundance/chris_insects_master_by_trap_tran_parasite$BeatTime
+chris_insects_master_by_trap_tran_parasite_beat<-chris_insects_master_by_trap_tran_parasite %>%  filter(Trap=="Beat") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_parasite_beat_av_abundance = mean(insect_parasite_beat_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
 
-chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_wide_tran_parasite_richness, all=TRUE)
+chris_insects_master_by_trap_tran_parasite$insect_parasite_pitfall_abundance<-chris_insects_master_by_trap_tran_parasite$sum_abundance/chris_insects_master_by_trap_tran_parasite$PitfallsCount
+chris_insects_master_by_trap_tran_parasite_pitfall<-chris_insects_master_by_trap_tran_parasite %>%  filter(Trap=="Pitfall") %>% 
+  group_by(unq_tran) %>% 
+  summarise(insect_parasite_pitfall_av_abundance = mean(insect_parasite_pitfall_abundance, na.rm=TRUE)) %>% 
+  replace(is.na(.), 0)
+
+
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_parasite_beat, all=TRUE)
+chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_richness, chris_insects_master_by_trap_tran_parasite_pitfall, all=TRUE)
+
 head(chris_insects_master_wide_tran_richness)
 
+####
 head(habitat_veg_wrack_soil_by_tran)
-by_tran_master<-merge(habitat_veg_wrack_soil_by_tran, chris_insects_tran, by="unq_tran", all=TRUE)
+by_tran_master<-merge(habitat_veg_wrack_soil_by_tran, chris_insects_master_wide_tran_richness, by="unq_tran", all=TRUE)
 head(by_tran_master)
 
 
