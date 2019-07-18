@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 #change to norahbrown if on work computer
 
 #read in necessary packages
@@ -519,16 +519,36 @@ head(chris_insects_master_wide_richness)
 
 
 #now a more standardized abundance measure per beat or pitfall trap on the island
-chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_isl, Trap) %>% 
-  summarise(mean_abundance = mean(Abundance, na.rm=TRUE)) 
+chris_trapline_data<-read.csv("C:Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
+chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
+chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
+chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
+head(chris_trapline_data)
 
-chris_insects_master_by_trap_beat<-chris_insects_master_by_trap %>%  filter(Trap=="Beat")
-names(chris_insects_master_by_trap_beat)[3]<-"insect_beat_av_abundance"
-chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(Trap=="Pitfall")
-names(chris_insects_master_by_trap_pitfall)[3]<-"insect_pitfall_av_abundance"
+#sum number of insects found on that trapline/traptype
+chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
+                            summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
 
-chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_beat[,c(1,3)], all=TRUE)
-chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_pitfall[,c(1,3)], all=TRUE)
+chris_insects_master_by_trap<-merge(chris_insects_master_by_trap, chris_trapline_data[,-c(2:15)], by="unq_tran")
+
+head(chris_insects_master_by_trap)
+
+chris_insects_master_by_trap$insect_beat_abundance<-chris_insects_master_by_trap$sum_abundance/chris_insects_master_by_trap$BeatTime
+
+chris_insects_master_by_trap_beat<-chris_insects_master_by_trap %>%  filter(Trap=="Beat") %>% 
+                                    group_by(unq_isl) %>% 
+                                    summarise(insect_beat_av_abundance = mean(insect_beat_abundance, na.rm=TRUE)) %>% 
+                                    replace(is.na(.), 0)
+
+chris_insects_master_by_trap$insect_pitfall_abundance<-chris_insects_master_by_trap$sum_abundance/chris_insects_master_by_trap$PitfallsCount
+chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(Trap=="Pitfall") %>% 
+                                    group_by(unq_isl) %>% 
+                                    summarise(insect_pitfall_av_abundance = mean(insect_pitfall_abundance, na.rm=TRUE)) %>% 
+                                    replace(is.na(.), 0)
+
+
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_beat, all=TRUE)
+chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_pitfall, all=TRUE)
 
 head(chris_insects_master_wide_richness)
 
