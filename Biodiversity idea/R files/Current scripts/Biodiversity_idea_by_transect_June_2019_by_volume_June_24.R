@@ -575,17 +575,17 @@ ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_cor
 ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_birdfood_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_carnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_herbivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_parasite_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_omnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_birdfood_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_carnivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_herbivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_parasite_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_omnivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=log(insect_abs_abundance+1), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_beat_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
-ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_pitfall_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=log(insect_abs_abundance+1), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_beat_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_pitfall_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
 
 
