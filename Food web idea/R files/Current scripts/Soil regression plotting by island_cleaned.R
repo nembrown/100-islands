@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to norahbrown if on work computer
 
 #read in necessary packages
@@ -969,6 +969,10 @@ ggplot(by_isl_master, aes(y=sum_basal, x=d15n))+geom_point()+geom_smooth(method=
 
 ggplot(by_isl_master, aes(y=NDVI_mean, x=d15n))+geom_point()+geom_smooth(method="lm")
 
+ggplot(by_isl_master, aes(y=plant_richness, x=n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_isl_master, aes(y=pc1, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_isl_master, aes(y=plant_evenness, x=n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_isl_master, aes(y=d15n, x=n))+geom_point()+geom_smooth(method="lm")
 
 
 
@@ -986,6 +990,7 @@ ggplot(by_isl_master, aes(y=insect_omnivore_richness, x=d15n))+geom_point()+geom
 ggplot(by_isl_master, aes(y=log(insect_abs_abundance+1), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 ggplot(by_isl_master, aes(y=(insect_beat_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 ggplot(by_isl_master, aes(y=(insect_pitfall_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_isl_master, aes(y=(insect_evenness), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
 
 

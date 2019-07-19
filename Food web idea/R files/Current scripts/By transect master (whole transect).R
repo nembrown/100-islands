@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, if there are multiple plots within transect they are averaged. 
@@ -334,7 +334,7 @@ chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, T
 
 chris_insects_master_by_trap_tran<-merge(chris_insects_master_by_trap_tran, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-head(chris_insects_master_by_trap_tran)
+View(chris_insects_master_by_trap_tran)
 
 chris_insects_master_by_trap_tran$insect_beat_abundance<-chris_insects_master_by_trap_tran$sum_abundance/chris_insects_master_by_trap_tran$BeatTime
 
@@ -649,3 +649,43 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 
 head(by_tran_master)
 write.csv(by_tran_master, "C:Data by person//Norah.data/by_tran_master.csv")
+
+
+
+
+#### PLotting
+
+ggplot(by_tran_master, aes(y=shrub_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_tran_master, aes(y=shrub_cover, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_tran_master, aes(y=herb_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_tran_master, aes(y=herb_cover, x=d15n))+geom_point()+geom_smooth(method="lm")
+
+ggplot(by_tran_master, aes(y=tree_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+ggplot(by_tran_master, aes(y=tree_abundance, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_tran_master, aes(y=sum_basal, x=d15n))+geom_point()+geom_smooth(method="lm")
+
+ggplot(by_tran_master, aes(y=NDVI_mean, x=d15n))+geom_point()+geom_smooth(method="lm")
+
+ggplot(by_tran_master, aes(y=plant_richness, x=n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_tran_master, aes(y=pc1, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_tran_master, aes(y=plant_evenness, x=n))+geom_point()+geom_smooth(method="lm")
+ggplot(by_tran_master, aes(y=d15n, x=n))+geom_point()+geom_smooth(method="lm")
+
+
+
+# Plotting insects by species ---------------------------------------------
+ggplot(by_tran_master, aes(y=insect_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_birdfood_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_detritivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_carnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_herbivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_parasite_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=insect_omnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+
+
+
+ggplot(by_tran_master, aes(y=log(insect_abs_abundance+1), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=(insect_beat_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=(insect_pitfall_av_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(by_tran_master, aes(y=(insect_evenness), x=d15n))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+

@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 #change to norahbrown if on work computer
 
 
@@ -348,7 +348,7 @@ head(fish_bycatch_richness_merged_tran)
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -365,7 +365,7 @@ which( colnames(by_tran_master)=="sum_basal")
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,18,19,15)]
+by_tran_master_subset<-by_tran_master[,c(1,15,18,19)]
 head(by_tran_master_subset)
 
 
@@ -406,7 +406,7 @@ head(fish_bycatch_richness_merged_tran)
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran")
 fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
@@ -568,14 +568,29 @@ ggsave("C:Plots//Transect//Chemistry//marine_richness_isopods.png", width=40, he
 head(fish_richness_merged_tran_isl_300)
 
 ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
-ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_1k, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
-ggplot(fish_richness_merged_tran_isl_300, aes(y=shrub_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=herb_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=herb_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=plant_evenness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=plant_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=plant_evenness, x=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=plant_richness, x=d15n))+geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_evenness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_birdfood_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_carnivore_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
+
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_abs_abundance, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_evenness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_birdfood_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
 ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_detritivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_carnivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson")) 
@@ -583,7 +598,7 @@ ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_herbivore_richness, x=fis
 ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_parasite_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=insect_omnivore_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))
 
-ggplot(fish_richness_merged_tran_isl_300, aes(y=log(insect_abs_abundance+1), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_1k, aes(y=log(insect_abs_abundance+1), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_beat_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_pitfall_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
@@ -595,11 +610,30 @@ marine_pc1<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corr
 marine_tree<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=tree_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
 marine_treeabun<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=tree_abundance))+geom_point()+geom_smooth(method="lm")
 marine_insect<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=insect_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
-marine_insectabund<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=log(insect_abundance)))+geom_point()+geom_smooth(method="lm")
+marine_insectabund<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=log(insect_abs_abundance)))+geom_point()+geom_smooth(method="lm")
 plot_grid(marine_plant,marine_pc1, marine_tree,marine_treeabun,marine_insect,marine_insectabund,ncol=3)
 ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial.png", width=40, height=20, unit="cm")
 
 
+#just by fish richness
+fish_plant<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=plant.richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_pc1<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=pc1))+geom_point()+geom_smooth(method="lm")
+fish_tree<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=tree_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_treeabun<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=tree_abundance))+geom_point()+geom_smooth(method="lm")
+fish_insect<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=insect_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_insectabund<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected, y=log(insect_abs_abundance)))+geom_point()+geom_smooth(method="lm")
+plot_grid(fish_plant,fish_pc1, fish_tree,fish_treeabun,fish_insect,fish_insectabund,ncol=3)
+ggsave("C:Plots//Transect//Resources_terr_var//fish_richness_terrestrial.png", width=40, height=20, unit="cm")
+
+#just by fish richness
+fish_plant<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=plant.richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_pc1<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=pc1))+geom_point()+geom_smooth(method="lm")
+fish_tree<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=tree_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_treeabun<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=tree_abundance))+geom_point()+geom_smooth(method="lm")
+fish_insect<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=insect_richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
+fish_insectabund<-ggplot(fish_richness_merged_tran_isl_1k, aes(x=fish_richness_corrected, y=log(insect_abs_abundance)))+geom_point()+geom_smooth(method="lm")
+plot_grid(fish_plant,fish_pc1, fish_tree,fish_treeabun,fish_insect,fish_insectabund,ncol=3)
+ggsave("C:Plots//Transect//Resources_terr_var//fish_richness_terrestrial_1k.png", width=40, height=20, unit="cm")
 
 
 
@@ -625,7 +659,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="lm")
