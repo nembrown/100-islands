@@ -86,12 +86,14 @@ ben_habitat_data_simple.SP <- st_as_sf(ben_habitat_data_simple, coords = c("long
 head(ben_habitat_data_simple.SP)
 ben_habitat_data_simple.SP$site_type<-"beachseine"
 
+### Islands level data just site-information
 head(df.SF)
 df.SF_simple<-unique(df.SF[,c(1)])
 head(df.SF_simple)
 names(df.SF_simple)[1]<-"site"
 df.SF_simple$site_type<-"100_islands"
 
+#combining 100 islands and beachseine data 
 df.SF_marine<-rbind(df.SF_simple, ben_habitat_data_simple.SP)
 head(df.SF_marine)
 df.SF_marine$long<-st_coordinates(df.SF_marine)[,1] # get coordinates
@@ -99,36 +101,32 @@ df.SF_marine$lat<-st_coordinates(df.SF_marine)[,2]
 
 ######
 bbox_marine <- make_bbox(df.SF_marine$long, df.SF_marine$lat, f = 0.01)
+bbox_marine_big <- make_bbox(df.SF_marine$long, df.SF_marine$lat, f = 5)
 map_toner_lite_marine <- get_stamenmap(bbox_marine, source="stamen", maptype= "toner-lite", crop=FALSE)
 map_marine <- get_stamenmap(bbox_marine, source="stamen", maptype= "terrain", crop=FALSE)
+map_marine_big <- get_stamenmap(bbox_marine_big, source="stamen", maptype= "terrain", crop=FALSE, zoom=7)
 
 
 ggmap(map_marine) + geom_point(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 
 
+ggmap(map_marine_big) + stat_density2d(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggmap(map_marine_big) + geom_blank(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Plots//map_big.png", width=40, height=20, unit="cm")
 
 
 # Transects --------------------------------------------------------------
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
-soil_merge_0m<-read.csv("C:Data by person//Norah.data//soil_merge_0m.csv")
-head(soil_merge_0m)
-soil_merge_0m<-soil_merge_0m[,-1]
+head(by_tran_master)
 
-###### now with transects:
-head(soil_merge_0m)
-data_subset2 <- soil_merge_0m[ , c("easting", "northing")]
-soil_merge_0m_no_na<- soil_merge_0m[complete.cases(data_subset2), ] 
+data_subset2 <- by_tran_master[ , c("easting", "northing")]
+by_tran_master_no_na<- by_tran_master[complete.cases(data_subset2), ] 
 
 
-df.SF_transects <- st_as_sf(soil_merge_0m_no_na, coords = c("easting", "northing"), crs = 26909)
+df.SF_transects <- st_as_sf(by_tran_master_no_na, coords = c("easting", "northing"), crs = 26909)
 df.SF_transects<-st_transform(x = df.SF_transects, crs = 4326)
 df.SF_transects$long<-st_coordinates(df.SF_transects)[,1] # get coordinates
 df.SF_transects$lat<-st_coordinates(df.SF_transects)[,2] # get coordinates
 head(df.SF_transects)
-
-###adding in fish richness
-which( colnames(df.SF_transects)=="lat" )
-which( colnames(df.SF_transects)=="long" )
 
 
 head(ben_habitat_data)
