@@ -1,19 +1,9 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
-fish_richness_merged_isl<-read.csv("C:fish_richness_merged_isl.csv")
-ben_habitat_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
+#This script plots the locations of collected samples from three separate datasets
+#Transects from 100 islands project, Beachsines from Hakai Nearshore, and Otter scats from Andrew Sheriff
 
-head(fish_richness_merged_isl)
-fish_richness_merged_isl<-fish_richness_merged_isl[,-1]
-
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Modelling practice")
-by_isl_master<-read.csv("C:Owen's data//by_isl_master.csv")
-head(by_isl_master)
-by_isl_master<-by_isl_master[,-1]
-
-isotope_by_isl_gathered4<- read.csv("C:Norah.data/isotope_by_isl_gathered4.csv")
-isotope_by_isl_gathered4<-isotope_by_isl_gathered4[,-1]
-
+##Loading necessary libraries
 #library(devtools)
 #install_github("r-spatial/sf")
 
@@ -32,31 +22,62 @@ library(ggsn) # for scale bars/north arrows in ggplots
 library(maps)
 library(mapdata)
 
-##### Plotting map
 
-###getting lat and long for the islands (from other mapping)
+# Loading the data ------------------------------------------------------------
+
+
+#loading in information on beachseine location
+ben_habitat_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
+head(ben_habitat_data)
+
+#loading in beachseine data that's combined with transect information 
+fish_richness_merged_tran_isl<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+fish_richness_merged_tran_isl<-fish_richness_merged_tran_isl[,-1]
+
+
+#loading information from 100 islands project
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+
+#Island level location information
+by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
+head(by_isl_master)
+by_isl_master<-by_isl_master[,-1]
+
+#Transect-level information
+by_tran_master<-read.csv("C:Data by person//Norah.data//by_tran_master.csv")
+by_tran_master<-by_tran_master[,-1]
+
+
+#isotopes on the island-level
+isotope_by_isl_gathered4<- read.csv("C:Data by person//Norah.data/isotope_by_isl_gathered4.csv")
+isotope_by_isl_gathered4<-isotope_by_isl_gathered4[,-1]
+
+
+# Mapping -----------------------------------------------------------------
+#using simple features 
+
+#Island-level combining data from isotopes of all species, and island-level ecological characteristics, lots of NAs but that's okay
 head(by_isl_master)
 head(isotope_by_isl_gathered4)
 which( colnames(by_isl_master)=="node" )
-isotope_master_sf<-merge(isotope_by_isl_gathered4[,-c(6, 7)], by_isl_master[,c(1,11,12,31:89)], by="unq_isl", all=TRUE)
+#take out s and cn becasue lot's of NAs
+isotope_master_sf<-merge(isotope_by_isl_gathered4[,-c(6,7)], by_isl_master[,-c(2:10)], by="unq_isl", all=TRUE)
 head(isotope_master_sf)
 
+#need no NAs
 data_subset <- isotope_master_sf[ , c("C_Easting", "C_Northing")]
 isotope_master_sf_no_na<- isotope_master_sf[complete.cases(data_subset), ] 
 
-
+#make an sf object
 df.SF <- st_as_sf(isotope_master_sf_no_na, coords = c("C_Easting", "C_Northing"), crs = 26909)
 df.SF<-st_transform(x = df.SF, crs = 4326)
 df.SF$long<-st_coordinates(df.SF)[,1] # get coordinates
 df.SF$lat<-st_coordinates(df.SF)[,2] # get coordinates
 head(df.SF)
-
-###adding in fish richness
-head(fish_richness_merged_isl)
-which( colnames(df.SF)=="lat" )
-which( colnames(df.SF)=="long" )
+#this is island-level data frame as an sf object
 
 
+#Now beachseine
 head(ben_habitat_data)
 ben_habitat_data_simple<-ben_habitat_data[,c(1:3)]
 head(ben_habitat_data_simple)
@@ -88,8 +109,8 @@ ggmap(map_marine) + geom_point(data=df.SF_marine, aes(x = long, y = lat, col=sit
 
 
 # Transects --------------------------------------------------------------
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Modelling practice")
-soil_merge_0m<-read.csv("C:Norah.data\\soil_merge_0m.csv")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+soil_merge_0m<-read.csv("C:Data by person//Norah.data//soil_merge_0m.csv")
 head(soil_merge_0m)
 soil_merge_0m<-soil_merge_0m[,-1]
 
@@ -138,9 +159,9 @@ map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 
 
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Modelling practice")
+
 #### adding in otter information
-otter_isotopes<-read.csv("C:Norah.data\\master_otter_isotope_nb_new.csv")
+otter_isotopes<-read.csv("C:Data by person//Norah.data//master_otter_isotope_nb_new.csv")
 head(otter_isotopes)
 otter_isotopes<- otter_isotopes %>%  filter(site.id != "CVMIL12S8")
 otter_isotopes_simple<-otter_isotopes[,c(7,9,10)]

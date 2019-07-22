@@ -1,5 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Modelling practice")
-
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 
 #library(devtools)
 #install_github("r-spatial/sf")
@@ -20,7 +19,7 @@ library(maps)
 library(mapdata)
 
 ##### Plotting map
-isotope_master<-read.csv("C:Owen's data//isotope_master.csv")
+isotope_master<-read.csv("C:Data by person//Owen's data//isotope_master.csv")
 
 head(isotope_master)
 by_isl_master_no_na<-na.omit(isotope_master)
@@ -124,9 +123,6 @@ df.SP_TQ<-df.SP %>% filter(node=="TQ")
 bbox_TQ <- make_bbox(df.SP_TQ$lon, df.SP_TQ$lat, f = 0.1)
 map_TQ <- get_stamenmap(bbox_TQ, source="stamen", maptype= "toner-lite", crop=TRUE, zoom=13)
 
-
-
-?bbox
 
 ggmap(map) + geom_point(data=filter(df.SP, group %in% c("soil_whole_island")), aes(x = lon, y = lat, col=d15n))+  scale_colour_viridis()
 
