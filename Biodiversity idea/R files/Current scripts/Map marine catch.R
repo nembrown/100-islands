@@ -155,16 +155,20 @@ map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "
 
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
 
 
-#### adding in otter information
+# Adding in otter locations -----------------------------------------------
+
 otter_isotopes<-read.csv("C:Data by person//Norah.data//master_otter_isotope_nb_new.csv")
 head(otter_isotopes)
-otter_isotopes<- otter_isotopes %>%  filter(site.id != "CVMIL12S8")
 otter_isotopes_simple<-otter_isotopes[,c(7,9,10)]
 head(otter_isotopes_simple)
 names(otter_isotopes_simple)[1]<-"site"
+otter_isotopes_simple$site <- as.factor(otter_isotopes_simple$site)
+otter_isotopes_simple<- otter_isotopes_simple %>%  filter(site != "CVMIL12S8")
+
 
 #NAD83
 otter_isotopes_simple.SP <- st_as_sf(otter_isotopes_simple, coords = c("long", "lat"), crs = 4269)
@@ -173,16 +177,23 @@ otter_isotopes_simple.SP.crs<-st_transform(x = otter_isotopes_simple.SP, crs = 4
 head(otter_isotopes_simple.SP.crs)
 otter_isotopes_simple.SP.crs$site_type<-"otter_scat"
 
-df.SF_transects_marine_otter<-rbind(df.SF_transects_marine, otter_isotopes_simple.SP.crs)
+#re-binding this without the lat and long
+df.SF_transects_marine2<-rbind(df.SF_transects_simple, ben_habitat_data_simple.SP)
+head(df.SF_transects_marine2)
+
+df.SF_transects_marine_otter<-rbind(df.SF_transects_marine2, otter_isotopes_simple.SP.crs)
 head(df.SF_transects_marine_otter)
 #this has to be before the lat and long above
 
 df.SF_transects_marine_otter$long<-st_coordinates(df.SF_transects_marine_otter)[,1] # get coordinates
 df.SF_transects_marine_otter$lat<-st_coordinates(df.SF_transects_marine_otter)[,2]
 
-
-
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine_otter, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Plots//map_transects_beachseine_otter.png", width=40, height=20, unit="cm")
+
+
+
+# Adding in otter N15 to otter location data ---------------------------------------------
 
 
 ### otter and N15 mapped
@@ -200,30 +211,27 @@ otter_isotopes.SP.crs$lat<-st_coordinates(otter_isotopes.SP.crs)[,2]
 bbox_otter <- make_bbox(otter_isotopes.SP.crs$long, otter_isotopes.SP.crs$lat, f = 0.01)
 map_otter <- get_stamenmap(bbox_otter, source="stamen", maptype= "terrain", crop=FALSE)
 
-otter_isotopes.SP.crs.mm<-otter_isotopes.SP.crs %>% filter(node=="MM")
-bbox_otter_MM <- make_bbox(otter_isotopes.SP.crs.mm$long, otter_isotopes.SP.crs.mm$lat, f = 0.01)
-map_otter_MM <- get_stamenmap(bbox_otter_MM, source="stamen", maptype= "terrain", crop=FALSE)
-
-otter_isotopes.SP.crs.cv<-otter_isotopes.SP.crs %>% filter(node=="CV")
-bbox_otter_CV <- make_bbox(otter_isotopes.SP.crs.cv$long, otter_isotopes.SP.crs.cv$lat, f = 0.01)
-map_otter_CV <- get_stamenmap(bbox_otter_CV, source="stamen", maptype= "terrain", crop=FALSE)
-
-otter_isotopes.SP.crs.gs<-otter_isotopes.SP.crs %>% filter(node=="GG")
-bbox_otter_GS <- make_bbox(otter_isotopes.SP.crs.gs$long, otter_isotopes.SP.crs.gs$lat, f = 0.01)
-map_otter_GS <- get_stamenmap(bbox_otter_GS, source="stamen", maptype= "terrain", crop=FALSE)
+# otter_isotopes.SP.crs.mm<-otter_isotopes.SP.crs %>% filter(node=="MM")
+# bbox_otter_MM <- make_bbox(otter_isotopes.SP.crs.mm$long, otter_isotopes.SP.crs.mm$lat, f = 0.01)
+# map_otter_MM <- get_stamenmap(bbox_otter_MM, source="stamen", maptype= "terrain", crop=FALSE)
+# 
+# otter_isotopes.SP.crs.cv<-otter_isotopes.SP.crs %>% filter(node=="CV")
+# bbox_otter_CV <- make_bbox(otter_isotopes.SP.crs.cv$long, otter_isotopes.SP.crs.cv$lat, f = 0.01)
+# map_otter_CV <- get_stamenmap(bbox_otter_CV, source="stamen", maptype= "terrain", crop=FALSE)
+# 
+# otter_isotopes.SP.crs.gs<-otter_isotopes.SP.crs %>% filter(node=="GG")
+# bbox_otter_GS <- make_bbox(otter_isotopes.SP.crs.gs$long, otter_isotopes.SP.crs.gs$lat, f = 0.01)
+# map_otter_GS <- get_stamenmap(bbox_otter_GS, source="stamen", maptype= "terrain", crop=FALSE)
 
 
 ggmap(map_otter) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
-
-ggmap(map_otter_CV) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
-
-ggmap(map_otter_MM) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
-
-ggmap(map_otter_GS) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
-
-
-
-ggmap(map_otter_MM) + geom_point(data=df.SF_transects_marine_otter, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+# 
+# ggmap(map_otter_CV) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
+# 
+# ggmap(map_otter_MM) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
+# 
+# ggmap(map_otter_GS) + geom_point(data=otter_isotopes.SP.crs, aes(x = long, y = lat, col=d15n))+  scale_colour_viridis()
+# ggmap(map_otter_MM) + geom_point(data=df.SF_transects_marine_otter, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 
 
 
