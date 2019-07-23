@@ -16,7 +16,8 @@ ben_size_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_specieslengt
 
 ben_habitat_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
 
-ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions_nb.csv")
+#if I want to include approximates of 2014 net size do thes file_nb
+ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.csv")
 
 #head(ben_netdimensions)
 #head(ben_fish_data)
@@ -47,15 +48,19 @@ ben_netdimensions$replicate[ben_netdimensions$replicate=="vol_set2"]<-"2"
 head(ben_netdimensions)
 
 # use only summer months data (July and August 7&8)
+#use the dnetdimensions where we don't estimate missing data
 # mean net volume used at that site in the summer
+ben_netdimensions$volume<-as.numeric(ben_netdimensions$volume)
 ben_netdimensions_year <-ben_netdimensions %>% filter(between(month, 7,8)) %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-ben_netdimensions_year <- ben_netdimensions_year[,c(1,13)]
-#head(ben_netdimensions_year)
+ben_netdimensions_year <- ben_netdimensions_year[,c(1,5)]
+head(ben_netdimensions_year)
 
 #sum of total net volume in given summer
 ben_netdimensions_summer <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year) %>% 
   summarise(sum_volume = sum(volume, na.rm=TRUE)) 
-#head(ben_netdimensions_summer)
+ben_netdimensions_summer$sum_volume[ben_netdimensions_summer$sum_volume==0]<-"NA"
+head(ben_netdimensions_summer)
+ben_netdimensions_summer$sum_volume<-as.numeric(ben_netdimensions_summer$sum_volume)
 
 
 # Fish data cleaning ------------------------------------------------------
@@ -359,7 +364,7 @@ fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year,
 #transect data
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
-#head(by_tran_master_0m)
+head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
 ### adding in tree diversity
@@ -375,7 +380,7 @@ which( colnames(by_tran_master)=="sum_basal")
 # which( colnames(by_tran_master)=="herb_cover")
 
 by_tran_master_subset<-by_tran_master[,c(1,15,18,19)]
-#head(by_tran_master_subset)
+head(by_tran_master_subset)
 
 
 
@@ -406,7 +411,7 @@ by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="u
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran")
 
 
-#head(by_tran_master_0m_with_isl)
+head(by_tran_master_0m_with_isl)
 
 
 #head(fish_bycatch_richness_merged_tran)

@@ -87,10 +87,13 @@ head(soil_merge)
 
 soil_merge_0m <- soil_merge %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
+soil_merge_0m<-soil_merge_0m[,-1]
 
 head(soil_merge_0m)
 
-#write.csv(soil_merge_0m, "C:Data by person\\Norah.data\\soil_merge_0m.csv")
+#going to take out the plot here so it make it simpler
+
+write.csv(soil_merge_0m, "C:Data by person\\Norah.data\\soil_merge_0m.csv")
 
 
 # Adding plant cover and richnes sshoreline -----------------------------------------
@@ -152,7 +155,7 @@ head(longform_plant_percentcover3_tran_0m)
 
 head(soil_merge_0m)
 
-habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m[,-8], longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
+habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_tran", all=TRUE)
 head(habitat_veg_soil_by_tran_0m)
 
 
@@ -507,7 +510,7 @@ chris_insects_master_wide_tran_richness<-merge(chris_insects_master_wide_tran_ri
 head(chris_insects_master_wide_tran_richness)
 
 chris_insects_master_wide_tran_richness_0m<-chris_insects_master_wide_tran_richness %>% filter(!stringr::str_detect(unq_tran, 'I'))
-
+head(chris_insects_master_wide_tran_richness_0m)
 
 head(habitat_veg_soil_by_tran_0m)
 by_tran_master_0m<-merge(habitat_veg_soil_by_tran_0m, chris_insects_master_wide_tran_richness_0m, by="unq_tran", all=TRUE)
