@@ -23,7 +23,7 @@ ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.cs
 #head(ben_fish_data)
 #head(ben_bycatch_data)
 
-head(ben_fish_data)
+View(ben_fish_data)
 ggplot(ben_fish_data, aes(x=month, y=abundance, color=site))+geom_point()+theme(legend.position="none")
 ### Need to include May 
 # load packages ----------------------------------------------------------
