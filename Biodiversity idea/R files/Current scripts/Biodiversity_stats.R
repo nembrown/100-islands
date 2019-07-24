@@ -44,6 +44,108 @@ library(gridExtra)
 
 
 
+
+
+# Plant richness ----------------------------------------------------------
+fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+head(fish_stats)
+fish_stats<-fish_stats[,-1]
+fish_stats<-fish_stats %>% filter(Distance < .25)
+fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
+fish_stats<- fish_stats[complete.cases(fish_stats$plant_richness), ] 
+fish_stats_zscores<-fish_stats
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
+
+
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=plant_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$plant_richness)
+qqp(fish_stats_zscores$plant_richness, "lnorm")
+
+poisson.fish<-fitdistr(fish_stats_zscores$plant_richness, "Poisson")
+qqp(fish_stats_zscores$plant_richness, "pois", lambda=poisson.fish$estimate[[1]])
+
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.plant_richness.fishcatch<-lme(plant_richness ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lmer.plant_richness.fishcatch<-lmer(plant_richness ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.1.plant_richness.fishcatch<-lmer(plant_richness ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.plant_richness.fishcatch<-glmmTMB((plant_richness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+#glmm.1.plant_richness.fishcatch<-glmmTMB((plant_richness+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(lmer.plant_richness.fishcatch, lmer.1.plant_richness.fishcatch,  glmm.plant_richness.fishcatch, lme.plant_richness.fishcatch)
+
+summary(glmm.plant_richness.fishcatch)
+
+#dwplot(list(glmmTMB=glmm.plant_richness.fishcatch,lmer=lmer.plant_richness.fishcatch),by_2sd=TRUE)
+
+## Visualizing glmm residuals with Dharma package
+simulationOutput <- simulateResiduals(fittedModel = glmm.plant_richness.fishcatch)
+plot(simulationOutput)
+testZeroInflation(simulationOutput)
+plot(simulationOutput, quantreg = T)
+#so our model is not great still.... 
+
+# Plot the residuals against island level/ transect
+augDat <- data.frame(fish_stats_zscores,resid=residuals(glmm.plant_richness.fishcatch,type="pearson"),
+                     fitted=fitted(glmm.plant_richness.fishcatch))
+ggplot(augDat,aes(x=unq_isl,y=resid))+geom_boxplot()+coord_flip()
+
+
+
+## Extracting coefficients and plotting
+fam.glmm.plant_richness.fishcatch <- family(glmm.plant_richness.fishcatch )
+fam.glmm.plant_richness.fishcatch
+str(fam.glmm.plant_richness.fishcatch)
+ilink.glmm.plant_richness.fishcatch<- fam.glmm.plant_richness.fishcatch$linkinv
+ilink.glmm.plant_richness.fishcatch
+
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.plant_richness.fishcatch<-glmm.plant_richness.fishcatch 
+ndata.plant_richness.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                        unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.plant_richness.fishcatch <- add_column(ndata.plant_richness.fishcatch, fit = predict(mod.plant_richness.fishcatch, newdata = ndata.plant_richness.fishcatch, type = 'response'))
+
+predict(mod.plant_richness.fishcatch, newdata = ndata.plant_richness.fishcatch, type = 'response')
+ndata.plant_richness.fishcatch <- bind_cols(ndata.plant_richness.fishcatch, setNames(as_tibble(predict(mod.plant_richness.fishcatch, ndata.plant_richness.fishcatch, se.fit = TRUE)[1:2]),
+                                                                 c('fit_link','se_link')))
+
+## create the interval and backtransform
+
+ndata.plant_richness.fishcatch <- mutate(ndata.plant_richness.fishcatch,
+                               fit_resp  = ilink.glmm.plant_richness.fishcatch(fit_link),
+                               right_upr = ilink.glmm.plant_richness.fishcatch(fit_link + (2 * se_link)),
+                               right_lwr = ilink.glmm.plant_richness.fishcatch(fit_link - (2 * se_link)))
+
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+
+ndata.plant_richness.fishcatch$fish_richness_corrected.unscaled<-ndata.plant_richness.fishcatch$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+
+View(ndata.plant_richness.fishcatch)
+# plot 
+plt.plant_richness.fishcatch <- ggplot(ndata.plant_richness.fishcatch, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(plant_richness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Soil plant_richness at shoreline")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.plant_richness.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.plant_richness.fishcatch
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_catch.png")
+
+
+# Beachseine only data ----------------------------------------------------
+
+
 beachseine_stats<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 
 beachseine_stats<-beachseine_stats[,-1]
@@ -229,7 +331,7 @@ plt.d15n.fishcatch <- ggplot(ndata.d15n.fishcatch, aes(x = fish_richness_correct
   geom_ribbon(data = ndata.d15n.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fishcatch
-ggsave("C:Plots//Model-fitted//GLM_Gamma_d15n_fish_catch.png")
+ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_catch.png")
 
 
 # Fish abundance ----------------------------------------------------------
@@ -237,7 +339,7 @@ fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, ce
 fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
 fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
 
-View(fish_stats)
+
 
 #visualize different distributions
 ggplot(fish_stats_zscores, aes(y=d15n, x=fish_abundance_bym3))+geom_point()+geom_smooth(method="lm")
@@ -332,9 +434,18 @@ plt.d15n.fish_abundance <- ggplot(ndata.d15n.fish_abundance, aes(x = log(fish_ab
   geom_ribbon(data = ndata.d15n.fish_abundance,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fish_abundance
-ggsave("C:Plots//Model-fitted//GLM_Gamma_d15n_fish_abundance.png")
+ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_abundance.png")
 
 
+
+# Combining Soil Plots ----------------------------------------------------
+library(cowplot)
+soil_plots<-plot_grid(plt.d15n.fishcatch, plt.d15n.fish_abundance, plt.fish_speciesvabund, ncol=3, align='v', axis = 'l')
+soil_plots
+                 
+ggplot2::ggsave("C:Plots//Model-fitted//soil_plots.png", width=60, height=20, units="cm")
+                          
+                          
 # Marine catch vs. d15n ---------------------------------------------------
 
 
