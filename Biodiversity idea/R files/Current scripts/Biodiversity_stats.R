@@ -1,7 +1,4 @@
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
-fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
-head(fish_stats)
-fish_stats<-fish_stats[,-1]
 
 
 library(tidyr)
@@ -48,12 +45,15 @@ library(gridExtra)
 
 
 # Fish richness and N15 ---------------------------------------------------
+fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+head(fish_stats)
+fish_stats<-fish_stats[,-1]
 fish_stats<-fish_stats %>% filter(Distance < .25)
+fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
 fish_stats_zscores<-fish_stats
 fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
 fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
-fish_stats_zscores<- fish_stats_zscores[complete.cases(fish_stats_zscores$fish_richness_corrected), ] 
 
 
 
@@ -65,27 +65,20 @@ gamma.12.fish_richness_corrected<-fitdistr(fish_stats_zscores$d15n+1, "gamma")
 qqp(fish_stats$fish_richness_corrected, "gamma", shape = gamma.12.fish_richness_corrected$estimate[[1]], rate = gamma.12.fish_richness_corrected$estimate[[2]])
 #normal and Gamma both good, have a few obs. outside 
 
-View(fish_stats_zscores)
+
 #suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
 lme.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-lme.1.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1+fish_richness_corrected|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-
-
+#lme.1.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1+fish_richness_corrected|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 lmer.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
 lmer.1.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, na.action=na.omit)
-
 glmm.d15n.fishcatch<-glmmTMB((d15n) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 #glmm.1.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 
 AICtab(lmer.d15n.fishcatch, lmer.1.d15n.fishcatch,  glmm.d15n.fishcatch, lme.d15n.fishcatch)
 
-
-summary(lme.d15n.fishcatch)
-summary(lmer.d15n.fishcatch)
-summary(lmer.1.d15n.fishcatch)
 summary(glmm.d15n.fishcatch)
 
-dwplot(list(glmmTMB=glmm.d15n.fishcatch,lmer=lmer.d15n.fishcatch),by_2sd=TRUE)
+#dwplot(list(glmmTMB=glmm.d15n.fishcatch,lmer=lmer.d15n.fishcatch),by_2sd=TRUE)
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
 grid.arrange(plot(lme.d15n.fishcatch,type=c("p","smooth")),
@@ -99,29 +92,31 @@ grid.arrange(plot(lme.d15n.fishcatch,type=c("p","smooth")),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
 
+## Visualizing glmm residuals with Dharma package
+simulationOutput <- simulateResiduals(fittedModel = glmm.d15n.fishcatch)
+plot(simulationOutput)
+testZeroInflation(simulationOutput)
+plot(simulationOutput, quantreg = T)
+#so our model is not great still.... 
+
+# Plot the residuals against island level/ transect
+augDat <- data.frame(fish_stats_zscores,resid=residuals(glmm.d15n.fishcatch,type="pearson"),
+                     fitted=fitted(glmm.d15n.fishcatch))
+ggplot(augDat,aes(x=unq_tran,y=resid))+geom_boxplot()+coord_flip()
 
 
 
-plot(lme.d15n.fishcatch)
-plot(lmer.d15n.fishcatch)
-plot(lme.slope.d15n.fishcatch)
+## Extracting coefficients and plotting
+fam.glmm.d15n.fishcatch <- family(glmm.d15n.fishcatch )
+fam.glmm.d15n.fishcatch
+str(fam.glmm.d15n.fishcatch)
+ilink.glmm.d15n.fishcatch<- fam.glmm.d15n.fishcatch$linkinv
+ilink.glmm.d15n.fishcatch
 
-
-
-summary(lme.d15n.fishcatch)
-Anova(lme.d15n.fishcatch)
-
-
-
-fam.gam.d15n.fishcatch <- family(glmm.d15n.fishcatch )
-fam.gam.d15n.fishcatch
-str(fam.gam.d15n.fishcatch)
-ilink.gam.d15n.fishcatch<- fam.gam.d15n.fishcatch$linkinv
-ilink.gam.d15n.fishcatch
-
-
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
 mod.d15n.fishcatch<-glmm.d15n.fishcatch 
-ndata.d15n.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100)))
+ndata.d15n.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                        unq_isl = unq_isl[want]))
 
 
 ## add the fitted values by predicting from the model for the new data
@@ -134,9 +129,9 @@ ndata.d15n.fishcatch <- bind_cols(ndata.d15n.fishcatch, setNames(as_tibble(predi
 ## create the interval and backtransform
 
 ndata.d15n.fishcatch <- mutate(ndata.d15n.fishcatch,
-                                 fit_resp  = ilink.gam.d15n.fishcatch(fit_link),
-                                 right_upr = ilink.gam.d15n.fishcatch(fit_link + (2 * se_link)),
-                                 right_lwr = ilink.gam.d15n.fishcatch(fit_link - (2 * se_link)))
+                                 fit_resp  = ilink.glmm.d15n.fishcatch(fit_link),
+                                 right_upr = ilink.glmm.d15n.fishcatch(fit_link + (2 * se_link)),
+                                 right_lwr = ilink.glmm.d15n.fishcatch(fit_link - (2 * se_link)))
 
 fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
 
@@ -148,12 +143,12 @@ plt.d15n.fishcatch <- ggplot(ndata.d15n.fishcatch, aes(x = fish_richness_correct
   theme_classic()+
   geom_line(size=1.5, aes()) +
   geom_point(aes(y =(d15n)), size=3, data = fish_stats_zscores)+
-  xlab(expression("fish catch richness per m2")) + ylab("d15n")+  
+  xlab(expression("Fish richness per 100 m3")) + ylab("Soil d15n at shoreline")+  
   scale_shape_manual(values=c(19))+
   geom_ribbon(data = ndata.d15n.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fishcatch
-ggsave("C:Plots//Transect//GLM_Gamma_d15n_fish_catch.png")
+ggsave("C:Plots//Model-fitted//GLM_Gamma_d15n_fish_catch.png")
 
 
 # Marine catch vs. d15n ---------------------------------------------------
@@ -172,11 +167,11 @@ AICtab( glm.d15n.marinecatch, lm.d15n.marinecatch)
 plot(glm.d15n.marinecatch)
 summary(glm.d15n.marinecatch)
 
-fam.gam.d15n.marinecatch <- family(glm.d15n.marinecatch )
-fam.gam.d15n.marinecatch
-str(fam.gam.d15n.marinecatch)
-ilink.gam.d15n.marinecatch<- fam.gam.d15n.marinecatch$linkinv
-ilink.gam.d15n.marinecatch
+fam.glmm.d15n.marinecatch <- family(glm.d15n.marinecatch )
+fam.glmm.d15n.marinecatch
+str(fam.glmm.d15n.marinecatch)
+ilink.glmm.d15n.marinecatch<- fam.glmm.d15n.marinecatch$linkinv
+ilink.glmm.d15n.marinecatch
 
 
 mod.d15n.marinecatch<-glm.d15n.marinecatch 
@@ -193,9 +188,9 @@ ndata.d15n.marinecatch <- bind_cols(ndata.d15n.marinecatch, setNames(as_tibble(p
 ## create the interval and backtransform
 
 ndata.d15n.marinecatch <- mutate(ndata.d15n.marinecatch,
-                                 fit_resp  = ilink.gam.d15n.marinecatch(fit_link),
-                                 right_upr = ilink.gam.d15n.marinecatch(fit_link + (2 * se_link)),
-                                 right_lwr = ilink.gam.d15n.marinecatch(fit_link - (2 * se_link)))
+                                 fit_resp  = ilink.glmm.d15n.marinecatch(fit_link),
+                                 right_upr = ilink.glmm.d15n.marinecatch(fit_link + (2 * se_link)),
+                                 right_lwr = ilink.glmm.d15n.marinecatch(fit_link - (2 * se_link)))
 
 fish_stats_zscores$marine_richness_corrected<-scale(fish_stats$marine_richness_corrected, center=TRUE, scale=TRUE)
 
@@ -238,11 +233,11 @@ glm.d13c.marinecatch<-glm(d13c ~ marine_richness_corrected, data=fish_stats_zsco
 
 #gamma does
 
-fam.gam.d13c.marinecatch <- family(gam.lm.d13c.marinecatch )
-fam.gam.d13c.marinecatch
-str(fam.gam.d13c.marinecatch)
-ilink.gam.d13c.marinecatch<- fam.gam.d13c.marinecatch$linkinv
-ilink.gam.d13c.marinecatch
+fam.glmm.d13c.marinecatch <- family(gam.lm.d13c.marinecatch )
+fam.glmm.d13c.marinecatch
+str(fam.glmm.d13c.marinecatch)
+ilink.glmm.d13c.marinecatch<- fam.glmm.d13c.marinecatch$linkinv
+ilink.glmm.d13c.marinecatch
 
 
 mod.d13c.marinecatch<-gam.lm.d13c.marinecatch 
@@ -259,9 +254,9 @@ ndata.d13c.marinecatch <- bind_cols(ndata.d13c.marinecatch, setNames(as_tibble(p
 ## create the interval and backtransform
 
 ndata.d13c.marinecatch <- mutate(ndata.d13c.marinecatch,
-                                 fit_resp  = ilink.gam.d13c.marinecatch(fit_link),
-                                 right_upr = ilink.gam.d13c.marinecatch(fit_link + (2 * se_link)),
-                                 right_lwr = ilink.gam.d13c.marinecatch(fit_link - (2 * se_link)))
+                                 fit_resp  = ilink.glmm.d13c.marinecatch(fit_link),
+                                 right_upr = ilink.glmm.d13c.marinecatch(fit_link + (2 * se_link)),
+                                 right_lwr = ilink.glmm.d13c.marinecatch(fit_link - (2 * se_link)))
 
 fish_stats_zscores$marine_richness_corrected<-scale(fish_stats$marine_richness_corrected, center=TRUE, scale=TRUE)
 
