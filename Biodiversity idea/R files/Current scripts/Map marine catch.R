@@ -160,12 +160,15 @@ ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
 
 # Adding in some data to map just to beachseine dataset ----------------------------------------------
+head(ben_beachseine)
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+
 fish_bycatch_richness_merged_tran_year<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 fish_bycatch_richness_merged_tran_year<-fish_bycatch_richness_merged_tran_year[,-1]
 head(fish_bycatch_richness_merged_tran_year)
 
 head(ben_habitat_data_simple.SP)
-ben_beachseine<-merge(ben_habitat_data_simple.SP, fish_bycatch_richness_merged_tran_year, by="site")
+ben_beachseine<-merge(ben_habitat_data_simple.SP, fish_bycatch_richness_merged_tran_year, by="site", all=TRUE)
 head(ben_beachseine)
 
 ben_beachseine$long<-st_coordinates(ben_beachseine)[,1] # get coordinates
@@ -175,12 +178,15 @@ ben_beachseine$lat<-st_coordinates(ben_beachseine)[,2]
 bbox_marine_beachseine <- make_bbox(ben_beachseine$long, ben_beachseine$lat, f = 0.01)
 map_marine_beachseine <- get_stamenmap(bbox_marine_beachseine, source="stamen", maptype= "terrain", crop=FALSE)
 
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_richness_uncorrected.png", width=40, height=20, unit="cm")
+
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness_corrected))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_length))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Plots//Maps//map_beachseine_fish_length.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(fish_abundance_bym3)))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_fish_abundance_bym3.png", width=40, height=20, unit="cm")

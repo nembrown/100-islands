@@ -16,13 +16,16 @@ ben_size_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_specieslengt
 
 ben_habitat_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
 
-ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions_nb.csv")
+#if I want to include approximates of 2014 net size do thes file_nb
+ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.csv")
 
 #head(ben_netdimensions)
 #head(ben_fish_data)
 #head(ben_bycatch_data)
 
-
+head(ben_fish_data)
+ggplot(ben_fish_data, aes(x=month, y=abundance, color=site))+geom_point()+theme(legend.position="none")
+### Need to include May 
 # load packages ----------------------------------------------------------
 
 library(tidyr)
@@ -47,21 +50,25 @@ ben_netdimensions$replicate[ben_netdimensions$replicate=="vol_set2"]<-"2"
 head(ben_netdimensions)
 
 # use only summer months data (July and August 7&8)
+#use the dnetdimensions where we don't estimate missing data
 # mean net volume used at that site in the summer
-ben_netdimensions_year <-ben_netdimensions %>% filter(between(month, 7,8)) %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-ben_netdimensions_year <- ben_netdimensions_year[,c(1,13)]
-#head(ben_netdimensions_year)
+ben_netdimensions$volume<-as.numeric(ben_netdimensions$volume)
+ben_netdimensions_year <-ben_netdimensions %>% filter(between(month, 5,8)) %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+ben_netdimensions_year <- ben_netdimensions_year[,c(1,5)]
+head(ben_netdimensions_year)
 
 #sum of total net volume in given summer
-ben_netdimensions_summer <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year) %>% 
+ben_netdimensions_summer <-ben_netdimensions%>% filter(between(month, 5,8)) %>% group_by(site, year) %>% 
   summarise(sum_volume = sum(volume, na.rm=TRUE)) 
-#head(ben_netdimensions_summer)
+ben_netdimensions_summer$sum_volume[ben_netdimensions_summer$sum_volume==0]<-"NA"
+head(ben_netdimensions_summer)
+ben_netdimensions_summer$sum_volume<-as.numeric(ben_netdimensions_summer$sum_volume)
 
 
 # Fish data cleaning ------------------------------------------------------
 #head(ben_fish_data)
 #only summer months 
-ben_fish_data <- ben_fish_data %>% filter(between(month, 7,8))
+ben_fish_data <- ben_fish_data %>% filter(between(month, 5,8))
 
 
 #make wide format to calculate number of species
@@ -93,7 +100,7 @@ ben_fish_data_wide_year_richness <- ben_fish_data_wide_year_richness[,-2] %>% gr
 ###demersal vs. pelagic
 
 #head(ben_fish_data)
-#head(ben_pelagic_demersal_data)
+head(ben_pelagic_demersal_data)
 names(ben_pelagic_demersal_data)[1]<-"species"
 
 ben_pelagic_demersal_data2<-merge(ben_pelagic_demersal_data,ben_fish_data, by="species" )
@@ -157,7 +164,7 @@ names(ben_bycatch_data)[1]<-"site"
 ben_bycatch_data[, 7] <- as.numeric(as.character( ben_bycatch_data[, 7] ))
 
 #summer months only 
-ben_bycatch_data <-ben_bycatch_data %>% filter(between(month, 7,8))
+ben_bycatch_data <-ben_bycatch_data %>% filter(between(month, 5,8))
 
 #same as above
 ben_bycatch_data_wide_year <-ben_bycatch_data %>%  replace(is.na(.), 0) %>% group_by(site, year, species) %>% 
@@ -184,7 +191,7 @@ ben_bycatch_data_wide_year_richness <- ben_bycatch_data_wide_year_richness[,-2] 
 #taking average length of a fish of given species at given site times the abundance at that site 
 #will give us "biomass" estimate = cm of fish of that species in total
 
-ben_size_data2 <-ben_size_data %>% filter(between(month, 7,8))
+ben_size_data2 <-ben_size_data %>% filter(between(month, 5,8))
 ben_size_data2[, 8] <- as.numeric(as.character( ben_size_data2[, 8] ))
 
 str(ben_size_data2)
@@ -224,7 +231,7 @@ ben_pelagic_demersal_size_data<-merge(ben_pelagic_demersal_data,ben_size_data, b
 ben_pelagic_size_data <- ben_pelagic_demersal_size_data %>% filter(Depth.Behaviour=="Pelagic")
 ben_demersal_size_data <- ben_pelagic_demersal_size_data %>% filter(Depth.Behaviour=="Demersal")
 
-ben_demersal_size_data2 <-ben_demersal_size_data %>% filter(between(month, 7,8))
+ben_demersal_size_data2 <-ben_demersal_size_data %>% filter(between(month, 5,8))
 ben_demersal_size_data2[, 8] <- as.numeric(as.character( ben_demersal_size_data2[, 8] ))
 
 #head(ben_demersal_size_data2)
@@ -256,7 +263,7 @@ ben_demersal_biomass_data_wide_year_nf <-ben_demersal_biomass_data_wide_year_nf[
 #head(ben_demersal_biomass_data_wide_year_nf)
 
 ###ben size data etc for pelagic and pelagic only 
-ben_pelagic_size_data2 <-ben_pelagic_size_data %>% filter(between(month, 7,8))
+ben_pelagic_size_data2 <-ben_pelagic_size_data %>% filter(between(month, 5,8))
 ben_pelagic_size_data2[, 8] <- as.numeric(as.character( ben_pelagic_size_data2[, 8] ))
 
 ben_pelagic_size_data_wide_year <-ben_pelagic_size_data2 %>%  replace(is.na(.), 0) %>% group_by(site, year, species) %>% 
@@ -287,7 +294,7 @@ ben_pelagic_biomass_data_wide_year_nf$fish_pelagic_biomass<-rowSums(ben_pelagic_
 ben_pelagic_biomass_data_wide_year_nf<-merge(ben_pelagic_biomass_data_wide_year_nf, ben_netdimensions_summer)
 ben_pelagic_biomass_data_wide_year_nf$fish_pelagic_biomass_bym3<-ben_pelagic_biomass_data_wide_year_nf$fish_pelagic_biomass/(ben_pelagic_biomass_data_wide_year_nf$sum_volume)
 ben_pelagic_biomass_data_wide_year_nf <-ben_pelagic_biomass_data_wide_year_nf[,-2]%>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-#head(ben_pelagic_biomass_data_wide_year_nf)
+head(ben_pelagic_biomass_data_wide_year_nf)
 
 # Merging fish, bycatch, biomass, net dimensions ------------------------------------------
 #merging files together into one data frame
@@ -359,7 +366,7 @@ fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year,
 #transect data
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
-#head(by_tran_master_0m)
+head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
 ### adding in tree diversity
@@ -375,7 +382,7 @@ which( colnames(by_tran_master)=="sum_basal")
 # which( colnames(by_tran_master)=="herb_cover")
 
 by_tran_master_subset<-by_tran_master[,c(1,15,18,19)]
-#head(by_tran_master_subset)
+head(by_tran_master_subset)
 
 
 
@@ -406,7 +413,7 @@ by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="u
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran")
 
 
-#head(by_tran_master_0m_with_isl)
+head(by_tran_master_0m_with_isl)
 
 
 #head(fish_bycatch_richness_merged_tran)
