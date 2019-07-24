@@ -42,12 +42,13 @@ library(mgcv)
 library(colorspace)
 library(gratia)
 library(cowplot)
-
+library(gtable)
+library(gridExtra)
 
 
 
 # Fish richness and N15 ---------------------------------------------------
-fish_stats<-fish_stats %>% filter(Distance < 1)
+fish_stats<-fish_stats %>% filter(Distance < .3)
 fish_stats_zscores<-fish_stats
 fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
@@ -63,13 +64,43 @@ qqp(fish_stats$fish_richness_corrected, "gamma", shape = gamma.12.fish_richness_
 
 View(fish_stats_zscores)
 #suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
-lmer.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores)
-lmer.1.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores)
+lme.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.1.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1+fish_richness_corrected|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 
-glmm.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
-glmm.1.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma")
 
-AICtab(lmer.d15n.fishcatch)
+lmer.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.1.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+#glmm.1.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(lmer.d15n.fishcatch, lmer.1.d15n.fishcatch,  glmm.d15n.fishcatch, lme.d15n.fishcatch)
+
+
+summary(lme.d15n.fishcatch)
+summary(lmer.d15n.fishcatch)
+summary(lmer.1.d15n.fishcatch)
+summary(glmm.d15n.fishcatch)
+
+dwplot(list(glmmTMB=glmm.d15n.fishcatch,lmer=lmer.d15n.fishcatch),by_2sd=TRUE)
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.d15n.fishcatch,type=c("p","smooth")),
+             plot(lme.d15n.fishcatch,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.d15n.fishcatch,resid(.,type="pearson")~fish_richness_corrected,
+                  type=c("p","smooth")),
+             qqnorm(lme.d15n.fishcatch,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+#CV04 is driving a lot of the variation 
+
+
+
+
+
 
 
 glmm.d15n.fishcatch<-glmmTMB(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
