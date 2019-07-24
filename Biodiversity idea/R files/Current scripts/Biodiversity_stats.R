@@ -48,11 +48,14 @@ library(gridExtra)
 
 
 # Fish richness and N15 ---------------------------------------------------
-fish_stats<-fish_stats %>% filter(Distance < .3)
+fish_stats<-fish_stats %>% filter(Distance < .25)
 fish_stats_zscores<-fish_stats
 fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
 fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
+fish_stats_zscores<- fish_stats_zscores[complete.cases(fish_stats_zscores$fish_richness_corrected), ] 
+
+
 
 #visualize different distributions
 ggplot(fish_stats_zscores, aes(y=d15n, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
@@ -60,7 +63,7 @@ qqp(fish_stats_zscores$d15n)
 qqp(fish_stats_zscores$d15n, "lnorm")
 gamma.12.fish_richness_corrected<-fitdistr(fish_stats_zscores$d15n+1, "gamma")
 qqp(fish_stats$fish_richness_corrected, "gamma", shape = gamma.12.fish_richness_corrected$estimate[[1]], rate = gamma.12.fish_richness_corrected$estimate[[2]])
-#normal is the best visually 
+#normal and Gamma both good, have a few obs. outside 
 
 View(fish_stats_zscores)
 #suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
@@ -71,7 +74,7 @@ lme.1.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1+fish_richne
 lmer.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
 lmer.1.d15n.fishcatch<-lmer(d15n ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, na.action=na.omit)
 
-glmm.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.d15n.fishcatch<-glmmTMB((d15n) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 #glmm.1.d15n.fishcatch<-glmmTMB((d15n+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 
 AICtab(lmer.d15n.fishcatch, lmer.1.d15n.fishcatch,  glmm.d15n.fishcatch, lme.d15n.fishcatch)
@@ -95,17 +98,9 @@ grid.arrange(plot(lme.d15n.fishcatch,type=c("p","smooth")),
              qqnorm(lme.d15n.fishcatch,abline=c(0,1),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
-#CV04 is driving a lot of the variation 
 
 
 
-
-
-
-
-glmm.d15n.fishcatch<-glmmTMB(d15n ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
-
-AICtab( glmm.d15n.fishcatch, lme.d15n.fishcatch)
 
 plot(lme.d15n.fishcatch)
 plot(lmer.d15n.fishcatch)
@@ -118,15 +113,15 @@ Anova(lme.d15n.fishcatch)
 
 
 
-fam.gam.d15n.fishcatch <- family(glm.d15n.fishcatch )
+fam.gam.d15n.fishcatch <- family(glmm.d15n.fishcatch )
 fam.gam.d15n.fishcatch
 str(fam.gam.d15n.fishcatch)
 ilink.gam.d15n.fishcatch<- fam.gam.d15n.fishcatch$linkinv
 ilink.gam.d15n.fishcatch
 
 
-mod.d15n.fishcatch<-glm.d15n.fishcatch 
-ndata.d15n.fishcatch <- with(fish_stats_zscores, data_frame(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100)))
+mod.d15n.fishcatch<-glmm.d15n.fishcatch 
+ndata.d15n.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100)))
 
 
 ## add the fitted values by predicting from the model for the new data
