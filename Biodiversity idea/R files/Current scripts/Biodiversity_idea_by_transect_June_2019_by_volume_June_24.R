@@ -27,14 +27,14 @@ View(ben_fish_data)
 ggplot(ben_fish_data, aes(x=month, y=abundance, color=site))+geom_point()+theme(legend.position="none")
 ### Need to include May 
 # load packages ----------------------------------------------------------
-
+library(rlang)
 library(tidyr)
 library(vegan)
 library(ggplot2)
 library(ggcorrplot)
 library(doBy)
 library(plyr)
-require(dplyr)
+library(dplyr)
 library(doBy)
 library(cowplot)
 library(viridis)

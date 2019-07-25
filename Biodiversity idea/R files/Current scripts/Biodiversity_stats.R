@@ -1,14 +1,9 @@
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 
-library(tidyr)
+
 library(bbmle) 
 library(glmmTMB)
-library(doBy)
-library(plyr)
-require(dplyr)
-library(ggplot2) 
-library(doBy)
 library(grid)
 library(glmmADMB)
 library(betareg)
@@ -30,8 +25,6 @@ library(multcomp)
 library(arm) ## for sim()
 library(descr)  ## for LogRegR2
 require(reshape2)
-library(ggplot2)
-library(grid)
 library(DHARMa)
 library(gap)
 library(qrnn)
@@ -43,7 +36,193 @@ library(gtable)
 library(gridExtra)
 
 
+#install.packages('TMB', type = 'source')
 
+
+# Plant cover (total) -----------------------------------------------------
+fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+head(fish_stats)
+fish_stats<-fish_stats[,-1]
+fish_stats<-fish_stats %>% filter(Distance < .25)
+fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
+fish_stats<- fish_stats[complete.cases(fish_stats$total_cover), ] 
+fish_stats_zscores<-fish_stats
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=total_cover, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$total_cover)
+qqp(fish_stats_zscores$total_cover, "lnorm")
+
+poisson.fish<-fitdistr(fish_stats_zscores$total_cover, "Poisson")
+qqp(fish_stats_zscores$total_cover, "pois", lambda=poisson.fish$estimate[[1]])
+
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.total_cover.fishcatch<-lme(total_cover ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lmer.total_cover.fishcatch<-lmer(total_cover ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.total_cover.fishcatch<-glmmTMB((total_cover) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.total_cover.fishcatch_gauss<-glmmTMB((total_cover) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="gaussian", na.action=na.omit)
+
+AICtab(glmm.total_cover.fishcatch_gauss, lmer.total_cover.fishcatch, glmm.total_cover.fishcatch, lme.total_cover.fishcatch)
+
+summary(lme.total_cover.fishcatch)
+
+#dwplot(list(glmmTMB=lme.total_cover.fishcatch,lmer=lmer.total_cover.fishcatch),by_2sd=TRUE)
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.total_cover.fishcatch,type=c("p","smooth")),
+             plot(lme.total_cover.fishcatch,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.total_cover.fishcatch,resid(.,type="pearson")~fish_richness_corrected,
+                  type=c("p","smooth")),
+             qqnorm(lme.total_cover.fishcatch,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+
+## Extracting coefficients and plotting
+fam.lmer.total_cover.fishcatch <- family(lmer.total_cover.fishcatch)
+fam.lmer.total_cover.fishcatch
+str(fam.lmer.total_cover.fishcatch)
+ilink.lmer.total_cover.fishcatch<- fam.lmer.total_cover.fishcatch$linkinv
+ilink.lmer.total_cover.fishcatch
+
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.total_cover.fishcatch<-lmer.total_cover.fishcatch 
+ndata.total_cover.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                                  unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.total_cover.fishcatch <- add_column(ndata.total_cover.fishcatch, fit = predict(mod.total_cover.fishcatch, newdata = ndata.total_cover.fishcatch, type = 'response'))
+
+predict(mod.total_cover.fishcatch, newdata = ndata.total_cover.fishcatch, type = 'response')
+ndata.total_cover.fishcatch <- bind_cols(ndata.total_cover.fishcatch, setNames(as_tibble(predict(mod.total_cover.fishcatch, ndata.total_cover.fishcatch, se.fit = TRUE)[1:2]),
+                                                                                     c('fit_link','se_link')))
+
+## create the interval and backtransform
+
+ndata.total_cover.fishcatch <- mutate(ndata.total_cover.fishcatch,
+                                         fit_resp  = ilink.lmer.total_cover.fishcatch(fit_link),
+                                         right_upr = ilink.lmer.total_cover.fishcatch(fit_link + (2 * se_link)),
+                                         right_lwr = ilink.lmer.total_cover.fishcatch(fit_link - (2 * se_link)))
+
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+
+ndata.total_cover.fishcatch$fish_richness_corrected.unscaled<-ndata.total_cover.fishcatch$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+
+
+# plot 
+plt.total_cover.fishcatch <- ggplot(ndata.total_cover.fishcatch, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(total_cover)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant evenness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.total_cover.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.total_cover.fishcatch
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_total_cover_fish_catch.png")
+
+
+# Plant evenness ----------------------------------------------------------
+fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+head(fish_stats)
+fish_stats<-fish_stats[,-1]
+fish_stats<-fish_stats %>% filter(Distance < .25)
+fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
+fish_stats<- fish_stats[complete.cases(fish_stats$plant_evenness), ] 
+fish_stats_zscores<-fish_stats
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=plant_evenness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$plant_evenness)
+qqp(fish_stats_zscores$plant_evenness, "lnorm")
+
+poisson.fish<-fitdistr(fish_stats_zscores$plant_evenness, "Poisson")
+qqp(fish_stats_zscores$plant_evenness, "pois", lambda=poisson.fish$estimate[[1]])
+
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.plant_evenness.fishcatch<-lme(plant_evenness ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lmer.plant_evenness.fishcatch<-lmer(plant_evenness ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+#lmer.1.plant_evenness.fishcatch<-lmer(plant_evenness ~ fish_richness_corrected +  (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.plant_evenness.fishcatch<-glmmTMB((plant_evenness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="binomial", na.action=na.omit)
+#glmm.1.plant_evenness.fishcatch<-glmmTMB((plant_evenness+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.plant_evenness.fishcatch_gauss<-glmmTMB((plant_evenness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="gaussian", na.action=na.omit)
+
+AICtab(glmm.plant_evenness.fishcatch_gauss, lmer.plant_evenness.fishcatch, lmer.1.plant_evenness.fishcatch,  glmm.plant_evenness.fishcatch, lme.plant_evenness.fishcatch)
+
+summary(glmm.plant_evenness.fishcatch_gauss)
+
+#dwplot(list(glmmTMB=lme.plant_evenness.fishcatch,lmer=lmer.plant_evenness.fishcatch),by_2sd=TRUE)
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.plant_evenness.fishcatch,type=c("p","smooth")),
+             plot(lme.plant_evenness.fishcatch,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.plant_evenness.fishcatch,resid(.,type="pearson")~fish_richness_corrected,
+                  type=c("p","smooth")),
+             qqnorm(lme.plant_evenness.fishcatch,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+
+## Extracting coefficients and plotting
+fam.glmm.plant_evenness.fishcatch_gauss <- family(glmm.plant_evenness.fishcatch_gauss)
+fam.glmm.plant_evenness.fishcatch_gauss
+str(fam.glmm.plant_evenness.fishcatch_gauss)
+ilink.glmm.plant_evenness.fishcatch_gauss<- fam.glmm.plant_evenness.fishcatch_gauss$linkinv
+ilink.glmm.plant_evenness.fishcatch_gauss
+
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.plant_evenness.fishcatch<-glmm.plant_evenness.fishcatch_gauss 
+ndata.plant_evenness.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                                  unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.plant_evenness.fishcatch <- add_column(ndata.plant_evenness.fishcatch, fit = predict(mod.plant_evenness.fishcatch, newdata = ndata.plant_evenness.fishcatch, type = 'response'))
+
+predict(mod.plant_evenness.fishcatch, newdata = ndata.plant_evenness.fishcatch, type = 'response')
+ndata.plant_evenness.fishcatch <- bind_cols(ndata.plant_evenness.fishcatch, setNames(as_tibble(predict(mod.plant_evenness.fishcatch, ndata.plant_evenness.fishcatch, se.fit = TRUE)[1:2]),
+                                                                                     c('fit_link','se_link')))
+
+## create the interval and backtransform
+
+ndata.plant_evenness.fishcatch <- mutate(ndata.plant_evenness.fishcatch,
+                                         fit_resp  = ilink.glmm.plant_evenness.fishcatch_gauss(fit_link),
+                                         right_upr = ilink.glmm.plant_evenness.fishcatch_gauss(fit_link + (2 * se_link)),
+                                         right_lwr = ilink.glmm.plant_evenness.fishcatch_gauss(fit_link - (2 * se_link)))
+
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+
+ndata.plant_evenness.fishcatch$fish_richness_corrected.unscaled<-ndata.plant_evenness.fishcatch$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+
+
+# plot 
+plt.plant_evenness.fishcatch <- ggplot(ndata.plant_evenness.fishcatch, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(plant_evenness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant evenness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.plant_evenness.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.plant_evenness.fishcatch
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_evenness_fish_catch.png")
 
 
 # Plant richness ----------------------------------------------------------
@@ -77,8 +256,9 @@ lmer.1.plant_richness.fishcatch<-lmer(plant_richness ~ fish_richness_corrected +
 
 glmm.plant_richness.fishcatch<-glmmTMB((plant_richness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
 #glmm.1.plant_richness.fishcatch<-glmmTMB((plant_richness+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.plant_richness.fishcatch_gauss<-glmmTMB((plant_richness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="gaussian", na.action=na.omit)
 
-AICtab(lmer.plant_richness.fishcatch, lmer.1.plant_richness.fishcatch,  glmm.plant_richness.fishcatch, lme.plant_richness.fishcatch)
+AICtab(glmm.plant_richness.fishcatch_gauss,lmer.plant_richness.fishcatch, lmer.1.plant_richness.fishcatch,  glmm.plant_richness.fishcatch, lme.plant_richness.fishcatch)
 
 summary(glmm.plant_richness.fishcatch)
 
@@ -129,13 +309,13 @@ fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corre
 
 ndata.plant_richness.fishcatch$fish_richness_corrected.unscaled<-ndata.plant_richness.fishcatch$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
 
-View(ndata.plant_richness.fishcatch)
+
 # plot 
 plt.plant_richness.fishcatch <- ggplot(ndata.plant_richness.fishcatch, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
   geom_point(aes(y =(plant_richness)), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish richness per 100 m3")) + ylab("Soil plant_richness at shoreline")+  
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant richness")+  
   scale_shape_manual(values=c(19))+
   geom_ribbon(data = ndata.plant_richness.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
@@ -239,9 +419,9 @@ fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_ri
 fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
 
 
-
+theme_classic()
 #visualize different distributions
-ggplot(fish_stats_zscores, aes(y=d15n, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_stats_zscores, aes(y=d15n, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")+theme_classic()
 qqp(fish_stats_zscores$d15n)
 qqp(fish_stats_zscores$d15n, "lnorm")
 gamma.12.fish_richness_corrected<-fitdistr(fish_stats_zscores$d15n+1, "gamma")
