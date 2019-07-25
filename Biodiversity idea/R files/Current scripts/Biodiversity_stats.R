@@ -56,9 +56,6 @@ ggplot(fish_stats_zscores, aes(y=total_cover, x=fish_richness_corrected))+geom_p
 qqp(fish_stats_zscores$total_cover)
 qqp(fish_stats_zscores$total_cover, "lnorm")
 
-poisson.fish<-fitdistr(fish_stats_zscores$total_cover, "Poisson")
-qqp(fish_stats_zscores$total_cover, "pois", lambda=poisson.fish$estimate[[1]])
-
 
 
 #suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
@@ -87,31 +84,21 @@ grid.arrange(plot(lme.total_cover.fishcatch,type=c("p","smooth")),
 
 
 ## Extracting coefficients and plotting
-fam.lmer.total_cover.fishcatch <- family(lmer.total_cover.fishcatch)
-fam.lmer.total_cover.fishcatch
-str(fam.lmer.total_cover.fishcatch)
-ilink.lmer.total_cover.fishcatch<- fam.lmer.total_cover.fishcatch$linkinv
-ilink.lmer.total_cover.fishcatch
-
 want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
-mod.total_cover.fishcatch<-lmer.total_cover.fishcatch 
+mod.total_cover.fishcatch<-lme.total_cover.fishcatch 
 ndata.total_cover.fishcatch <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
                                                                   unq_isl = unq_isl[want]))
 
-
 ## add the fitted values by predicting from the model for the new data
-ndata.total_cover.fishcatch <- add_column(ndata.total_cover.fishcatch, fit = predict(mod.total_cover.fishcatch, newdata = ndata.total_cover.fishcatch, type = 'response'))
+ndata.total_cover.fishcatch <- add_column(ndata.total_cover.fishcatch, fit = predict(mod.total_cover.fishcatch, newdata = ndata.total_cover.fishcatch, level=0))
 
-predict(mod.total_cover.fishcatch, newdata = ndata.total_cover.fishcatch, type = 'response')
-ndata.total_cover.fishcatch <- bind_cols(ndata.total_cover.fishcatch, setNames(as_tibble(predict(mod.total_cover.fishcatch, ndata.total_cover.fishcatch, se.fit = TRUE)[1:2]),
-                                                                                     c('fit_link','se_link')))
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.total_cover.fishcatch)[-2], ndata.total_cover.fishcatch)
+predvar <- diag(Designmat %*% vcov(mod.total_cover.fishcatch) %*% t(Designmat)) 
 
-## create the interval and backtransform
-
-ndata.total_cover.fishcatch <- mutate(ndata.total_cover.fishcatch,
-                                         fit_resp  = ilink.lmer.total_cover.fishcatch(fit_link),
-                                         right_upr = ilink.lmer.total_cover.fishcatch(fit_link + (2 * se_link)),
-                                         right_lwr = ilink.lmer.total_cover.fishcatch(fit_link - (2 * se_link)))
+ndata.total_cover.fishcatch$SE <- sqrt(predvar) 
+ndata.total_cover.fishcatch$SE2 <- sqrt(predvar+mod.total_cover.fishcatch$sigma^2)
 
 fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
 
@@ -123,12 +110,80 @@ plt.total_cover.fishcatch <- ggplot(ndata.total_cover.fishcatch, aes(x = fish_ri
   theme_classic()+
   geom_line(size=1.5, aes()) +
   geom_point(aes(y =(total_cover)), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish richness per 100 m3")) + ylab("Plant evenness")+  
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant total cover")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.total_cover.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  geom_ribbon(data = ndata.total_cover.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_cover.fishcatch
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_total_cover_fish_catch.png")
+ggsave("C:Plots//Model-fitted//LME_Poisson_total_cover_fish_catch.png")
+
+###now with fish abundance
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.total_cover.fish_abundance<-lme(total_cover ~ fish_abundance_bym3, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.total_cover.fish_abundance_log<-lme(total_cover ~ log(fish_abundance_bym3+1), random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+
+lmer.total_cover.fish_abundance<-lmer(total_cover ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.total_cover.fish_abundance_log<-lmer(total_cover ~ log(fish_abundance_bym3+1) +  (1+fish_abundance_bym3|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.total_cover.fish_abundance<-glmmTMB((total_cover+0.01) ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.total_cover.fish_abundance_log<-glmmTMB((total_cover+0.01) ~ log(fish_abundance_bym3+1) + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(lmer.total_cover.fish_abundance, lmer.total_cover.fish_abundance_log, glmm.total_cover.fish_abundance_log, glmm.total_cover.fish_abundance, lme.total_cover.fish_abundance, lme.total_cover.fish_abundance_log)
+
+summary(lme.total_cover.fish_abundance_log)
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.total_cover.fish_abundance_log,type=c("p","smooth")),
+             plot(lme.total_cover.fish_abundance_log,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.total_cover.fish_abundance_log,resid(.,type="pearson")~log(fish_abundance_bym3+1),
+                  type=c("p","smooth")),
+             qqnorm(lme.total_cover.fish_abundance_log,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+
+## Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.total_cover.fish_abundance<-lme.total_cover.fish_abundance_log
+ndata.total_cover.fish_abundance <- with(fish_stats_zscores, tibble(fish_abundance_bym3 = seq(min(fish_abundance_bym3), max(fish_abundance_bym3),length = 100),
+                                                                       unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.total_cover.fish_abundance <- add_column(ndata.total_cover.fish_abundance, fit = predict(mod.total_cover.fish_abundance, newdata = ndata.total_cover.fish_abundance, type = 'response'))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.total_cover.fish_abundance)[-2], ndata.total_cover.fish_abundance)
+predvar <- diag(Designmat %*% vcov(mod.total_cover.fish_abundance) %*% t(Designmat)) 
+
+ndata.total_cover.fish_abundance$SE <- sqrt(predvar) 
+ndata.total_cover.fish_abundance$SE2 <- sqrt(predvar+mod.total_cover.fish_abundance$sigma^2)
+
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+
+ndata.total_cover.fish_abundance$fish_abundance_bym3.unscaled<-ndata.total_cover.fish_abundance$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+
+
+
+# plot 
+plt.total_cover.fish_abundance <- ggplot(ndata.total_cover.fish_abundance, aes(x = log(fish_abundance_bym3.unscaled+1), y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(total_cover)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Log fish abundance per m3")) + ylab("Plant cover")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.total_cover.fish_abundance,aes(ymin = fit - 2*SE, ymax = fit+2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.total_cover.fish_abundance
+ggsave("C:Plots//Model-fitted//LME_total_cover_fish_abundance.png")
+
 
 
 # Plant evenness ----------------------------------------------------------
@@ -223,6 +278,93 @@ plt.plant_evenness.fishcatch <- ggplot(ndata.plant_evenness.fishcatch, aes(x = f
   theme(legend.position="none")
 plt.plant_evenness.fishcatch
 ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_evenness_fish_catch.png")
+
+###now with fish abundance
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.plant_evenness.fish_abundance<-lme(plant_evenness ~ fish_abundance_bym3, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.plant_evenness.fish_abundance_log<-lme(plant_evenness ~ log(fish_abundance_bym3+1), random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+
+lmer.plant_evenness.fish_abundance<-lmer(plant_evenness ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.plant_evenness.fish_abundance_log<-lmer(plant_evenness ~ log(fish_abundance_bym3+1) +  (1+fish_abundance_bym3|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.plant_evenness.fish_abundance<-glmmTMB((plant_evenness) ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, family="binomial", na.action=na.omit)
+glmm.plant_evenness.fish_abundance_log<-glmmTMB((plant_evenness) ~ log(fish_abundance_bym3+1) + (1|unq_isl), data=fish_stats_zscores, family="binomial", na.action=na.omit)
+
+glmm.plant_evenness.fish_abundance_gamma<-glmmTMB((plant_evenness+0.01) ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.plant_evenness.fish_abundance_log_gamma<-glmmTMB((plant_evenness+0.01) ~ log(fish_abundance_bym3+1) + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(glmm.plant_evenness.fish_abundance_gamma, glmm.plant_evenness.fish_abundance_log_gamma, lmer.plant_evenness.fish_abundance, lmer.plant_evenness.fish_abundance_log, glmm.plant_evenness.fish_abundance_log, glmm.plant_evenness.fish_abundance, lme.plant_evenness.fish_abundance, lme.plant_evenness.fish_abundance_log)
+
+summary(glmm.plant_evenness.fish_abundance_log_gamma)
+#since lme is within 0.9 i think it's a simpler model for now
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.plant_evenness.fish_abundance,type=c("p","smooth")),
+             plot(lme.plant_evenness.fish_abundance,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.plant_evenness.fish_abundance,resid(.,type="pearson")~fish_abundance_bym3,
+                  type=c("p","smooth")),
+             qqnorm(lme.plant_evenness.fish_abundance,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+
+
+
+## Visualizing glmm residuals with Dharma package
+simulationOutput <- simulateResiduals(fittedModel = lmer.plant_evenness.fish_abundance_log)
+plot(simulationOutput)
+testZeroInflation(simulationOutput)
+plot(simulationOutput, quantreg = T)
+
+# Plot the residuals against island level
+augDat <- data.frame(fish_stats_zscores,resid=residuals(glmm.plant_evenness.fish_abundance,type="pearson"),
+                     fitted=fitted(glmm.plant_evenness.fish_abundance))
+ggplot(augDat,aes(x=unq_isl,y=resid))+geom_boxplot()+coord_flip()
+
+
+
+## Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.plant_evenness.fish_abundance<-lme.plant_evenness.fish_abundance_log
+ndata.plant_evenness.fish_abundance <- with(fish_stats_zscores, tibble(fish_abundance_bym3 = seq(min(fish_abundance_bym3), max(fish_abundance_bym3),length = 100),
+                                                                       unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.plant_evenness.fish_abundance <- add_column(ndata.plant_evenness.fish_abundance, fit = predict(mod.plant_evenness.fish_abundance, newdata = ndata.plant_evenness.fish_abundance, type = 'response'))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.plant_evenness.fish_abundance)[-2], ndata.plant_evenness.fish_abundance)
+predvar <- diag(Designmat %*% vcov(mod.plant_evenness.fish_abundance) %*% t(Designmat)) 
+
+ndata.plant_evenness.fish_abundance$SE <- sqrt(predvar) 
+ndata.plant_evenness.fish_abundance$SE2 <- sqrt(predvar+mod.plant_evenness.fish_abundance$sigma^2)
+
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+
+ndata.plant_evenness.fish_abundance$fish_abundance_bym3.unscaled<-ndata.plant_evenness.fish_abundance$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+
+
+
+# plot 
+plt.plant_evenness.fish_abundance <- ggplot(ndata.plant_evenness.fish_abundance, aes(x = log(fish_abundance_bym3.unscaled+1), y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(plant_evenness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Log fish abundance per m3")) + ylab("Plant evenness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.plant_evenness.fish_abundance,aes(ymin = fit - 2*SE, ymax = fit+2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.plant_evenness.fish_abundance
+ggsave("C:Plots//Model-fitted//LME_plant_evenness_fish_abundance.png")
+
 
 
 # Plant richness ----------------------------------------------------------
@@ -322,6 +464,266 @@ plt.plant_richness.fishcatch <- ggplot(ndata.plant_richness.fishcatch, aes(x = f
 plt.plant_richness.fishcatch
 ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_catch.png")
 
+
+
+##### now with fish abundance
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
+
+
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=plant_richness, x=fish_abundance_bym3))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$plant_richness)
+qqp(fish_stats_zscores$plant_richness, "lnorm")
+#normal and Gamma both good, have a few obs. outside 
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.plant_richness.fish_abundance<-lme(plant_richness ~ fish_abundance_bym3, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.plant_richness.fish_abundance_log<-lme(plant_richness ~ log(fish_abundance_bym3+1), random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+
+lmer.plant_richness.fish_abundance<-lmer(plant_richness ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.plant_richness.fish_abundance_log<-lmer(plant_richness ~ log(fish_abundance_bym3+1) +  (1+fish_abundance_bym3|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.plant_richness.fish_abundance<-glmmTMB((plant_richness) ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+glmm.plant_richness.fish_abundance_log<-glmmTMB((plant_richness) ~ log(fish_abundance_bym3+1) + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+
+AICtab(lmer.plant_richness.fish_abundance, lmer.plant_richness.fish_abundance_log, glmm.plant_richness.fish_abundance_log, glmm.plant_richness.fish_abundance, lme.plant_richness.fish_abundance, lme.plant_richness.fish_abundance_log)
+
+summary(glmm.plant_richness.fish_abundance_log)
+
+## Visualizing glmm residuals with Dharma package
+simulationOutput <- simulateResiduals(fittedModel = glmm.plant_richness.fish_abundance_log)
+plot(simulationOutput)
+testZeroInflation(simulationOutput)
+plot(simulationOutput, quantreg = T)
+#so our model is not great still.... 
+
+# Plot the residuals against island level/ transect
+augDat <- data.frame(fish_stats_zscores,resid=residuals(glmm.plant_richness.fish_abundance,type="pearson"),
+                     fitted=fitted(glmm.plant_richness.fish_abundance))
+ggplot(augDat,aes(x=unq_isl,y=resid))+geom_boxplot()+coord_flip()
+
+
+
+## Extracting coefficients and plotting
+fam.glmm.plant_richness.fish_abundance <- family(glmm.plant_richness.fish_abundance_log )
+fam.glmm.plant_richness.fish_abundance
+str(fam.glmm.plant_richness.fish_abundance)
+ilink.glmm.plant_richness.fish_abundance<- fam.glmm.plant_richness.fish_abundance$linkinv
+ilink.glmm.plant_richness.fish_abundance
+
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.plant_richness.fish_abundance<-glmm.plant_richness.fish_abundance_log 
+ndata.plant_richness.fish_abundance <- with(fish_stats_zscores, tibble(fish_abundance_bym3 = seq(min(fish_abundance_bym3), max(fish_abundance_bym3),length = 100),
+                                                             unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.plant_richness.fish_abundance <- add_column(ndata.plant_richness.fish_abundance, fit = predict(mod.plant_richness.fish_abundance, newdata = ndata.plant_richness.fish_abundance, type = 'response'))
+
+predict(mod.plant_richness.fish_abundance, newdata = ndata.plant_richness.fish_abundance, type = 'response')
+ndata.plant_richness.fish_abundance <- bind_cols(ndata.plant_richness.fish_abundance, setNames(as_tibble(predict(mod.plant_richness.fish_abundance, ndata.plant_richness.fish_abundance, se.fit = TRUE)[1:2]),
+                                                                           c('fit_link','se_link')))
+
+## create the interval and backtransform
+
+ndata.plant_richness.fish_abundance <- mutate(ndata.plant_richness.fish_abundance,
+                                    fit_resp  = ilink.glmm.plant_richness.fish_abundance(fit_link),
+                                    right_upr = ilink.glmm.plant_richness.fish_abundance(fit_link + (2 * se_link)),
+                                    right_lwr = ilink.glmm.plant_richness.fish_abundance(fit_link - (2 * se_link)))
+
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+
+ndata.plant_richness.fish_abundance$fish_abundance_bym3.unscaled<-ndata.plant_richness.fish_abundance$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+
+
+# plot 
+plt.plant_richness.fish_abundance <- ggplot(ndata.plant_richness.fish_abundance, aes(x = log(fish_abundance_bym3.unscaled+1), y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(plant_richness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Log fish abundance per m3")) + ylab("Plant richness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.plant_richness.fish_abundance,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.plant_richness.fish_abundance
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_abundance.png")
+
+
+# Tree richness -----------------------------------------------------------
+
+fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+head(fish_stats)
+fish_stats<-fish_stats[,-1]
+fish_stats<-fish_stats %>% filter(Distance < .3)
+fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
+fish_stats<- fish_stats[complete.cases(fish_stats$tree_richness), ] 
+fish_stats_zscores<-fish_stats
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
+
+
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=tree_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$tree_richness)
+qqp(fish_stats_zscores$tree_richness, "lnorm")
+
+poisson.fish<-fitdistr(fish_stats_zscores$tree_richness, "Poisson")
+qqp(fish_stats_zscores$tree_richness, "pois", lambda=poisson.fish$estimate[[1]])
+
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.tree_richness.fishcatch<-lme(tree_richness ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lmer.tree_richness.fishcatch<-lmer(tree_richness ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.tree_richness.fishcatch<-glmmTMB((tree_richness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+#glmm.1.tree_richness.fishcatch<-glmmTMB((tree_richness+1) ~ fish_richness_corrected + (1+fish_richness_corrected|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(lmer.tree_richness.fishcatch, lmer.1.tree_richness.fishcatch,  glmm.tree_richness.fishcatch, lme.tree_richness.fishcatch)
+
+summary(lme.tree_richness.fishcatch)
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.tree_richness.fishcatch,type=c("p","smooth")),
+             plot(lme.tree_richness.fishcatch,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.tree_richness.fishcatch,resid(.,type="pearson")~log(fish_richness_corrected+1),
+                  type=c("p","smooth")),
+             qqnorm(lme.tree_richness.fishcatch,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+
+## Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.tree_richness.fish_abundance<-lme.tree_richness.fishcatch
+ndata.tree_richness.fish_abundance <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                                    unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.tree_richness.fish_abundance <- add_column(ndata.tree_richness.fish_abundance, fit = predict(mod.tree_richness.fish_abundance, newdata = ndata.tree_richness.fish_abundance, type = 'response'))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.tree_richness.fish_abundance)[-2], ndata.tree_richness.fish_abundance)
+predvar <- diag(Designmat %*% vcov(mod.tree_richness.fish_abundance) %*% t(Designmat)) 
+
+ndata.tree_richness.fish_abundance$SE <- sqrt(predvar) 
+ndata.tree_richness.fish_abundance$SE2 <- sqrt(predvar+mod.tree_richness.fish_abundance$sigma^2)
+
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+
+ndata.tree_richness.fish_abundance$fish_richness_corrected.unscaled<-ndata.tree_richness.fish_abundance$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+
+
+
+# plot 
+plt.tree_richness.fishcatch <- ggplot(ndata.tree_richness.fishcatch, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(tree_richness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant richness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.tree_richness.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.tree_richness.fishcatch
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_catch.png")
+
+
+
+##### now with fish abundance
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
+
+
+
+#visualize different distributions
+ggplot(fish_stats_zscores, aes(y=tree_richness, x=fish_abundance_bym3))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$tree_richness)
+qqp(fish_stats_zscores$tree_richness, "lnorm")
+#normal and Gamma both good, have a few obs. outside 
+
+
+#suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
+lme.tree_richness.fish_abundance<-lme(tree_richness ~ fish_abundance_bym3, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.tree_richness.fishcatch<-lme(tree_richness ~ log(fish_abundance_bym3+1), random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+
+lmer.tree_richness.fish_abundance<-lmer(tree_richness ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+lmer.tree_richness.fish_abundance_log<-lmer(tree_richness ~ log(fish_abundance_bym3+1) +  (1+fish_abundance_bym3|unq_isl), data=fish_stats_zscores, na.action=na.omit)
+
+glmm.tree_richness.fish_abundance<-glmmTMB((tree_richness) ~ fish_abundance_bym3 + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+glmm.tree_richness.fish_abundance_log<-glmmTMB((tree_richness) ~ log(fish_abundance_bym3+1) + (1|unq_isl), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+
+AICtab(lmer.tree_richness.fish_abundance, lmer.tree_richness.fish_abundance_log, glmm.tree_richness.fish_abundance_log, glmm.tree_richness.fish_abundance, lme.tree_richness.fish_abundance, lme.tree_richness.fish_abundance_log)
+
+summary(glmm.tree_richness.fish_abundance_log)
+
+## Visualizing glmm residuals with Dharma package
+simulationOutput <- simulateResiduals(fittedModel = glmm.tree_richness.fish_abundance_log)
+plot(simulationOutput)
+testZeroInflation(simulationOutput)
+plot(simulationOutput, quantreg = T)
+#so our model is not great still.... 
+
+# Plot the residuals against island level/ transect
+augDat <- data.frame(fish_stats_zscores,resid=residuals(glmm.tree_richness.fish_abundance,type="pearson"),
+                     fitted=fitted(glmm.tree_richness.fish_abundance))
+ggplot(augDat,aes(x=unq_isl,y=resid))+geom_boxplot()+coord_flip()
+
+
+
+## Extracting coefficients and plotting
+fam.glmm.tree_richness.fish_abundance <- family(glmm.tree_richness.fish_abundance_log )
+fam.glmm.tree_richness.fish_abundance
+str(fam.glmm.tree_richness.fish_abundance)
+ilink.glmm.tree_richness.fish_abundance<- fam.glmm.tree_richness.fish_abundance$linkinv
+ilink.glmm.tree_richness.fish_abundance
+
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.tree_richness.fish_abundance<-glmm.tree_richness.fish_abundance_log 
+ndata.tree_richness.fish_abundance <- with(fish_stats_zscores, tibble(fish_abundance_bym3 = seq(min(fish_abundance_bym3), max(fish_abundance_bym3),length = 100),
+                                                                       unq_isl = unq_isl[want]))
+
+
+## add the fitted values by predicting from the model for the new data
+ndata.tree_richness.fish_abundance <- add_column(ndata.tree_richness.fish_abundance, fit = predict(mod.tree_richness.fish_abundance, newdata = ndata.tree_richness.fish_abundance, type = 'response'))
+
+predict(mod.tree_richness.fish_abundance, newdata = ndata.tree_richness.fish_abundance, type = 'response')
+ndata.tree_richness.fish_abundance <- bind_cols(ndata.tree_richness.fish_abundance, setNames(as_tibble(predict(mod.tree_richness.fish_abundance, ndata.tree_richness.fish_abundance, se.fit = TRUE)[1:2]),
+                                                                                               c('fit_link','se_link')))
+
+## create the interval and backtransform
+
+ndata.tree_richness.fish_abundance <- mutate(ndata.tree_richness.fish_abundance,
+                                              fit_resp  = ilink.glmm.tree_richness.fish_abundance(fit_link),
+                                              right_upr = ilink.glmm.tree_richness.fish_abundance(fit_link + (2 * se_link)),
+                                              right_lwr = ilink.glmm.tree_richness.fish_abundance(fit_link - (2 * se_link)))
+
+fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
+
+ndata.tree_richness.fish_abundance$fish_abundance_bym3.unscaled<-ndata.tree_richness.fish_abundance$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
+
+
+# plot 
+plt.tree_richness.fish_abundance <- ggplot(ndata.tree_richness.fish_abundance, aes(x = log(fish_abundance_bym3.unscaled+1), y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(tree_richness)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Log fish abundance per m3")) + ylab("Plant richness")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.tree_richness.fish_abundance,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.tree_richness.fish_abundance
+ggsave("C:Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_abundance.png")
 
 # Beachseine only data ----------------------------------------------------
 
@@ -514,7 +916,7 @@ plt.d15n.fishcatch
 ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_catch.png")
 
 
-# Fish abundance ----------------------------------------------------------
+# Fish abundance and N15 ----------------------------------------------------------
 fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
 fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
@@ -618,14 +1020,21 @@ ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_abundance.png")
 
 
 
-# Combining Soil Plots ----------------------------------------------------
+# Combining Plots ----------------------------------------------------
 library(cowplot)
 soil_plots<-plot_grid(plt.d15n.fishcatch, plt.d15n.fish_abundance, plt.fish_speciesvabund, ncol=3, align='v', axis = 'l')
 soil_plots
                  
 ggplot2::ggsave("C:Plots//Model-fitted//soil_plots.png", width=60, height=20, units="cm")
                           
-                          
+
+plant_plots<-plot_grid(plt.plant_richness.fishcatch, plt.plant_evenness.fishcatch, plt.total_cover.fishcatch,
+                       plt.plant_richness.fish_abundance, plt.plant_evenness.fish_abundance, plt.total_cover.fish_abundance , ncol=3, align='v', axis = 'l')
+plant_plots
+
+ggplot2::ggsave("C:Plots//Model-fitted//plant_plots.png", width=60, height=40, units="cm")
+
+
 # Marine catch vs. d15n ---------------------------------------------------
 
 
