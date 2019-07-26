@@ -80,6 +80,7 @@ names(owen_coords)[2]<-"northing"
 owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
 head(owen_key_expanded)
 
+head(soil_clean)
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
@@ -87,11 +88,8 @@ head(soil_merge)
 
 soil_merge_0m <- soil_merge %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
-soil_merge_0m<-soil_merge_0m[,-1]
 
 head(soil_merge_0m)
-
-#going to take out the plot here so it make it simpler
 
 write.csv(soil_merge_0m, "C:Data by person\\Norah.data\\soil_merge_0m.csv")
 
@@ -150,12 +148,12 @@ longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentc
 
 longform_plant_percentcover3_tran_0m$unq_tran<-strtrim(longform_plant_percentcover3_tran_0m$unq_tran, 5)
 
-head(longform_plant_percentcover3_tran_0m)
+which( colnames(longform_plant_percentcover3_tran_0m)=="unq_tran" )
 
 
 head(soil_merge_0m)
 
-habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_tran", all=TRUE)
+habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m[,-2], by="unq_plot", all=TRUE)
 head(habitat_veg_soil_by_tran_0m)
 
 
