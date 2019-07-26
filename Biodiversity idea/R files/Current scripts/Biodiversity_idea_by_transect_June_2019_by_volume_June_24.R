@@ -23,7 +23,7 @@ ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.cs
 #head(ben_fish_data)
 #head(ben_bycatch_data)
 
-View(ben_fish_data)
+head(ben_fish_data)
 ggplot(ben_fish_data, aes(x=month, y=abundance, color=site))+geom_point()+theme(legend.position="none")
 ### Need to include May 
 # load packages ----------------------------------------------------------
@@ -369,7 +369,7 @@ by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
-### adding in tree diversity
+### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Data by person\\Norah.data\\by_tran_master.csv")
 #head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
@@ -409,8 +409,8 @@ paste(
 by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13)]
 #head(by_isl_master_subset)
 
-by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl")
-by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran")
+by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
+by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran", all=TRUE)
 
 
 head(by_tran_master_0m_with_isl)
@@ -419,8 +419,8 @@ head(by_tran_master_0m_with_isl)
 #head(fish_bycatch_richness_merged_tran)
 
 #merging terrestrial with marine and adding in marine site information, saving file
-fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran")
-fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
+fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all=TRUE)
+fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site", all=TRUE)
 #head(fish_richness_merged_tran_isl)
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
@@ -428,6 +428,7 @@ write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_t
 #how many beachseine sites - 12, how many transects - 106
 length(unique(fish_richness_merged_tran_isl$site))
 length(unique(fish_richness_merged_tran_isl$unq_tran))
+#I think I added more after I fixed the issues with Owen's plots! 
 
 # Determining best scale of comparison -----------------------------------------
 
