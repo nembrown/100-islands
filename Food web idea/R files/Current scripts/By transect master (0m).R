@@ -566,5 +566,5 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 
 # Tidying up -------------------------------------------------------------
 
-head(by_tran_master_0m)
+View(by_tran_master_0m)
 write.csv(by_tran_master_0m, "C:Data by person//Norah.data/by_tran_master_0m.csv")
