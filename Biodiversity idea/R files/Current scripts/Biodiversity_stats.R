@@ -81,7 +81,7 @@ qqp(fish_stats_zscores$total_cover, "lnorm")
 
 #suite of models, we need to have unq_isl as a random effect, therefore mixed effects models
 lme.total_cover.fishcatch<-lme(total_cover ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-glmm.total_cover.fishcatch<-glmmTMB((total_cover) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.total_cover.fishcatch<-glmmTMB((total_cover+0.01) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 
 AICtab(glmm.total_cover.fishcatch, lme.total_cover.fishcatch)
 
@@ -201,6 +201,8 @@ ggsave("C:Plots//Model-fitted//LME_total_cover_fish_abundance.png")
 
 
 # Plant evenness vs. fish richness ----------------------------------------------------------
+##this one differs between 1km and 0.3km ... 
+
 
 #visualize different distributions
 ggplot(fish_stats_zscores, aes(y=plant_evenness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
@@ -216,7 +218,7 @@ qqp(fish_stats_zscores$plant_evenness, "pois", lambda=poisson.fish$estimate[[1]]
 lme.plant_evenness.fishcatch<-lme(plant_evenness ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 
 glmm.plant_evenness.fishcatch<-glmmTMB((plant_evenness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="binomial", na.action=na.omit)
-glmm.plant_evenness.fishcatch_gam<-glmmTMB((plant_evenness) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.plant_evenness.fishcatch_gam<-glmmTMB((plant_evenness+0.01) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 
 AICtab(glmm.plant_evenness.fishcatch, lme.plant_evenness.fishcatch, glmm.plant_evenness.fishcatch_gam)
 
@@ -548,19 +550,6 @@ ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_abundance.png")
 
 # Tree richness vs. fish richness -----------------------------------------------------------
 
-fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
-head(fish_stats)
-fish_stats<-fish_stats[,-1]
-fish_stats<-fish_stats %>% filter(Distance < .3)
-fish_stats<- fish_stats[complete.cases(fish_stats$fish_richness_corrected), ] 
-fish_stats<- fish_stats[complete.cases(fish_stats$tree_richness), ] 
-fish_stats_zscores<-fish_stats
-fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
-fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
-fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
-
-
-
 #visualize different distributions
 ggplot(fish_stats_zscores, aes(y=tree_richness, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
 qqp(fish_stats_zscores$tree_richness)
@@ -699,7 +688,6 @@ plt.tree_richness.fish_abundance
 ggsave("C:Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_abundance.png")
 
 # Beachseine only data ----------------------------------------------------
-
 
 beachseine_stats<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 
