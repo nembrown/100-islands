@@ -117,7 +117,7 @@ AssignClosestTempPoints()
 
 
 ### now with transects
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 head(ben_habitat_data_simple)
 bens_sites<-ben_habitat_data_simple
@@ -191,7 +191,7 @@ AssignClosestTempPoints2 <- function()
    # And, at the end, write the point assignment file.
    #
    message("Write beachseine/site assignment table to disk in .csv format")
-   write.csv(FinalTable2,file="Distance_btwn_points_transects.csv")
+   write.csv(FinalTable2,file="C:Output files//Distance_btwn_points_transects.csv")
 }
 
 AssignClosestTempPoints2()
