@@ -24,7 +24,8 @@ ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.cs
 #head(ben_bycatch_data)
 
 head(ben_fish_data)
-ggplot(ben_fish_data, aes(x=month, y=abundance, color=site))+geom_point()+theme(legend.position="none")
+ggplot(ben_fish_data %>% filter(species=="herr"), aes(x=month, y=abundance, color=site))+geom_point()
+
 ### Need to include May 
 # load packages ----------------------------------------------------------
 library(rlang)
@@ -348,18 +349,26 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_
 
 
 # Matching terrestrial transects to beachseine sites ----------------------
-#pulls from output files of R script - "Assigned points"
-hakai_sites_distance_tran<-read.csv("C:Output files//Distance_btwn_points_transects.csv")
+
+#This is one option: 
+# #pulls from output files of R script - "Assigned points"
+# hakai_sites_distance_tran<-read.csv("C:Output files//Distance_btwn_points_transects.csv")
+# hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
+# #head(hakai_sites_distance_tran)
+# names(hakai_sites_distance_tran)[3]<-"unq_tran"
+# names(hakai_sites_distance_tran)[6]<-"site"
+# hakai_sites_distance_tran<- hakai_sites_distance_tran%>% filter(Distance < 5)
+# #head(hakai_sites_distance_tran )
+
+
+#This is working with a 1km radius around the transects instead
+hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
-#head(hakai_sites_distance_tran)
-names(hakai_sites_distance_tran)[3]<-"unq_tran"
-names(hakai_sites_distance_tran)[6]<-"site"
-hakai_sites_distance_tran<- hakai_sites_distance_tran%>% filter(Distance < 5)
-#head(hakai_sites_distance_tran )
+head(hakai_sites_distance_tran)
 
-fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran[,c(3,5,6)], by="site")
+fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
-#head(fish_bycatch_richness_merged_tran)
+head(fish_bycatch_richness_merged_tran)
 
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
