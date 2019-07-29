@@ -66,7 +66,7 @@ ben_netdimensions_summer$sum_volume<-as.numeric(ben_netdimensions_summer$sum_vol
 
 
 # Fish data cleaning ------------------------------------------------------
-#head(ben_fish_data)
+View(ben_fish_data)
 #only summer months 
 ben_fish_data <- ben_fish_data %>% filter(between(month, 5,8))
 
@@ -619,7 +619,11 @@ ggplot(fish_richness_merged_tran_isl_1k, aes(y=log(insect_abs_abundance+1), x=fi
 ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_beat_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 ggplot(fish_richness_merged_tran_isl_300, aes(y=(insect_pitfall_av_abundance), x=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
+ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=pelagic_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
+ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=demersal_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
+
+View(fish_richness_merged_tran_isl_300)
 
 #transect level
 marine_plant<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=plant.richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))

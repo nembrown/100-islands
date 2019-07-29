@@ -330,7 +330,7 @@ plt.plant_evenness.fish_abundance <- ggplot(ndata.plant_evenness.fish_abundance,
   geom_point(aes(y =(plant_evenness)), size=3, data = fish_stats_zscores)+
   xlab(expression("Fish abundance per m3")) + ylab("Plant_evenness")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.plant_evenness.fish_abundance,aes(ymin = fit - 2*SE2, ymax = fit + 2*SE2), alpha = 0.10)+
+  geom_ribbon(data = ndata.plant_evenness.fish_abundance,aes(ymin = fit - 2*SE, ymax = fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.plant_evenness.fish_abundance
 ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_evenness_fish_abundance.png")
@@ -715,6 +715,7 @@ summary(lm.fish_speciesvabund_log)
 
 plot(lm.fish_speciesvabund_log)
 
+r2.corr.mer(lm.fish_speciesvabund_log)
 
 ## Extracting coefficients and plotting
 fam.lm.fish_speciesvabund_log <- family(lm.fish_speciesvabund_log)
@@ -779,9 +780,16 @@ glmm.d15n.fishcatch<-glmmTMB((d15n+1.5) ~ fish_richness_corrected + (1|unq_isl),
 glmm.d15n.fishcatch_admb<-glmmadmb((d15n+1.5) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
 
 
-AICtab(lmer.d15n.fishcatch, lmer.1.d15n.fishcatch,  glmm.d15n.fishcatch, lme.d15n.fishcatch, glmm.d15n.fishcatch_admb)
+AICtab(glmm.d15n.fishcatch, lme.d15n.fishcatch)
 
-summary(glmm.d15n.fishcatch_admb)
+summary(glmm.d15n.fishcatch)
+
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
+
+r2.corr.mer(glmm.d15n.fishcatch)
 
 
 ## Visualizing glmm residuals with Dharma package
@@ -884,6 +892,12 @@ AICtab(glmm.d15n.fish_abundance_log, glmm.d15n.fish_abundance, lme.d15n.fish_abu
 summary(glmm.d15n.fish_abundance_log)
 
 #dwplot(list(glmmTMB=glmm.d15n.fish_abundance,lmer=lmer.d15n.fish_abundance),by_2sd=TRUE)
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
+
+r2.corr.mer(glmm.d15n.fish_abundance_log)
 
 
 ## Visualizing glmm residuals with Dharma package

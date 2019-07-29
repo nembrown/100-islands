@@ -40,7 +40,7 @@ library(cowplot)
 library(gtable)
 library(gridExtra)
 
-
+install.packages("r2glmm")
 #install.packages('TMB', type = 'source')
 
 # Reading data -------------------------------------------------------------------------
@@ -793,6 +793,11 @@ AICtab( glmm.d15n.fishcatch_300, lme.d15n.fishcatch_300)
 
 summary(lme.d15n.fishcatch_300)
 
+m<-lme.d15n.fishcatch_300
+r2<-1-var(residuals(m))/var(model.response(model.frame(m)))
+
+cor(model.response(model.frame(m)),predict(m,type="response"))^2
+
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
 grid.arrange(plot(lme.d15n.fishcatch_300,type=c("p","smooth")),
@@ -866,6 +871,17 @@ AICtab(glmm.d15n.fish_abundance_log, glmm.d15n.fish_abundance, lme.d15n.fish_abu
 summary(glmm.d15n.fish_abundance)
 
 #dwplot(list(glmmTMB=glmm.d15n.fish_abundance,lmer=lmer.d15n.fish_abundance),by_2sd=TRUE)
+
+#jarrett byrnes, but on bolker blog
+#https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+#solutinos/approximations of r2
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
+
+r2.corr.mer(glmm.d15n.fish_abundance)
+
 
 
 ## Visualizing glmm residuals with Dharma package
