@@ -428,9 +428,9 @@ head(by_tran_master_0m_with_isl)
 #head(fish_bycatch_richness_merged_tran)
 
 #merging terrestrial with marine and adding in marine site information, saving file
-fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all=TRUE)
-fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site", all=TRUE)
-#head(fish_richness_merged_tran_isl)
+fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all.y=TRUE)
+fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
+head(fish_richness_merged_tran_isl)
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
@@ -441,21 +441,17 @@ length(unique(fish_richness_merged_tran_isl$unq_tran))
 
 # Determining best scale of comparison -----------------------------------------
 
-#restricting site and transect matches to a given distance in kms
-fish_richness_merged_tran_isl_300<-fish_richness_merged_tran_isl %>% filter(Distance < 0.3)
-fish_richness_merged_tran_isl_350<-fish_richness_merged_tran_isl %>% filter(Distance < 0.35)
-fish_richness_merged_tran_isl_250<-fish_richness_merged_tran_isl %>% filter(Distance < 0.25)
-fish_richness_merged_tran_isl_400<-fish_richness_merged_tran_isl %>% filter(Distance < 0.4)
-fish_richness_merged_tran_isl_500<-fish_richness_merged_tran_isl %>% filter(Distance < 0.5)
-fish_richness_merged_tran_isl_100<-fish_richness_merged_tran_isl %>% filter(Distance < 0.1)
-fish_richness_merged_tran_isl_600<-fish_richness_merged_tran_isl %>% filter(Distance < 0.6)
-fish_richness_merged_tran_isl_750<-fish_richness_merged_tran_isl %>% filter(Distance < 0.75)
-fish_richness_merged_tran_isl_850<-fish_richness_merged_tran_isl %>% filter(Distance < 0.85)
-fish_richness_merged_tran_isl_2k<-fish_richness_merged_tran_isl %>% filter(Distance < 2)
-fish_richness_merged_tran_isl_3k<-fish_richness_merged_tran_isl %>% filter(Distance < 3)
-fish_richness_merged_tran_isl_1k<-fish_richness_merged_tran_isl %>% filter(Distance < 1)
-fish_richness_merged_tran_isl_4k<-fish_richness_merged_tran_isl %>% filter(Distance < 4)
-fish_richness_merged_tran_isl_5k<-fish_richness_merged_tran_isl %>% filter(Distance < 5)
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+geom_text(aes(label=unq_tran))
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n, col=PA_norml))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_c()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(fish_abundance_bym3+1), y=d15n, col=PA_norml))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_c()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(fish_abundance_bym3+1), y=d15n))+geom_point()+geom_smooth(aes(),method="gam")
+
+
+
+
+ head(fish_richness_merged_tran_isl)
 
 #plotting the relationship between n15 and fish richness at various distances
 n15_100<-ggplot(fish_richness_merged_tran_isl_100, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(method="lm")+ggtitle("100 m")
