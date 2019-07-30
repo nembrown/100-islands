@@ -178,11 +178,24 @@ ben_beachseine$lat<-st_coordinates(ben_beachseine)[,2]
 bbox_marine_beachseine <- make_bbox(ben_beachseine$long, ben_beachseine$lat, f = 0.01)
 map_marine_beachseine <- get_stamenmap(bbox_marine_beachseine, source="stamen", maptype= "terrain", crop=FALSE)
 
-ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_richness_uncorrected.png", width=40, height=20, unit="cm")
-
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness_corrected))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass.png", width=40, height=20, unit="cm")
+
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_biomass_bym3_sd))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_sd.png", width=40, height=20, unit="cm")
+
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_length))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_length.png", width=40, height=20, unit="cm")
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_abundance_bym3))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_abundance.png", width=40, height=20, unit="cm")
+
+
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=pelagic_abundance_bym3))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
