@@ -20,7 +20,7 @@ ben_weights<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_specieslength_
 
 
 #if I want to include approximates of 2014 net size do thes file_nb
-ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions.csv")
+ben_netdimensions<-read.csv("C:Ben.data//beachseine_calvert_NB//netdimensions_nb.csv")
 
 #head(ben_netdimensions)
 #head(ben_fish_data)
@@ -76,13 +76,13 @@ ben_fish_data <- ben_fish_data %>% filter(between(month, 5,8))
 
 
 #make wide format to calculate number of species
-#use sum of abundance to reflect all species caught in a given summer 
+#use sum of abundance to reflect total of all fish caught in a given summer 
 ben_fish_data_wide_year <-ben_fish_data %>% group_by(site, year, species) %>% 
   summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
   spread( species, sum_abundance) %>% 
   replace(is.na(.), 0) 
 
-#head(ben_fish_data_wide_year)
+head(ben_fish_data_wide_year)
 
 #calculate richness & abundance  from the wide dataframe
 ben_fish_data_wide_year_richness<-ben_fish_data_wide_year[,c(1,2)]
@@ -206,39 +206,89 @@ head(ben_size_data_wide_year)
 ben_size_data_wide_year_richness<-ben_size_data_wide_year[,c(1,2, 3, 4, 5)]
 ben_size_data_wide_year_richness$fish_length<-rowMeans(ben_size_data_wide_year[,-c(1,2,3,4,5)],na.rm = TRUE)
 ben_size_data_wide_year_richness$fish_sd<-rowSds(as.matrix(ben_size_data_wide_year[,-c(1,2,3,4,5)]),na.rm = TRUE)
-#head(ben_size_data_wide_year_richness)
+head(ben_size_data_wide_year_richness)
 
-ben_size_data_wide_year_richness <- ben_size_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-#head(ben_size_data_wide_year_richness)
+ben_size_data_wide_year_richness <- ben_size_data_wide_year_richness[,-c(2,3,4,5)] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(ben_size_data_wide_year_richness)
 
 ### Now adding in the biomass data from genevieve - fish base ... times the length by the LW relationship for that species
+#Also do this by replicate
 head(ben_weights)
 ben_weights<-ben_weights[,-c(15,16,17,18, 19)]
 ben_weights2 <-ben_weights %>% filter(between(month, 5,8))
 
-ben_weights_wide_year <-ben_weights2 %>%  replace(is.na(.), 0) %>% group_by(site, year, species) %>% 
+ben_weights_wide_year <-ben_weights2 %>%  replace(is.na(.), 0) %>% group_by(site, year, month, day, replicate, species) %>% 
   summarise(fish_weight = mean(Weight..g., na.rm=TRUE)) %>% 
   spread( species, fish_weight) %>% 
   replace(is.na(.), 0)
 
+#481 x 97 
 head(ben_weights_wide_year)
 
-ben_weights_wide_year_richness<-ben_weights_wide_year[,c(1,2)]
-ben_weights_wide_year_richness$fish_av_weight<-rowMeans(ben_weights_wide_year[,-c(1,2)],na.rm = TRUE)
-ben_weights_wide_year_richness$fish_weight_sd<-rowSds(as.matrix(ben_weights_wide_year[,-c(1,2)]),na.rm = TRUE)
-#head(ben_weights_wide_year_richness)
+ben_weights_wide_year_richness<-ben_weights_wide_year[,c(1,2,3,4,5)]
+ben_weights_wide_year_richness$fish_av_weight<-rowMeans(ben_weights_wide_year[,-c(1,2,3,4,5)],na.rm = TRUE)
+ben_weights_wide_year_richness$fish_weight_sd<-rowSds(as.matrix(ben_weights_wide_year[,-c(1,2,3,4,5)]),na.rm = TRUE)
+head(ben_weights_wide_year_richness)
+
+ben_weights_wide_year_richness <- ben_weights_wide_year_richness[,-c(2,3,4,5)] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(ben_weights_wide_year_richness)
+
+ben_fish_data_wide_year_2 <-ben_fish_data %>% group_by(site, year, month, day, replicate, species) %>% 
+  summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
+  spread( species, sum_abundance) %>% 
+  replace(is.na(.), 0) 
+
+#488 x 97
+head(ben_fish_data_wide_year_2)
+
+#biomass is missing 8 rows ... abundance missing 1 rows
+ben_fish_data_wide_year_3<-ben_fish_data_wide_year_2
+ben_fish_data_wide_year_3$code<-paste(ben_fish_data_wide_year_3$site, ben_fish_data_wide_year_3$year, ben_fish_data_wide_year_3$month, ben_fish_data_wide_year_3$day, ben_fish_data_wide_year_3$replicate)
+ben_weights_wide_year_3<-ben_weights_wide_year
+ben_weights_wide_year_3$code<-paste(ben_weights_wide_year_3$site, ben_weights_wide_year_3$year, ben_weights_wide_year_3$month, ben_weights_wide_year_3$day, ben_weights_wide_year_3$replicate)
+
+subset(ben_fish_data_wide_year_3, !(code %in% ben_weights_wide_year_3$code))
+#8
+
+subset(ben_weights_wide_year_3, !(code %in% ben_fish_data_wide_year_3$code))
+#1 
+
+head(ben_weights_wide_year_3$code)
+ben_weights_wide_year_4 <- ben_weights_wide_year_3 %>% filter(code!="ppo 2014 6 14 2")
+ben_weights_wide_year_4 <- ben_weights_wide_year_4[,-98]
+
+ben_fish_data_wide_year_4 <- ben_fish_data_wide_year_3 %>% filter(! code %in% c("fan1 2018 7 15 2", "hdo 2015 5 3 2", 
+                                                                                "ppo 2018 5 29 2", "ris1 2018 7 19 2", 
+                                                                                "ssp 2014 7 2 2", "ssp 2016 5 8 2", 
+                                                                                "wfb 2014 6 11 1", "wfb 2014 6 11 2"))
+ben_fish_data_wide_year_4<- ben_fish_data_wide_year_4[,-98]
+
+
 
 #combining size and abundance to get "biomass" estimate
-ben_biomass_data_wide_year<-(ben_weights_wide_year[,-c(1,2)])*(ben_fish_data_wide_year[,-c(1,2)])
-ben_biomass_data_wide_year_nf<-ben_size_data_wide_year[,c(1,2)]
+ben_biomass_data_wide_year<-(ben_weights_wide_year_4[,-c(1,2,3,4,5)])*(ben_fish_data_wide_year_4[,-c(1,2,3,4,5)])
+ben_biomass_data_wide_year_nf<-ben_weights_wide_year_4[,c(1,2,3,4,5)]
 ben_biomass_data_wide_year_nf$fish_biomass<-rowSums(ben_biomass_data_wide_year)
 head(ben_biomass_data_wide_year_nf)
 
 #correcting for total net volume
-ben_biomass_data_wide_year_nf<-merge(ben_biomass_data_wide_year_nf, ben_netdimensions_summer)
+ben_netdimensions_summer4 <-ben_netdimensions%>% filter(between(month, 5,8)) %>% group_by(site, year, month, replicate) %>% 
+  summarise(sum_volume = sum(volume, na.rm=TRUE)) 
+ben_netdimensions_summer4$sum_volume[ben_netdimensions_summer4$sum_volume==0]<-"NA"
+head(ben_netdimensions_summer4)
+ben_netdimensions_summer4$sum_volume<-as.numeric(ben_netdimensions_summer4$sum_volume)
+
+ 
+
+
+head(ben_netdimensions_summer)
+ben_biomass_data_wide_year_nf<-merge(ben_biomass_data_wide_year_nf, ben_netdimensions_summer4)
 ben_biomass_data_wide_year_nf$fish_biomass_bym3<-ben_biomass_data_wide_year_nf$fish_biomass/(ben_biomass_data_wide_year_nf$sum_volume)
 ben_biomass_data_wide_year_nf <-ben_biomass_data_wide_year_nf[,-2]%>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(ben_biomass_data_wide_year_nf)
+
+ben_size_data_wide_year_richness <- ben_size_data_wide_year_richness[,-c(2,3,4,5)] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(ben_size_data_wide_year_richness)
 
 #Pelagic and demersal data - changed to biomass 
 
