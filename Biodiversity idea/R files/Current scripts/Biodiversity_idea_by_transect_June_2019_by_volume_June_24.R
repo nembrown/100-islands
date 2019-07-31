@@ -490,7 +490,7 @@ head(by_tran_master_subset)
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Data by person\\Owen's data//by_isl_master.csv")
 by_isl_master<-by_isl_master[,-1]
-#head(by_isl_master)
+head(by_isl_master)
 paste(
   which( colnames(by_isl_master)=="unq_isl" ),
   which( colnames(by_isl_master)=="mammal_richness" ),
@@ -504,10 +504,12 @@ paste(
   which( colnames(by_isl_master)=="DistW_ML" ),
   which( colnames(by_isl_master)=="Dist_Near" ),
   which( colnames(by_isl_master)=="Area" ),
+  which( colnames(by_isl_master)=="size.cat2" ),
+  which( colnames(by_isl_master)=="d15n.cat" ),
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13)]
+by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13, 105, 106)]
 #head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
@@ -544,8 +546,20 @@ ggplot(fish_richness_merged_tran_isl, aes(y=fish_biomass_bym3_sd, x=fish_biomass
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="gam")
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n, colour=PA_norml))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_c()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n, colour=size.cat2))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=plant_richness, colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
+
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=plant_richness, colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+
+
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_av_weight, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
