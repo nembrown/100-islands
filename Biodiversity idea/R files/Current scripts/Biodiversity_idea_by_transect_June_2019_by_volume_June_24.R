@@ -577,15 +577,15 @@ ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(tree_richness), col
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(insect_richness), colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
-<<<<<<< HEAD
+
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(insect_richness), colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(insect_richness), colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_c()
-=======
+
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=insect_richness, colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(insect_richness), colour=d15n))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_c()
->>>>>>> 95e4e8e6d7c07b7483c983712bf486418db5f141
+
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
