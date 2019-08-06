@@ -470,6 +470,12 @@ by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
+ 
+xs3=quantile(na.omit(by_tran_master_0m$d15n),c(0,1/2, 1))
+labels3 <- c("low d15N", "high d15N")
+by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
+
+
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Data by person\\Norah.data\\by_tran_master.csv")
 #head(by_tran_master)
@@ -505,11 +511,10 @@ paste(
   which( colnames(by_isl_master)=="Dist_Near" ),
   which( colnames(by_isl_master)=="Area" ),
   which( colnames(by_isl_master)=="size.cat2" ),
-  which( colnames(by_isl_master)=="d15n.cat" ),
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13, 105, 106)]
+by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13, 105)]
 #head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
@@ -525,6 +530,15 @@ head(by_tran_master_0m_with_isl)
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all.y=TRUE)
 fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
+
+xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,1/2, 1))
+labels4 <- c("low fish biomass", "high fish biomass")
+fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
+head(fish_richness_merged_tran_isl)
+
+
+
+
 setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
@@ -548,16 +562,29 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geo
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n, colour=size.cat2))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
-ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=plant_richness, colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
+ggplot(fish_richness_merged_tran_isl, aes(col=log(Area), y=plant_richness, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
 
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=plant_richness, colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(plant_richness), colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(plant_richness), colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=tree_richness, colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=tree_richness, colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=insect_richness, colour=d15n.cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=insect_richness, colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+
+
+
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=d15n, colour=fish_richness_corrected))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
 
