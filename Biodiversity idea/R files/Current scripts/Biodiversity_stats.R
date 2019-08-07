@@ -776,7 +776,7 @@ lme.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1|unq_isl, data
 #lme.1.d15n.fishcatch<-lme(d15n ~ fish_richness_corrected, random= ~1+fish_richness_corrected|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 
 
-glmm.d15n.fishcatch<-glmmTMB((d15n+1.5) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
+glmm.d15n.fishcatch<-glmmTMB((d15n+1.5) ~ fish_richness_corrected + (1|unq_isl) + (1|site), data=fish_stats_zscores, family="Gamma")
 glmm.d15n.fishcatch_admb<-glmmadmb((d15n+1.5) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma")
 
 

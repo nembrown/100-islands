@@ -25,7 +25,7 @@ df.SF_transects_simple<-unique(df.SF_transects[,c(1)])
 df.SF_transects_simple_new<- df.SF_transects_simple %>% st_transform(3035) 
 
 
-
+#https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
 
 # Buffer circles by 500m -- creates polygons around the 
 dat_circles <- st_buffer(df.SF_transects_simple_new, dist = 1000)

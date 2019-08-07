@@ -138,7 +138,7 @@ head(ben_habitat_data_simple.SP)
 ben_habitat_data_simple.SP$site_type<-"beachseine"
 
 head(df.SF_transects)
-df.SF_transects_simple<-unique(df.SF_transects[,c(9)])
+df.SF_transects_simple<-df.SF_transects[,1]
 head(df.SF_transects_simple)
 names(df.SF_transects_simple)[1]<-"site"
 df.SF_transects_simple$site_type<-"100_islands"
@@ -149,13 +149,47 @@ df.SF_transects_marine$long<-st_coordinates(df.SF_transects_marine)[,1] # get co
 df.SF_transects_marine$lat<-st_coordinates(df.SF_transects_marine)[,2]
 
 
-bbox_marine_trans <- make_bbox(df.SF_transects_marine$long, df.SF_transects_marine$lat, f = 0.01)
+bbox_marine_trans <- make_bbox(df.SF_transects_marine$long, df.SF_transects_marine$lat, f = 0.1)
 map_toner_lite_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "toner-lite", crop=FALSE)
-map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "terrain", crop=FALSE)
+map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "terrain", crop=TRUE)
 
 
-ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
-ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
+# ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+# ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
+
+# devtools::install_github("dill/beyonce")
+library(beyonce)
+
+colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
+
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+
+ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
+ggsave("C:Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
+
+
+# Map at 1km radius only -------------------------------------------------------
+
+hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
+hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
+head(hakai_sites_distance_tran)
+
+head(df.SF_transects_marine)
+
+
+df.SF_transects_marine_1k_beachseine<-subset(df.SF_transects_marine, (site %in% hakai_sites_distance_tran$site))
+head(df.SF_transects_marine_1k_beachseine)
+
+df.SF_transects_marine_1k_unq_tran<-subset(df.SF_transects_marine, (site %in% hakai_sites_distance_tran$unq_tran))
+head(df.SF_transects_marine_1k_unq_tran)
+
+df.SF_transects_marine_1k <-rbind(df.SF_transects_marine_1k_unq_tran, df.SF_transects_marine_1k_beachseine)
+head(df.SF_transects_marine_1k)
+
+ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine_1k, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
+ggsave("C:Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, unit="cm")
+
+
 
 
 
@@ -178,11 +212,24 @@ ben_beachseine$lat<-st_coordinates(ben_beachseine)[,2]
 bbox_marine_beachseine <- make_bbox(ben_beachseine$long, ben_beachseine$lat, f = 0.01)
 map_marine_beachseine <- get_stamenmap(bbox_marine_beachseine, source="stamen", maptype= "terrain", crop=FALSE)
 
-ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_richness_uncorrected.png", width=40, height=20, unit="cm")
-
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness_corrected))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass.png", width=40, height=20, unit="cm")
+
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_biomass_bym3_sd))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_sd.png", width=40, height=20, unit="cm")
+
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_length))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_length.png", width=40, height=20, unit="cm")
+
+ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_abundance_bym3))+  scale_colour_viridis()
+ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_abundance.png", width=40, height=20, unit="cm")
+
+
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=pelagic_abundance_bym3))+  scale_colour_viridis()
 ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
