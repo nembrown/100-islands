@@ -39,16 +39,16 @@ library(gratia)
 library(cowplot)
 library(gtable)
 library(gridExtra)
-
+library(gamm4)
 
 #install.packages('TMB', type = 'source')
 
 # Reading data -------------------------------------------------------------------------
 #Reading in the data and making scaled
 fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
-str(fish_stats)
+head(fish_stats)
 fish_stats<-fish_stats[,-1]
-fish_stats<-fish_stats %>% filter(Distance < 1)
+# fish_stats<-fish_stats %>% filter(Distance < 1)
 fish_stats_zscores$d15n<-as.numeric(fish_stats_zscores$d15n)
 
 fish_stats$fish_abundance_bym3_log<-log(fish_stats$fish_abundance_bym3+1)
@@ -61,6 +61,10 @@ fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corre
 fish_stats_zscores$fish_richness_corrected.unscaled <-fish_stats_zscores$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
 fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_richness_corrected)
 
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+fish_stats_zscores$fish_biomass_bym3_mean.unscaled <-fish_stats_zscores$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+fish_stats_zscores$fish_biomass_bym3_mean<-as.numeric(fish_stats_zscores$fish_biomass_bym3_mean)
+
 
 fish_stats_zscores$fish_abundance_bym3_log<-scale(fish_stats$fish_abundance_bym3_log, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_abundance_bym3_log.unscaled <-fish_stats_zscores$fish_abundance_bym3_log * attr(fish_stats_zscores$fish_abundance_bym3_log, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3_log, 'scaled:center')
@@ -70,6 +74,271 @@ fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, ce
 fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
 fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
 
+# Shrub cover (total) vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=shrub_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$shrub_cover)
+qqp(fish_stats_zscores$shrub_cover, "lnorm")
+
+
+#this is the right specification 
+lmer.shrub_cover.fishbiomass<-lmer(shrub_cover ~ fish_biomass_bym3_mean + (1|unq_isl) + (1|site), data=fish_stats_zscores, na.action=na.omit)
+glmm.shrub_cover.fishbiomass<-glmmTMB((shrub_cover) ~ fish_biomass_bym3_mean + (1|unq_isl)+ (1|site), data=fish_stats_zscores, family="gaussian", na.action=na.omit)
+
+gamm.shrub_cover.fishbiomass<- gamm4(shrub_cover ~ s(fish_biomass_bym3_mean), random=~(1|unq_isl)+ (1|site), data=fish_stats_zscores, family="gaussian")
+
+gam.shrub_cover.fishbiomass<- gam(shrub_cover ~ s(fish_biomass_bym3_mean) + s(unq_isl, bs="re")+s(site,bs="re"), data=fish_stats_zscores, method="REML")
+gam.shrub_cover.fishbiomass_3<- gam(shrub_cover ~ s(fish_biomass_bym3_mean, unq_isl, bs="re")+s(fish_biomass_bym3_mean,site,bs="re"), data=fish_stats_zscores, method="REML")
+gam.shrub_cover.fishbiomass_2<- gam(shrub_cover ~ s(fish_biomass_bym3_mean, unq_isl, bs="re")+s(site,bs="re"), data=fish_stats_zscores, method="REML")
+
+AICtab(gam.shrub_cover.fishbiomass_2, gam.shrub_cover.fishbiomass,gam.shrub_cover.fishbiomass_3, glmm.shrub_cover.fishbiomass, lmer.shrub_cover.fishbiomass, gamm.shrub_cover.fishbiomass$mer)
+#or gam just specifying ransom effects.... as smooth
+
+
+AICtab(glmm.shrub_cover.fishbiomass, lmer.shrub_cover.fishbiomass, gamm.shrub_cover.fishbiomass$mer)
+
+summary(gam.shrub_cover.fishbiomass)
+
+plot(gam.shrub_cover.fishbiomass, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
+appraise(gam.shrub_cover.fishbiomass)
+qq_plot(gam.shrub_cover.fishbiomass, method = 'simulate')
+k.check(gam.shrub_cover.fishbiomass)
+
+
+fam.gam.shrub_cover.fishbiomass <- family(gam.shrub_cover.fishbiomass)
+fam.gam.shrub_cover.fishbiomass 
+str(fam.gam.shrub_cover.fishbiomass )
+ilink.gam.shrub_cover.fishbiomass <- fam.gam.shrub_cover.fishbiomass$linkinv
+ilink.gam.shrub_cover.fishbiomass
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.shrub_cover.fishbiomass<-gam.shrub_cover.fishbiomass
+ndata.shrub_cover.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+                                                               unq_isl = unq_isl[want], site = site[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.shrub_cover.fishbiomass <- add_column(ndata.shrub_cover.fishbiomass, fit = predict(mod.shrub_cover.fishbiomass, newdata = ndata.shrub_cover.fishbiomass, level=0))
+
+ndata.shrub_cover.fishbiomass <- bind_cols(ndata.shrub_cover.fishbiomass, setNames(as_tibble(predict(mod.shrub_cover.fishbiomass, ndata.shrub_cover.fishbiomass, se.fit = TRUE)[1:2]),
+                                                   c('fit_link','se_link')))
+
+
+ndata.shrub_cover.fishbiomass <- mutate(ndata.shrub_cover.fishbiomass,
+                        fit_resp  = ilink.gam.shrub_cover.fishbiomass(fit_link),
+                        right_upr = ilink.gam.shrub_cover.fishbiomass(fit_link + (2 * se_link)),
+                        right_lwr = ilink.gam.shrub_cover.fishbiomass(fit_link - (2 * se_link)))
+
+
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+
+ndata.shrub_cover.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.shrub_cover.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+
+
+# plot 
+plt.shrub_cover.fishbiomass <- ggplot(ndata.shrub_cover.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =(shrub_cover)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant shrub cover")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.shrub_cover.fishbiomass,aes(ymin = right_lwr, ymax =  right_upr), alpha = 0.10)+
+  theme(legend.position="none")
+plt.shrub_cover.fishbiomass
+ggsave("C:Plots//Model-fitted//GAM_shrub_cover_fish_biomass.png")
+
+
+
+# Herb cover (total) vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=herb_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$herb_cover)
+qqp(fish_stats_zscores$herb_cover, "lnorm")
+
+# lme.herb_cover.fishbiomass<-lme(herb_cover ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.herb_cover.fishbiomass_site<-lme(herb_cover ~ fish_biomass_bym3_mean, random=list(unq_isl=~1, site=~1), data=fish_stats_zscores, na.action=na.omit)
+lme.herb_cover.fishbiomass_site_log<-lme(log(herb_cover+1) ~ fish_biomass_bym3_mean, random=list(unq_isl=~1, site=~1), data=fish_stats_zscores, na.action=na.omit)
+
+
+#glmm.herb_cover.fishbiomass<-glmmTMB((herb_cover+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(lme.herb_cover.fishbiomass, lme.herb_cover.fishbiomass_site, lme.herb_cover.fishbiomass_site_log)
+
+summary(lme.herb_cover.fishbiomass_site_log)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.herb_cover.fishbiomass_site_log,type=c("p","smooth")),
+             plot(lme.herb_cover.fishbiomass_site_log,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.herb_cover.fishbiomass_site_log,resid(.,type="pearson")~fish_biomass_bym3_mean,
+                  type=c("p","smooth")),
+             qqnorm(lme.herb_cover.fishbiomass_site_log,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.herb_cover.fishbiomass<-lme.herb_cover.fishbiomass_site_log 
+ndata.herb_cover.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+                                                                 unq_isl = unq_isl[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.herb_cover.fishbiomass <- add_column(ndata.herb_cover.fishbiomass, fit = predict(mod.herb_cover.fishbiomass, newdata = ndata.herb_cover.fishbiomass, level=0))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.herb_cover.fishbiomass)[-2], ndata.herb_cover.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.herb_cover.fishbiomass) %*% t(Designmat)) 
+
+ndata.herb_cover.fishbiomass$SE <- sqrt(predvar) 
+ndata.herb_cover.fishbiomass$SE2 <- sqrt(predvar+mod.herb_cover.fishbiomass$sigma^2)
+
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+
+ndata.herb_cover.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.herb_cover.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+
+
+# plot 
+plt.herb_cover.fishbiomass <- ggplot(ndata.herb_cover.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =log(herb_cover+1)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish richness per 100 m3")) + ylab("Plant herb cover")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.herb_cover.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.herb_cover.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_herb_cover_fish_biomass.png")
+
+# Tree abundance vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=tree_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$tree_abundance)
+qqp(fish_stats_zscores$tree_abundance, "lnorm")
+
+lme.tree_abundance.fishbiomass<-lme(tree_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.tree_abundance.fishbiomass_site<-lme(tree_abundance ~ fish_biomass_bym3_mean, random=list(unq_isl=~1, site=~1), data=fish_stats_zscores, na.action=na.omit)
+lme.tree_abundance.fishbiomass_site_log<-lme(log(tree_abundance+1) ~ fish_biomass_bym3_mean, random=list(unq_isl=~1, site=~1), data=fish_stats_zscores, na.action=na.omit)
+
+#glmm.tree_abundance.fishbiomass_site<-glmmTMB((tree_abundance) ~ fish_biomass_bym3_mean + (1|unq_isl)+ (1|site), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+
+
+#glmm.tree_abundance.fishbiomass<-glmmTMB((tree_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab(glmm.tree_abundance.fishbiomass_site, lme.tree_abundance.fishbiomass, lme.tree_abundance.fishbiomass_site, lme.tree_abundance.fishbiomass_site_log)
+
+summary(lme.tree_abundance.fishbiomass_site_log)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.tree_abundance.fishbiomass_site_log,type=c("p","smooth")),
+             plot(lme.tree_abundance.fishbiomass_site_log,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.tree_abundance.fishbiomass_site_log,resid(.,type="pearson")~fish_biomass_bym3_mean,
+                  type=c("p","smooth")),
+             qqnorm(lme.tree_abundance.fishbiomass_site_log,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.tree_abundance.fishbiomass<-lme.tree_abundance.fishbiomass_site_log 
+ndata.tree_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+                                                                unq_isl = unq_isl[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.tree_abundance.fishbiomass <- add_column(ndata.tree_abundance.fishbiomass, fit = predict(mod.tree_abundance.fishbiomass, newdata = ndata.tree_abundance.fishbiomass, level=0))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.tree_abundance.fishbiomass)[-2], ndata.tree_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.tree_abundance.fishbiomass) %*% t(Designmat)) 
+
+ndata.tree_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.tree_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.tree_abundance.fishbiomass$sigma^2)
+
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+
+ndata.tree_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.tree_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+
+
+# plot 
+plt.tree_abundance.fishbiomass <- ggplot(ndata.tree_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =log(tree_abundance+1)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Tree density")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.tree_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.tree_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_tree_abundance_fish_biomass.png")
+
+# Sum_basal vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=sum_basal, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$sum_basal)
+qqp(fish_stats_zscores$sum_basal, "lnorm")
+
+lme.sum_basal.fishbiomass<-lme(sum_basal ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.sum_basal.fishbiomass_site<-lme(sum_basal ~ fish_biomass_bym3_mean, random=list(unq_isl=~1, site=~1), data=fish_stats_zscores, na.action=na.omit)
+lme.sum_basal.fishbiomass_site_log<-lme(log(sum_basal+1) ~ fish_biomass_bym3_mean, 
+                                        random=pdBlocked(list(pdIdent(~ 0 + unq_isl),
+                                        pdIdent(~ 0 + site))), data=fish_stats_zscores, na.action=na.omit)
+
+#glmm.sum_basal.fishbiomass_site<-glmmTMB((sum_basal) ~ fish_biomass_bym3_mean + (1|unq_isl)+ (1|site), data=fish_stats_zscores, family="poisson", na.action=na.omit)
+
+
+#glmm.sum_basal.fishbiomass<-glmmTMB((sum_basal+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+
+AICtab( lme.sum_basal.fishbiomass, lme.sum_basal.fishbiomass_site, lme.sum_basal.fishbiomass_site_log)
+
+summary(lme.sum_basal.fishbiomass_site_log)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.sum_basal.fishbiomass_site_log,type=c("p","smooth")),
+             plot(lme.sum_basal.fishbiomass_site_log,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.sum_basal.fishbiomass_site_log,resid(.,type="pearson")~fish_biomass_bym3_mean,
+                  type=c("p","smooth")),
+             qqnorm(lme.sum_basal.fishbiomass_site_log,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.sum_basal.fishbiomass<-lme.sum_basal.fishbiomass_site_log 
+ndata.sum_basal.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+                                                                    unq_isl = unq_isl[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.sum_basal.fishbiomass <- add_column(ndata.sum_basal.fishbiomass, fit = predict(mod.sum_basal.fishbiomass, newdata = ndata.sum_basal.fishbiomass, level=0))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.sum_basal.fishbiomass)[-2], ndata.sum_basal.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.sum_basal.fishbiomass) %*% t(Designmat)) 
+
+ndata.sum_basal.fishbiomass$SE <- sqrt(predvar) 
+ndata.sum_basal.fishbiomass$SE2 <- sqrt(predvar+mod.sum_basal.fishbiomass$sigma^2)
+
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+
+ndata.sum_basal.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.sum_basal.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+
+
+# plot 
+plt.sum_basal.fishbiomass <- ggplot(ndata.sum_basal.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =log(sum_basal+1)), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Tree basal area")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.sum_basal.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.sum_basal.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_sum_basal_fish_biomass.png")
 
 # Plant cover (total) vs. fish richness -----------------------------------------------------
 #visualize different distributions

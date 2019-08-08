@@ -568,14 +568,18 @@ ggplot(fish_richness_merged_tran_isl, aes(col=log(Area), y=plant_richness, x=fis
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=total_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=herb_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
-
-
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_sd, y=total_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
-
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_abs_abundance))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=d15n, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=log(plant_richness), colour=fish_biomass_bym3_cat))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
