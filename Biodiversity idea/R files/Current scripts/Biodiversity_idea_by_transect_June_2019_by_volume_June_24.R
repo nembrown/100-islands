@@ -572,6 +572,7 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_abund
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_abs_abundance))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()
 
