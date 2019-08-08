@@ -142,7 +142,7 @@ qqp(fish_stats_zscores$shrub_cover, "gamma", shape = gamma.12.evenness$estimate[
 
 lme.shrub_cover.fishbiomass<-lme(shrub_cover ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 lme.shrub_cover.fishbiomass_log<-lme(log(shrub_cover+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-#glmm.shrub_cover.fishbiomass<-glmmTMB((shrub_cover+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+glmm.shrub_cover.fishbiomass<-glmmTMB((shrub_cover+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 
 
 AICtab(lme.shrub_cover.fishbiomass, lme.shrub_cover.fishbiomass_log, glmm.shrub_cover.fishbiomass)
@@ -188,7 +188,7 @@ plt.shrub_cover.fishbiomass <- ggplot(ndata.shrub_cover.fishbiomass, aes(x = fis
   theme_classic()+
   geom_line(size=1.5, aes()) +
   geom_point(aes(y =log(shrub_cover+1)), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Plant shrub cover (log)")+  
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Shrub cover (log)")+  
   scale_shape_manual(values=c(19))+
   geom_ribbon(data = ndata.shrub_cover.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
@@ -339,7 +339,7 @@ glmm.sum_basal.fishbiomass<-glmmTMB((sum_basal+0.01) ~ fish_biomass_bym3_mean + 
 
 AICtab( lme.sum_basal.fishbiomass, lme.sum_basal.fishbiomass_log, glmm.sum_basal.fishbiomass)
 
-summary(lme.sum_basal.fishbiomass_loglog)
+summary(lme.sum_basal.fishbiomass_log)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
