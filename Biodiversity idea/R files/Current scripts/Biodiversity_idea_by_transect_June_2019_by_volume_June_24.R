@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 #change to norahbrown if on work computer
 
 
@@ -436,7 +436,7 @@ fish_bycatch_richness_merged_tran_year$marine_richness<-(fish_bycatch_richness_m
 fish_bycatch_richness_merged_tran_year$marine_richness_bym3<-(fish_bycatch_richness_merged_tran_year$fish_richness_bym3+fish_bycatch_richness_merged_tran_year$bycatch_richness_bym3)
 
 #head(fish_bycatch_richness_merged_tran_year)
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 
 
@@ -470,7 +470,7 @@ fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -533,7 +533,7 @@ head(by_tran_master_0m_with_isl)
 
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all.y=TRUE)
-#fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
+# fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
 
 xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,1/2, 1))
@@ -544,7 +544,7 @@ head(fish_richness_merged_tran_isl)
 
 
 
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
@@ -570,12 +570,35 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n, colo
 
 ggplot(fish_richness_merged_tran_isl, aes(col=log(Area), y=plant_richness, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis()
 
+
+
+#### fish biomass
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=total_cover))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=herb_cover))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=total_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=herb_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=total_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=herb_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=sum_basal))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+View(fish_richness_merged_tran_isl)
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 
@@ -996,7 +1019,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="lm")

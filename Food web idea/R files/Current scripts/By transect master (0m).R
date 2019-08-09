@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 #change to Norah if on work computer
 
 # this is the by transect file, but only the 0 m plots
@@ -566,5 +566,5 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 
 # Tidying up -------------------------------------------------------------
 
-View(by_tran_master_0m)
+head(by_tran_master_0m)
 write.csv(by_tran_master_0m, "C:Data by person//Norah.data/by_tran_master_0m.csv")
