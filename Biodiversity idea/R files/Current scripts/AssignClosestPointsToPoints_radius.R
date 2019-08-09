@@ -37,7 +37,7 @@ df.SF_transects_simple_new<- df.SF_transects_simple %>% st_transform(3035)
 #https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
 
 # Buffer circles by 1000m -- creates polygons around the 
-dat_circles <- st_buffer(df.SF_transects_simple_new, dist = 500)
+dat_circles <- st_buffer(df.SF_transects_simple_new, dist = 1000)
 
 #which of the beachseines fall within 500m radius of the transect
 transects_beach_joined = st_join(ben_habitat_data_simple.SP_new, dat_circles, left=FALSE)
