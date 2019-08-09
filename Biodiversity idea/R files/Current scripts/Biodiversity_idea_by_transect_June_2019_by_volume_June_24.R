@@ -316,7 +316,7 @@ ben_demersal_data_wide_year_3$code<-paste(ben_demersal_data_wide_year_3$site, be
 ben_demersal_weights_wide_year_3<-ben_demersal_weights_wide_year
 ben_demersal_weights_wide_year_3$code<-paste(ben_demersal_weights_wide_year_3$site, ben_demersal_weights_wide_year_3$year, ben_demersal_weights_wide_year_3$month, ben_demersal_weights_wide_year_3$day, ben_demersal_weights_wide_year_3$replicate)
 
-View(subset(ben_demersal_data_wide_year_3, !(code %in% ben_demersal_weights_wide_year_3$code)))
+head(subset(ben_demersal_data_wide_year_3, !(code %in% ben_demersal_weights_wide_year_3$code)))
 #16
 
 ben_demersal_weights_wide_year_3
@@ -454,7 +454,8 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_
 
 
 
-#This is working with a 1km radius around the transects instead
+#This is working with a 500m radius around the transects instead
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
@@ -541,6 +542,8 @@ labels4 <- c("low fish biomass", "high fish biomass")
 fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
 head(fish_richness_merged_tran_isl)
 
+length(xs4)
+length(labels4)
 
 
 
@@ -581,13 +584,13 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal)
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=total_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+mggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=shrub_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=herb_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=sum_basal))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_abs_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()+ylim(0,5000)
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_herbivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=total_cover))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
@@ -596,7 +599,22 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=herb_cove
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=tree_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=sum_basal))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_abs_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()+ylim(0,4000)
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()+ylim(0,500)
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_beat_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_detritivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_carnivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_herbivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
 
 View(fish_richness_merged_tran_isl)
 

@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 #This script plots the locations of collected samples from three separate datasets
 #Transects from 100 islands project, Beachsines from Hakai Nearshore, and Otter scats from Andrew Sheriff
@@ -36,7 +36,7 @@ fish_richness_merged_tran_isl<-fish_richness_merged_tran_isl[,-1]
 
 
 #loading information from 100 islands project
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
 
 #Island level location information
 by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
@@ -88,7 +88,7 @@ ben_habitat_data_simple.SP$site_type<-"beachseine"
 
 ### Islands level data just site-information
 head(df.SF)
-df.SF_simple<-unique(df.SF[,c(1)])
+df.SF_simple<-df.SF[,1]
 head(df.SF_simple)
 names(df.SF_simple)[1]<-"site"
 df.SF_simple$site_type<-"100_islands"
@@ -157,12 +157,12 @@ map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "
 # ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 # ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
-# devtools::install_github("dill/beyonce")
+ devtools::install_github("dill/beyonce")
 library(beyonce)
 
 colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
 
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
 ggsave("C:Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
@@ -195,7 +195,7 @@ ggsave("C:Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, un
 
 # Adding in some data to map just to beachseine dataset ----------------------------------------------
 head(ben_beachseine)
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 fish_bycatch_richness_merged_tran_year<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 fish_bycatch_richness_merged_tran_year<-fish_bycatch_richness_merged_tran_year[,-1]
