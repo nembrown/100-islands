@@ -507,6 +507,7 @@ paste(
   which( colnames(by_isl_master)=="unq_isl" ),
   which( colnames(by_isl_master)=="mammal_richness" ),
   which( colnames(by_isl_master)=="bird.richness" ),
+  which( colnames(by_isl_master)=="bird.density" ),
   which( colnames(by_isl_master)=="habitat_het" ),
   which( colnames(by_isl_master)=="log_Area" ),
   which( colnames(by_isl_master)=="Neighb_250" ),
@@ -520,7 +521,7 @@ paste(
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,97,47,102,98,19,20,14,15,17,18,13, 105)]
+by_isl_master_subset<-by_isl_master[,c(1,97,47,46,102,98,19,20,14,15,17,18,13,105)]
 #head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
@@ -540,7 +541,7 @@ head(fish_richness_merged_tran_isl)
 xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,1/2, 1))
 labels4 <- c("low fish biomass", "high fish biomass")
 fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
-head(fish_richness_merged_tran_isl)
+View(fish_richness_merged_tran_isl)
 
 length(xs4)
 length(labels4)
@@ -621,6 +622,13 @@ View(fish_richness_merged_tran_isl)
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=NDVI_mean))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_abs_abundance))+geom_point()+geom_smooth(aes(),method="gam", formula = y ~ s(x))+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=bird.density))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+data_subset3 <- fish_richness_merged_tran_isl[ , "fish_biomass_bym3_cat"]
+fish_richness_merged_tran_isl_nona<- fish_richness_merged_tran_isl[complete.cases(data_subset3), ] 
+ggplot(fish_richness_merged_tran_isl_nona, aes(col=fish_biomass_bym3_cat, y=bird.richness, x=log_Area))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 
 
 
