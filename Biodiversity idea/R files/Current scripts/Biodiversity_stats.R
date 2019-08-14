@@ -562,21 +562,14 @@ ggplot(fish_stats_zscores_cat, aes(y=bird.richness, x=log_Area))+geom_point()+ge
 qqp(fish_stats_zscores_cat$bird.richness)
 qqp(fish_stats_zscores_cat$bird.richness, "lnorm")
 
-lm.bird.richness.fishbiomass<-lm(log(bird.richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-# lme.bird.richness.fishbiomass_log<-lme(log(bird.richness+1) ~ log_Area, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
-# 
-# glmm.bird.richness.fishbiomass<-glmmTMB((bird.richness+0.01) ~ log_Area + (1|unq_isl), data=fish_stats_zscores_cat, family="Gamma", na.action=na.omit)
-# 
-# 
-# AICtab( lme.bird.richness.fishbiomass, lme.bird.richness.fishbiomass_log, glmm.bird.richness.fishbiomass)
-
-summary(lm.bird.richness.fishbiomass)
+lm.bird.richness.Area<-lm(log(bird.richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.bird.richness.Area)
 
 
 # plot 
 colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
 
-plt.bird.richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(bird.richness) ,col=fish_biomass_bym3_cat)) + 
+plt.bird.richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(bird.richness) ,col=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_point(size=3)+
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
@@ -584,121 +577,26 @@ plt.bird.richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area
   scale_shape_manual(values=c(19))+
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
-plt.bird.richness.fishbiomass
+plt.bird.richness.Area
 ggsave("C:Plots//Model-fitted//LME_bird.richness_Area.png")
 
 
 
 ####
-# insect_carnivore_richness vs. Area ----------
-ggplot(fish_stats_zscores_cat, aes(y=insect_carnivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores_cat$insect_carnivore_richness)
-qqp(fish_stats_zscores_cat$insect_carnivore_richness, "lnorm")
-
-lm.insect_carnivore_richness.fishbiomass<-lm(log(insect_carnivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.insect_carnivore_richness.fishbiomass)
-
-
-# plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-
-plt.insect_carnivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_carnivore_richness) ,col=fish_biomass_bym3_cat)) + 
-  theme_classic()+
-  geom_point(size=3)+
-  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Insect carnivore richness (log)")+  
-  scale_shape_manual(values=c(19))+
-  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
-  theme(legend.position="none")
-plt.insect_carnivore_richness.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
-
-# insect_detritivore_richness vs. Area ----------
-ggplot(fish_stats_zscores_cat, aes(y=insect_detritivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores_cat$insect_detritivore_richness)
-qqp(fish_stats_zscores_cat$insect_detritivore_richness, "lnorm")
-
-lm.insect_detritivore_richness.fishbiomass<-lm(log(insect_detritivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.insect_detritivore_richness.fishbiomass)
-
-
-# plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-
-plt.insect_detritivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_detritivore_richness) ,col=fish_biomass_bym3_cat)) + 
-  theme_classic()+
-  geom_point(size=3)+
-  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Insect detritivore richness (log)")+  
-  scale_shape_manual(values=c(19))+
-  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
-  theme(legend.position="none")
-plt.insect_detritivore_richness.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_detritivore_richness_Area.png")
-
-
-
-####
-# insect_herbivore_richness vs. Area ----------
-ggplot(fish_stats_zscores_cat, aes(y=insect_herbivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores_cat$insect_herbivore_richness)
-qqp(fish_stats_zscores_cat$insect_herbivore_richness, "lnorm")
-
-lm.insect_herbivore_richness.fishbiomass<-lm(log(insect_herbivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.insect_herbivore_richness.fishbiomass)
-
-
-# plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-
-plt.insect_herbivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_herbivore_richness) ,col=fish_biomass_bym3_cat)) + 
-  theme_classic()+
-  geom_point(size=3)+
-  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Insect herbivore richness (log)")+  
-  scale_shape_manual(values=c(19))+
-  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
-  theme(legend.position="none")
-plt.insect_herbivore_richness.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_herbivore_richness_Area.png")
-
-# insect_richness vs. Area ----------
-ggplot(fish_stats_zscores_cat, aes(y=insect_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores_cat$insect_richness)
-qqp(fish_stats_zscores_cat$insect_richness, "lnorm")
-
-lm.insect_richness.fishbiomass<-lm(log(insect_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.insect_richness.fishbiomass)
-
-
-# plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-
-plt.insect_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_richness) ,col=fish_biomass_bym3_cat)) + 
-  theme_classic()+
-  geom_point(size=3)+
-  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Insect richness (log)")+  
-  scale_shape_manual(values=c(19))+
-  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
-  theme(legend.position="none")
-plt.insect_richness.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_richness_Area.png")
-
 
 # tree_richness vs. Area ----------
 ggplot(fish_stats_zscores_cat, aes(y=tree_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
 qqp(fish_stats_zscores_cat$tree_richness)
 qqp(fish_stats_zscores_cat$tree_richness, "lnorm")
 
-lm.tree_richness.fishbiomass<-lm(log(tree_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.tree_richness.fishbiomass)
+lm.tree_richness.Area<-lm(log(tree_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.tree_richness.Area)
 
 
 # plot 
 colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
 
-plt.tree_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(tree_richness) ,col=fish_biomass_bym3_cat)) + 
+plt.tree_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(tree_richness) ,col=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_point(size=3)+
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
@@ -706,34 +604,8 @@ plt.tree_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area
   scale_shape_manual(values=c(19))+
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
-plt.tree_richness.fishbiomass
+plt.tree_richness.Area
 ggsave("C:Plots//Model-fitted//LME_tree_richness_Area.png")
-
-
-
-
-# plant_richness vs. Area ----------
-ggplot(fish_stats_zscores_cat, aes(y=plant_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores_cat$plant_richness)
-qqp(fish_stats_zscores_cat$plant_richness, "lnorm")
-
-lm.plant_richness.fishbiomass<-lm(log(plant_richness) ~ log_Area+fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lm.plant_richness.fishbiomass)
-
-
-# plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-
-plt.plant_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(plant_richness) ,col=fish_biomass_bym3_cat)) + 
-  theme_classic()+
-  geom_point(size=3)+
-  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Plant richness (log)")+  
-  scale_shape_manual(values=c(19))+
-  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
-  theme(legend.position="none")
-plt.plant_richness.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_plant_richness_Area.png")
 
 
 # bird.density vs. fish richness ----------
@@ -889,58 +761,264 @@ ggsave("C:Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_bioma
 
 
 
-# insect_carnivore_richness vs. fish biomass ----------
+# insect_carnivore_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=insect_carnivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
 qqp(fish_stats_zscores_cat$insect_carnivore_richness)
 qqp(fish_stats_zscores_cat$insect_carnivore_richness, "lnorm")
 
-lme.insect_carnivore_richness.fishbiomass<-lme(log(insect_carnivore_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
-summary(lme.insect_carnivore_richness.fishbiomass)
+lme.insect_carnivore_richness.Area<-lme(log(insect_carnivore_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_carnivore_richness.Area)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
-grid.arrange(plot(lme.insect_carnivore_richness.fishbiomass,type=c("p","smooth")),
-             plot(lme.insect_carnivore_richness.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+grid.arrange(plot(lme.insect_carnivore_richness.Area,type=c("p","smooth")),
+             plot(lme.insect_carnivore_richness.Area,sqrt(abs(resid(.)))~fitted(.),
                   col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
                   type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
              ## "sqrt(abs(resid(x)))"),
-             plot(lme.insect_carnivore_richness.fishbiomass,resid(.,type="pearson")~log_Area,
+             plot(lme.insect_carnivore_richness.Area,resid(.,type="pearson")~log_Area,
                   type=c("p","smooth")),
-             qqnorm(lme.insect_carnivore_richness.fishbiomass,abline=c(0,1),
+             qqnorm(lme.insect_carnivore_richness.Area,abline=c(0,1),
                     col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
 
 # Extracting coefficients and plotting
-fm1<-lme.insect_carnivore_richness.fishbiomass
-newdat <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+
+fm1_carnivore<-lme.insect_carnivore_richness.Area
+newdat_carnivore <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
                       fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
-newdat$pred <- predict(fm1, newdat, level = 0)
+newdat_carnivore$pred <- predict(fm1_carnivore, newdat_carnivore, level = 0)
 
 
-Designmat <- model.matrix(formula(fm1)[-2], newdat)
-predvar <- diag(Designmat %*% vcov(fm1) %*% t(Designmat)) 
-newdat$SE <- sqrt(predvar) 
-newdat$SE2 <- sqrt(predvar+fm1$sigma^2)
+Designmat_carnivore <- model.matrix(formula(fm1_carnivore)[-2], newdat_carnivore)
+predvar_carnivore <- diag(Designmat_carnivore %*% vcov(fm1_carnivore) %*% t(Designmat_carnivore)) 
+newdat_carnivore$SE <- sqrt(predvar_carnivore) 
+newdat_carnivore$SE2 <- sqrt(predvar_carnivore+fm1_carnivore$sigma^2)
 
 fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
 
-newdat$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+newdat_carnivore$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
 
 
 # plot
 colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
-plt.insect_carnivore_richness.fishbiomass <- ggplot(newdat, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+plt.insect_carnivore_richness.Area <- ggplot(newdat_carnivore, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
   geom_point(aes(y =log(insect_carnivore_richness)), size=3, data = fish_stats_zscores_cat)+
   xlab(expression("Island Area (log)")) + ylab("Insect carnivore richness (log)")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = newdat,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  geom_ribbon(data = newdat_carnivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
-plt.insect_carnivore_richness.fishbiomass
+plt.insect_carnivore_richness.Area
 ggsave("C:Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
 
+# insect_detritivore_richness vs. Area----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_detritivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_detritivore_richness)
+qqp(fish_stats_zscores_cat$insect_detritivore_richness, "lnorm")
 
+lme.insect_detritivore_richness.Area<-lme(log(insect_detritivore_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_detritivore_richness.Area)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_detritivore_richness.Area,type=c("p","smooth")),
+             plot(lme.insect_detritivore_richness.Area,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_detritivore_richness.Area,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_detritivore_richness.Area,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+fm1_detritivore<-lme.insect_detritivore_richness.Area
+newdat_detritivore <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                                fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat_detritivore$pred <- predict(fm1_detritivore, newdat_detritivore, level = 0)
+
+
+Designmat_detritivore <- model.matrix(formula(fm1_detritivore)[-2], newdat_detritivore)
+predvar_detritivore <- diag(Designmat_detritivore %*% vcov(fm1_detritivore) %*% t(Designmat_detritivore)) 
+newdat_detritivore$SE <- sqrt(predvar_detritivore) 
+newdat_detritivore$SE2 <- sqrt(predvar_detritivore+fm1_detritivore$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat_detritivore$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.insect_detritivore_richness.Area <- ggplot(newdat_detritivore, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(insect_detritivore_richness)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Insect detritivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat_detritivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.insect_detritivore_richness.Area
+ggsave("C:Plots//Model-fitted//LME_insect_detritivore_richness_Area.png")
+
+
+# insect_herbivore_richness vs. Area----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_herbivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_herbivore_richness)
+qqp(fish_stats_zscores_cat$insect_herbivore_richness, "lnorm")
+
+lme.insect_herbivore_richness.Area<-lme(log(insect_herbivore_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_herbivore_richness.Area)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_herbivore_richness.Area,type=c("p","smooth")),
+             plot(lme.insect_herbivore_richness.Area,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_herbivore_richness.Area,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_herbivore_richness.Area,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+fm1_herbivore<-lme.insect_herbivore_richness.Area
+newdat_herbivore <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                                fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat_herbivore$pred <- predict(fm1_herbivore, newdat_herbivore, level = 0)
+
+
+Designmat_herbivore <- model.matrix(formula(fm1_herbivore)[-2], newdat_herbivore)
+predvar_herbivore <- diag(Designmat_herbivore %*% vcov(fm1_herbivore) %*% t(Designmat_herbivore)) 
+newdat_herbivore$SE <- sqrt(predvar_herbivore) 
+newdat_herbivore$SE2 <- sqrt(predvar_herbivore+fm1_herbivore$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat_herbivore$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.insect_herbivore_richness.Area <- ggplot(newdat_herbivore, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(insect_herbivore_richness)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Insect herbivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat_herbivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.insect_herbivore_richness.Area
+ggsave("C:Plots//Model-fitted//LME_insect_herbivore_richness_Area.png")
+
+# insect_richness vs. Area----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_richness)
+qqp(fish_stats_zscores_cat$insect_richness, "lnorm")
+
+lme.insect_richness.Area<-lme(log(insect_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_richness.Area)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_richness.Area,type=c("p","smooth")),
+             plot(lme.insect_richness.Area,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_richness.Area,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_richness.Area,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+
+fm1_insect<-lme.insect_richness.Area
+newdat_insect <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                                fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat_insect$pred <- predict(fm1_insect, newdat_insect, level = 0)
+
+
+Designmat_insect <- model.matrix(formula(fm1_insect)[-2], newdat_insect)
+predvar_insect <- diag(Designmat_insect %*% vcov(fm1_insect) %*% t(Designmat_insect)) 
+newdat_insect$SE <- sqrt(predvar_insect) 
+newdat_insect$SE2 <- sqrt(predvar_insect+fm1_insect$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat_insect$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.insect_richness.Area <- ggplot(newdat_insect, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(insect_richness)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Insect richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat_insect,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.insect_richness.Area
+ggsave("C:Plots//Model-fitted//LME_insect_richness_Area.png")
+
+# plant_richness vs. Area----------
+ggplot(fish_stats_zscores_cat, aes(y=plant_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$plant_richness)
+qqp(fish_stats_zscores_cat$plant_richness, "lnorm")
+
+lme.plant_richness.Area<-lme(log(plant_richness+1) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.plant_richness.Area)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.plant_richness.Area,type=c("p","smooth")),
+             plot(lme.plant_richness.Area,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.plant_richness.Area,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.plant_richness.Area,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+
+fm1_plant<-lme.plant_richness.Area
+newdat_plant <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                             fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat_plant$pred <- predict(fm1_plant, newdat_plant, level = 0)
+
+
+Designmat_plant <- model.matrix(formula(fm1_plant)[-2], newdat_plant)
+predvar_plant <- diag(Designmat_plant %*% vcov(fm1_plant) %*% t(Designmat_plant)) 
+newdat_plant$SE <- sqrt(predvar_plant) 
+newdat_plant$SE2 <- sqrt(predvar_plant+fm1_plant$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat_plant$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.plant_richness.Area <- ggplot(newdat_plant, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(plant_richness+1)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Plant richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat_plant,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.plant_richness.Area
+ggsave("C:Plots//Model-fitted//LME_plant_richness_Area.png")
 
 
 # insect_herbivore_beat_av_abundance vs. fish biomass ----------
@@ -2365,6 +2443,20 @@ insect_plots_cover<-plot_grid(plt.insect_detritivore_beat_av_abundance.fishbioma
                              ncol=3, align='v', axis = 'l')
 insect_plots_cover
 ggplot2::ggsave("C:Plots//Model-fitted//insect_plots_cover.png", width=30, height=10, units="cm")
+
+
+insect_plots_Area<-plot_grid(plt.insect_detritivore_richness.Area,plt.insect_herbivore_richness.Area, plt.insect_carnivore_richness.Area,
+                              ncol=3, align='v', axis = 'l')
+insect_plots_Area
+ggplot2::ggsave("C:Plots//Model-fitted//insect_plots_Area.png", width=30, height=10, units="cm")
+
+
+
+plant_plots_Area<-plot_grid(plt.plant_richness.Area, plt.tree_richness.Area,
+                                      ncol=2, align='v', axis = 'l')
+plant_plots_Area
+ggplot2::ggsave("C:Plots//Model-fitted//plant_plots_Area.png", width=20, height=10, units="cm")
+
 
 
 # Marine catch vs. d15n ---------------------------------------------------
