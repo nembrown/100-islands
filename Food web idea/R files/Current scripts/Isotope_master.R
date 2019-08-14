@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Modelling practice")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 #change to norahbrown if on work computer
 
 #read in necessary packages
@@ -32,14 +32,14 @@ library(beyonce)
 
 ##### DEB
 #Deb's soil data and Deb's shore dist
-i.soil.all<-read.csv("C:Deb.data//i-soil-all.csv")
+i.soil.all<-read.csv("C:Data by person//Deb.data//i-soil-all.csv")
 #this is isotopes
 head(i.soil.all)
 
-shoredist.deb<-read.csv("C:Deb.data//shoredist.csv")
+shoredist.deb<-read.csv("C:Data by person//Deb.data//shoredist.csv")
 #this is the point count to distance to shore data
 
-pointcount.gps<-read.csv("C:Deb.data//pointcounts.csv")
+pointcount.gps<-read.csv("C:Data by person//Deb.data//pointcounts.csv")
 head(pointcount.gps)
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
@@ -66,7 +66,7 @@ head(soil.deb)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("c:Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("c:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -78,12 +78,12 @@ names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
 #Owen's key data
-owen_key<-read.csv("c:Owen's data//key_mod.csv", header=TRUE, sep=",")
+owen_key<-read.csv("c:Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_isl))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("c:Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("c:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
@@ -92,7 +92,7 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_isl))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("c:Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("c:Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
 head(owen_coords)
 owen_coords<-owen_coords[,c(1:9)]
 
@@ -190,7 +190,7 @@ head(soil_owen_deb_by_isl)
 # Vegetation --------------------------------------------------------------
 
 
-owen.veg<-read.csv("C:Owen's data\\foliar_clean_sorted_merge_meta.csv")
+owen.veg<-read.csv("C:Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
 head(owen.veg)
 owen.veg<-owen.veg[,-1]
 names(owen.veg)[3]<-"n"
@@ -203,7 +203,7 @@ names(owen.veg)[2]<-"group"
 
 
 library(car)
-deb.veg<-read.csv("C:Deb.data//i-veg-all (1).csv")
+deb.veg<-read.csv("C:Data by person//Deb.data//i-veg-all (1).csv")
 head(deb.veg)
 deb.veg<-deb.veg[,-1]
 names(deb.veg)[6]<-"group"
@@ -275,9 +275,9 @@ isotope_by_isl_gathered<-veg_soil_owen_deb_by_isl
 
 
 #loading all the data
-i.feces.all<-read.csv("C:Deb.data//i-feces-all.csv")
-i.feathers.all<-read.csv("C:Deb.data//i-feathers-all (1).csv")
-feathers.key<-read.csv("c:Deb.data//banding-all.csv", header=TRUE, sep=",")
+i.feces.all<-read.csv("C:Data by person//Deb.data//i-feces-all.csv")
+i.feathers.all<-read.csv("C:Data by person//Deb.data//i-feathers-all (1).csv")
+feathers.key<-read.csv("c:Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
 
 
 #birds
@@ -350,7 +350,7 @@ head(isotope_by_isl_gathered2)
 # Mammals -----------------------------------------------------------------
 
 
-katie.mammal<-read.csv("c:Katie.data//katie.mammal.csv", header=TRUE, sep=",")
+katie.mammal<-read.csv("c:Data by person//Katie.data//katie.mammal.csv", header=TRUE, sep=",")
 head(katie.mammal)
 katie.mammal$s<-"NA"
 katie.mammal$s<-as.numeric(katie.mammal$s)
@@ -434,7 +434,7 @@ head(isotope_by_isl_gathered3)
 
 # Insects -----------------------------------------------------------------
 
-chris.isotopes<-read.csv("c:Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
+chris.isotopes<-read.csv("c:Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
 head(chris.isotopes)
 chris.isotopes$s<-as.numeric(chris.isotopes$s)
 
@@ -464,7 +464,7 @@ write.csv(isotope_by_isl_gathered4, "C:Norah.data/isotope_by_isl_gathered4.csv")
 # Adding habitat characteristics, terrestrial diversity, nearby marine biodiversity -------------------------
 
 #terrestrial diversity
-by_isl_master<-read.csv("C:Owen's data//by_isl_master.csv")
+by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
 head(by_isl_master)
 head(isotope_by_isl_gathered4)
 which( colnames(by_isl_master)=="d15n" )
@@ -479,12 +479,12 @@ node.adding<-unique(node.adding)
 isotope_master<-merge(isotope_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(isotope_master, "C:Owen's data/isotope_master.csv")
+write.csv(isotope_master, "C:Data by person//Owen's data/isotope_master.csv")
 
 
 #marine biodiversity
-
-fish_richness_merged_isl_simple<-fish_richness_merged_isl[,c(2,3,4,8:18)]
+which( colnames(fish_richness_merged_tran_isl)=="unq_isl" )
+fish_richness_merged_isl_simple<-fish_richness_merged_tran_isl[,c(1:45)]
 head(fish_richness_merged_isl_simple)
 isotope_master_2<-merge(isotope_master, fish_richness_merged_isl_simple, by.x="unq_isl", all=TRUE)
 
@@ -862,16 +862,16 @@ plot_grid(nut_fish_c_101+ theme(legend.position="none"),nut_fish_c_131,nut_fish_
 ggsave("C:Plots//Marine_nut//d13c_marine_catch.png", width=30, height=20, unit="cm")
 
 
-#d15n vs. bycatch_abundance_corrected
-nut_bycatch_101<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
-nut_bycatch_111<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","soil_whole_island")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")  +  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
-nut_bycatch_121<-ggplot(filter(isotope_master_2, group %in% c("gash","midi")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
-nut_bycatch_131<-ggplot(filter(isotope_master_2, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
-nut_bycatch_141<-ggplot(filter(isotope_master_2, group %in% c("bird_feces","bird_feathers")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
-nut_bycatch_151<-ggplot(filter(isotope_master_2, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+#d15n vs. fish_biomass_bym3_mean
+nut_bycatch_101<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
+nut_bycatch_111<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","soil_whole_island")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")  +  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
+nut_bycatch_121<-ggplot(filter(isotope_master_2, group %in% c("gash","midi")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+nut_bycatch_131<-ggplot(filter(isotope_master_2, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+nut_bycatch_141<-ggplot(filter(isotope_master_2, group %in% c("bird_feces","bird_feathers")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+nut_bycatch_151<-ggplot(filter(isotope_master_2, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_bycatch_101+ theme(legend.position="bottom"))
 plot_grid(nut_bycatch_101+ theme(legend.position="none"),nut_bycatch_131,nut_bycatch_121,nut_bycatch_111,nut_bycatch_141,nut_bycatch_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_bycatch_abundance.png", width=30, height=20, unit="cm")
+ggsave("C:Plots//Marine_nut//d15n_biomass.png", width=40, height=30, unit="cm")
 
 #d15n vs. bycatch_richness_corrected
 nut_bycatch_101<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)

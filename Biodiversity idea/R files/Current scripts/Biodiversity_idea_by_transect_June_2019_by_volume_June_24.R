@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 #change to norahbrown if on work computer
 
 
@@ -436,7 +436,7 @@ fish_bycatch_richness_merged_tran_year$marine_richness<-(fish_bycatch_richness_m
 fish_bycatch_richness_merged_tran_year$marine_richness_bym3<-(fish_bycatch_richness_merged_tran_year$fish_richness_bym3+fish_bycatch_richness_merged_tran_year$bycatch_richness_bym3)
 
 #head(fish_bycatch_richness_merged_tran_year)
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 
 
@@ -455,7 +455,7 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_
 
 
 #This is working with a 500m radius around the transects instead
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
@@ -471,7 +471,7 @@ fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -538,17 +538,17 @@ fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_
 # fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
 
-xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,1/2, 1))
-labels4 <- c("low fish biomass", "high fish biomass")
+xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
+labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
 fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
-View(fish_richness_merged_tran_isl)
+head(fish_richness_merged_tran_isl)
 
 length(xs4)
 length(labels4)
 
 
 
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
@@ -611,6 +611,10 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_pi
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_detritivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_carnivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_herbivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+
+
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
@@ -1045,7 +1049,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="lm")

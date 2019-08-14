@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 # install.packages("devtools")
 # devtools::install_github("cardiomoon/ggiraphExtra")
@@ -77,6 +77,11 @@ fish_stats_zscores$fish_abundance_bym3_log<-as.numeric(fish_stats_zscores$fish_a
 fish_stats_zscores$fish_abundance_bym3<-scale(fish_stats$fish_abundance_bym3, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_abundance_bym3.unscaled <-fish_stats_zscores$fish_abundance_bym3 * attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:scale') + attr(fish_stats_zscores$fish_abundance_bym3, 'scaled:center')
 fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abundance_bym3)
+
+
+fish_stats_zscores_cat<-fish_stats_zscores %>% filter(fish_biomass_bym3_cat != "med fish biomass")
+head(fish_stats_zscores_cat)
+
 
 # Shrub cover (total) vs. fish biomass ----------
 ggplot(fish_stats_zscores, aes(y=shrub_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
@@ -545,14 +550,14 @@ plt.bird.density.fishbiomass
 ggsave("C:Plots//Model-fitted//LME_bird.density_fish_biomass.png")
 
 # bird.richness vs. Area ----------
-ggplot(fish_stats_zscores, aes(y=bird.richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$bird.richness)
-qqp(fish_stats_zscores$bird.richness, "lnorm")
+ggplot(fish_stats_zscores_cat, aes(y=bird.richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$bird.richness)
+qqp(fish_stats_zscores_cat$bird.richness, "lnorm")
 
-lm.bird.richness.fishbiomass<-lm(bird.richness ~ log_Area+fish_biomass_bym3_cat, data=fish_stats_zscores, na.action=na.omit)
-# lme.bird.richness.fishbiomass_log<-lme(log(bird.richness+1) ~ log_Area, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lm.bird.richness.fishbiomass<-lm(log(bird.richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+# lme.bird.richness.fishbiomass_log<-lme(log(bird.richness+1) ~ log_Area, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
 # 
-# glmm.bird.richness.fishbiomass<-glmmTMB((bird.richness+0.01) ~ log_Area + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# glmm.bird.richness.fishbiomass<-glmmTMB((bird.richness+0.01) ~ log_Area + (1|unq_isl), data=fish_stats_zscores_cat, family="Gamma", na.action=na.omit)
 # 
 # 
 # AICtab( lme.bird.richness.fishbiomass, lme.bird.richness.fishbiomass_log, glmm.bird.richness.fishbiomass)
@@ -561,19 +566,166 @@ summary(lm.bird.richness.fishbiomass)
 
 
 # plot 
-colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#89CFF0" )
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
 
-plt.bird.richness.fishbiomass <- ggplot(fish_stats_zscores, aes(x = log_Area, y = bird.richness ,col=fish_biomass_bym3_cat)) + 
+plt.bird.richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(bird.richness) ,col=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_point(size=3)+
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
-  xlab(expression("Island Area (log)")) + ylab("Bird richness")+  
+  xlab(expression("Island Area (log)")) + ylab("Bird richness (log)")+  
   scale_shape_manual(values=c(19))+
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.bird.richness.fishbiomass
 ggsave("C:Plots//Model-fitted//LME_bird.richness_Area.png")
 
+
+
+####
+# insect_carnivore_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_carnivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_carnivore_richness)
+qqp(fish_stats_zscores_cat$insect_carnivore_richness, "lnorm")
+
+lm.insect_carnivore_richness.fishbiomass<-lm(log(insect_carnivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.insect_carnivore_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.insect_carnivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_carnivore_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Insect carnivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.insect_carnivore_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
+
+# insect_detritivore_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_detritivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_detritivore_richness)
+qqp(fish_stats_zscores_cat$insect_detritivore_richness, "lnorm")
+
+lm.insect_detritivore_richness.fishbiomass<-lm(log(insect_detritivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.insect_detritivore_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.insect_detritivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_detritivore_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Insect detritivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.insect_detritivore_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_detritivore_richness_Area.png")
+
+
+
+####
+# insect_herbivore_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_herbivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_herbivore_richness)
+qqp(fish_stats_zscores_cat$insect_herbivore_richness, "lnorm")
+
+lm.insect_herbivore_richness.fishbiomass<-lm(log(insect_herbivore_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.insect_herbivore_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.insect_herbivore_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_herbivore_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Insect herbivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.insect_herbivore_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_herbivore_richness_Area.png")
+
+# insect_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_richness)
+qqp(fish_stats_zscores_cat$insect_richness, "lnorm")
+
+lm.insect_richness.fishbiomass<-lm(log(insect_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.insect_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.insect_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(insect_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Insect richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.insect_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_richness_Area.png")
+
+
+# tree_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=tree_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$tree_richness)
+qqp(fish_stats_zscores_cat$tree_richness, "lnorm")
+
+lm.tree_richness.fishbiomass<-lm(log(tree_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.tree_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.tree_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(tree_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Tree richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.tree_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_tree_richness_Area.png")
+
+
+
+
+# plant_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=plant_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$plant_richness)
+qqp(fish_stats_zscores_cat$plant_richness, "lnorm")
+
+lm.plant_richness.fishbiomass<-lm(log(plant_richness) ~ log_Area+fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.plant_richness.fishbiomass)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.plant_richness.fishbiomass <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(plant_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("Plant richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.plant_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_plant_richness_Area.png")
 
 
 # bird.density vs. fish richness ----------
@@ -604,253 +756,252 @@ plt.bird.density.fishcatch
 ggsave("C:Plots//Model-fitted//LME_bird.density_fish_biomass.png")
 
 
+# insect_detritivore_beat_av_abundance vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=insect_detritivore_beat_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
 
+qqp(fish_stats_zscores$insect_detritivore_beat_av_abundance)
+qqp(fish_stats_zscores$insect_detritivore_beat_av_abundance, "lnorm")
 
-# insect_detritivore_pitfall_av_abundance vs. fish biomass ----------
-ggplot(fish_stats_zscores, aes(y=insect_detritivore_pitfall_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$insect_detritivore_pitfall_av_abundance)
-qqp(fish_stats_zscores$insect_detritivore_pitfall_av_abundance, "lnorm")
-
-lme.insect_detritivore_pitfall_av_abundance.fishbiomass<-lme(insect_detritivore_pitfall_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-# lme.insect_detritivore_pitfall_av_abundance.fishbiomass_log<-lme(log(insect_detritivore_pitfall_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.insect_detritivore_beat_av_abundance.fishbiomass<-lme(insect_detritivore_beat_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_detritivore_beat_av_abundance.fishbiomass_log<-lme(log(insect_detritivore_beat_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 # 
-# glmm.insect_detritivore_pitfall_av_abundance.fishbiomass<-glmmTMB((insect_detritivore_pitfall_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# glmm.insect_detritivore_beat_av_abundance.fishbiomass<-glmmTMB((insect_detritivore_beat_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 # 
 # 
-# AICtab( lme.insect_detritivore_pitfall_av_abundance.fishbiomass, lme.insect_detritivore_pitfall_av_abundance.fishbiomass_log, glmm.insect_detritivore_pitfall_av_abundance.fishbiomass)
+# AICtab( lme.insect_detritivore_beat_av_abundance.fishbiomass, lme.insect_detritivore_beat_av_abundance.fishbiomass_log, glmm.insect_detritivore_beat_av_abundance.fishbiomass)
 
-summary(lme.insect_detritivore_pitfall_av_abundance.fishbiomass)
+summary(lme.insect_detritivore_beat_av_abundance.fishbiomass)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
-grid.arrange(plot(lme.insect_detritivore_pitfall_av_abundance.fishbiomass,type=c("p","smooth")),
-             plot(lme.insect_detritivore_pitfall_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+grid.arrange(plot(lme.insect_detritivore_beat_av_abundance.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_detritivore_beat_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
                   col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
                   type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
              ## "sqrt(abs(resid(x)))"),
-             plot(lme.insect_detritivore_pitfall_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
+             plot(lme.insect_detritivore_beat_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
                   type=c("p","smooth")),
-             qqnorm(lme.insect_detritivore_pitfall_av_abundance.fishbiomass,abline=c(0,1),
+             qqnorm(lme.insect_detritivore_beat_av_abundance.fishbiomass,abline=c(0,1),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
 # Extracting coefficients and plotting
 want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
-mod.insect_detritivore_pitfall_av_abundance.fishbiomass<-lme.insect_detritivore_pitfall_av_abundance.fishbiomass 
-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+mod.insect_detritivore_beat_av_abundance.fishbiomass<-lme.insect_detritivore_beat_av_abundance.fishbiomass 
+ndata.insect_detritivore_beat_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
                                                                unq_isl = unq_isl[want]))
 
 ## add the fitted values by predicting from the model for the new data
-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass <- add_column(ndata.insect_detritivore_pitfall_av_abundance.fishbiomass, fit = predict(mod.insect_detritivore_pitfall_av_abundance.fishbiomass, newdata = ndata.insect_detritivore_pitfall_av_abundance.fishbiomass, level=0))
+ndata.insect_detritivore_beat_av_abundance.fishbiomass <- add_column(ndata.insect_detritivore_beat_av_abundance.fishbiomass, fit = predict(mod.insect_detritivore_beat_av_abundance.fishbiomass, newdata = ndata.insect_detritivore_beat_av_abundance.fishbiomass, level=0))
 
 ###for lmes: from bolker: 
 #http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
-Designmat <- model.matrix(formula(mod.insect_detritivore_pitfall_av_abundance.fishbiomass)[-2], ndata.insect_detritivore_pitfall_av_abundance.fishbiomass)
-predvar <- diag(Designmat %*% vcov(mod.insect_detritivore_pitfall_av_abundance.fishbiomass) %*% t(Designmat)) 
+Designmat <- model.matrix(formula(mod.insect_detritivore_beat_av_abundance.fishbiomass)[-2], ndata.insect_detritivore_beat_av_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.insect_detritivore_beat_av_abundance.fishbiomass) %*% t(Designmat)) 
 
-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass$SE <- sqrt(predvar) 
-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_detritivore_pitfall_av_abundance.fishbiomass$sigma^2)
+ndata.insect_detritivore_beat_av_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.insect_detritivore_beat_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_detritivore_beat_av_abundance.fishbiomass$sigma^2)
 
 fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
 
-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_detritivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+ndata.insect_detritivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_detritivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
 
 
 # plot 
-plt.insect_detritivore_pitfall_av_abundance.fishbiomass <- ggplot(ndata.insect_detritivore_pitfall_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+plt.insect_detritivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_detritivore_beat_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
-  geom_point(aes(y =insect_detritivore_pitfall_av_abundance), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect detritivore density (#/pitfall)")+  
+  geom_point(aes(y =insect_detritivore_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect detritivore density (#/beat)")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.insect_detritivore_pitfall_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  geom_ribbon(data = ndata.insect_detritivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
-plt.insect_detritivore_pitfall_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_detritivore_pitfall_av_abundance_fish_biomass.png")
+plt.insect_detritivore_beat_av_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
 
-# insect_carnivore_pitfall_av_abundance vs. fish biomass ----------
-ggplot(fish_stats_zscores, aes(y=insect_carnivore_pitfall_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$insect_carnivore_pitfall_av_abundance)
-qqp(fish_stats_zscores$insect_carnivore_pitfall_av_abundance, "lnorm")
+# insect_carnivore_beat_av_abundance vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=insect_carnivore_beat_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$insect_carnivore_beat_av_abundance)
+qqp(fish_stats_zscores$insect_carnivore_beat_av_abundance, "lnorm")
 
-lme.insect_carnivore_pitfall_av_abundance.fishbiomass<-lme(insect_carnivore_pitfall_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-# lme.insect_carnivore_pitfall_av_abundance.fishbiomass_log<-lme(log(insect_carnivore_pitfall_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.insect_carnivore_beat_av_abundance.fishbiomass<-lme(insect_carnivore_beat_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_carnivore_beat_av_abundance.fishbiomass_log<-lme(log(insect_carnivore_beat_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 # 
-# glmm.insect_carnivore_pitfall_av_abundance.fishbiomass<-glmmTMB((insect_carnivore_pitfall_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# glmm.insect_carnivore_beat_av_abundance.fishbiomass<-glmmTMB((insect_carnivore_beat_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 # 
 # 
-# AICtab( lme.insect_carnivore_pitfall_av_abundance.fishbiomass, lme.insect_carnivore_pitfall_av_abundance.fishbiomass_log, glmm.insect_carnivore_pitfall_av_abundance.fishbiomass)
+# AICtab( lme.insect_carnivore_beat_av_abundance.fishbiomass, lme.insect_carnivore_beat_av_abundance.fishbiomass_log, glmm.insect_carnivore_beat_av_abundance.fishbiomass)
 
-summary(lme.insect_carnivore_pitfall_av_abundance.fishbiomass)
+summary(lme.insect_carnivore_beat_av_abundance.fishbiomass)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
-grid.arrange(plot(lme.insect_carnivore_pitfall_av_abundance.fishbiomass,type=c("p","smooth")),
-             plot(lme.insect_carnivore_pitfall_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+grid.arrange(plot(lme.insect_carnivore_beat_av_abundance.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_carnivore_beat_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
                   col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
                   type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
              ## "sqrt(abs(resid(x)))"),
-             plot(lme.insect_carnivore_pitfall_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
+             plot(lme.insect_carnivore_beat_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
                   type=c("p","smooth")),
-             qqnorm(lme.insect_carnivore_pitfall_av_abundance.fishbiomass,abline=c(0,1),
+             qqnorm(lme.insect_carnivore_beat_av_abundance.fishbiomass,abline=c(0,1),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
 # Extracting coefficients and plotting
 want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
-mod.insect_carnivore_pitfall_av_abundance.fishbiomass<-lme.insect_carnivore_pitfall_av_abundance.fishbiomass 
-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+mod.insect_carnivore_beat_av_abundance.fishbiomass<-lme.insect_carnivore_beat_av_abundance.fishbiomass 
+ndata.insect_carnivore_beat_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
                                                                                              unq_isl = unq_isl[want]))
 
 ## add the fitted values by predicting from the model for the new data
-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass <- add_column(ndata.insect_carnivore_pitfall_av_abundance.fishbiomass, fit = predict(mod.insect_carnivore_pitfall_av_abundance.fishbiomass, newdata = ndata.insect_carnivore_pitfall_av_abundance.fishbiomass, level=0))
+ndata.insect_carnivore_beat_av_abundance.fishbiomass <- add_column(ndata.insect_carnivore_beat_av_abundance.fishbiomass, fit = predict(mod.insect_carnivore_beat_av_abundance.fishbiomass, newdata = ndata.insect_carnivore_beat_av_abundance.fishbiomass, level=0))
 
 ###for lmes: from bolker: 
 #http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
-Designmat <- model.matrix(formula(mod.insect_carnivore_pitfall_av_abundance.fishbiomass)[-2], ndata.insect_carnivore_pitfall_av_abundance.fishbiomass)
-predvar <- diag(Designmat %*% vcov(mod.insect_carnivore_pitfall_av_abundance.fishbiomass) %*% t(Designmat)) 
+Designmat <- model.matrix(formula(mod.insect_carnivore_beat_av_abundance.fishbiomass)[-2], ndata.insect_carnivore_beat_av_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.insect_carnivore_beat_av_abundance.fishbiomass) %*% t(Designmat)) 
 
-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass$SE <- sqrt(predvar) 
-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_carnivore_pitfall_av_abundance.fishbiomass$sigma^2)
+ndata.insect_carnivore_beat_av_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.insect_carnivore_beat_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_carnivore_beat_av_abundance.fishbiomass$sigma^2)
 
 fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
 
-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_carnivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+ndata.insect_carnivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_carnivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
 
 
 # plot
-plt.insect_carnivore_pitfall_av_abundance.fishbiomass <- ggplot(ndata.insect_carnivore_pitfall_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+plt.insect_carnivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_carnivore_beat_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
-  geom_point(aes(y =insect_carnivore_pitfall_av_abundance), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect carnivore density (#/pitfall)")+  
+  geom_point(aes(y =insect_carnivore_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect carnivore density (#/beat)")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.insect_carnivore_pitfall_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  geom_ribbon(data = ndata.insect_carnivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
-plt.insect_carnivore_pitfall_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_carnivore_pitfall_av_abundance_fish_biomass.png")
+plt.insect_carnivore_beat_av_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_biomass.png")
 
 
-# insect_herbivore_pitfall_av_abundance vs. fish biomass ----------
-ggplot(fish_stats_zscores, aes(y=insect_herbivore_pitfall_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$insect_herbivore_pitfall_av_abundance)
-qqp(fish_stats_zscores$insect_herbivore_pitfall_av_abundance, "lnorm")
+# insect_herbivore_beat_av_abundance vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=insect_herbivore_beat_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$insect_herbivore_beat_av_abundance)
+qqp(fish_stats_zscores$insect_herbivore_beat_av_abundance, "lnorm")
 
-lme.insect_herbivore_pitfall_av_abundance.fishbiomass<-lme(insect_herbivore_pitfall_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-# lme.insect_herbivore_pitfall_av_abundance.fishbiomass_log<-lme(log(insect_herbivore_pitfall_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.insect_herbivore_beat_av_abundance.fishbiomass<-lme(insect_herbivore_beat_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_herbivore_beat_av_abundance.fishbiomass_log<-lme(log(insect_herbivore_beat_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 # 
-# glmm.insect_herbivore_pitfall_av_abundance.fishbiomass<-glmmTMB((insect_herbivore_pitfall_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# glmm.insect_herbivore_beat_av_abundance.fishbiomass<-glmmTMB((insect_herbivore_beat_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 # 
 # 
-# AICtab( lme.insect_herbivore_pitfall_av_abundance.fishbiomass, lme.insect_herbivore_pitfall_av_abundance.fishbiomass_log, glmm.insect_herbivore_pitfall_av_abundance.fishbiomass)
+# AICtab( lme.insect_herbivore_beat_av_abundance.fishbiomass, lme.insect_herbivore_beat_av_abundance.fishbiomass_log, glmm.insect_herbivore_beat_av_abundance.fishbiomass)
 
-summary(lme.insect_herbivore_pitfall_av_abundance.fishbiomass)
+summary(lme.insect_herbivore_beat_av_abundance.fishbiomass)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
-grid.arrange(plot(lme.insect_herbivore_pitfall_av_abundance.fishbiomass,type=c("p","smooth")),
-             plot(lme.insect_herbivore_pitfall_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+grid.arrange(plot(lme.insect_herbivore_beat_av_abundance.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_herbivore_beat_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
                   col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
                   type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
              ## "sqrt(abs(resid(x)))"),
-             plot(lme.insect_herbivore_pitfall_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
+             plot(lme.insect_herbivore_beat_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
                   type=c("p","smooth")),
-             qqnorm(lme.insect_herbivore_pitfall_av_abundance.fishbiomass,abline=c(0,1),
+             qqnorm(lme.insect_herbivore_beat_av_abundance.fishbiomass,abline=c(0,1),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
 # Extracting coefficients and plotting
 want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
-mod.insect_herbivore_pitfall_av_abundance.fishbiomass<-lme.insect_herbivore_pitfall_av_abundance.fishbiomass 
-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+mod.insect_herbivore_beat_av_abundance.fishbiomass<-lme.insect_herbivore_beat_av_abundance.fishbiomass 
+ndata.insect_herbivore_beat_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
                                                                                              unq_isl = unq_isl[want]))
 
 ## add the fitted values by predicting from the model for the new data
-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass <- add_column(ndata.insect_herbivore_pitfall_av_abundance.fishbiomass, fit = predict(mod.insect_herbivore_pitfall_av_abundance.fishbiomass, newdata = ndata.insect_herbivore_pitfall_av_abundance.fishbiomass, level=0))
+ndata.insect_herbivore_beat_av_abundance.fishbiomass <- add_column(ndata.insect_herbivore_beat_av_abundance.fishbiomass, fit = predict(mod.insect_herbivore_beat_av_abundance.fishbiomass, newdata = ndata.insect_herbivore_beat_av_abundance.fishbiomass, level=0))
 
 ###for lmes: from bolker: 
 #http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
-Designmat <- model.matrix(formula(mod.insect_herbivore_pitfall_av_abundance.fishbiomass)[-2], ndata.insect_herbivore_pitfall_av_abundance.fishbiomass)
-predvar <- diag(Designmat %*% vcov(mod.insect_herbivore_pitfall_av_abundance.fishbiomass) %*% t(Designmat)) 
+Designmat <- model.matrix(formula(mod.insect_herbivore_beat_av_abundance.fishbiomass)[-2], ndata.insect_herbivore_beat_av_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.insect_herbivore_beat_av_abundance.fishbiomass) %*% t(Designmat)) 
 
-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass$SE <- sqrt(predvar) 
-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_herbivore_pitfall_av_abundance.fishbiomass$sigma^2)
+ndata.insect_herbivore_beat_av_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.insect_herbivore_beat_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_herbivore_beat_av_abundance.fishbiomass$sigma^2)
 
 fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
 
-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_herbivore_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+ndata.insect_herbivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_herbivore_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
 
 
 # plot 
-plt.insect_herbivore_pitfall_av_abundance.fishbiomass <- ggplot(ndata.insect_herbivore_pitfall_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+plt.insect_herbivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_herbivore_beat_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
-  geom_point(aes(y =insect_herbivore_pitfall_av_abundance), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect herbivore density (#/pitfall)")+  
+  geom_point(aes(y =insect_herbivore_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect herbivore density (#/beat)")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.insect_herbivore_pitfall_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  geom_ribbon(data = ndata.insect_herbivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
-plt.insect_herbivore_pitfall_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_herbivore_pitfall_av_abundance_fish_biomass.png")
+plt.insect_herbivore_beat_av_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_herbivore_beat_av_abundance_fish_biomass.png")
 
 
-# insect_pitfall_av_abundance vs. fish biomass ----------
-ggplot(fish_stats_zscores, aes(y=insect_pitfall_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$insect_pitfall_av_abundance)
-qqp(fish_stats_zscores$insect_pitfall_av_abundance, "lnorm")
+# insect_beat_av_abundance vs. fish biomass ----------
+ggplot(fish_stats_zscores, aes(y=insect_beat_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores$insect_beat_av_abundance)
+qqp(fish_stats_zscores$insect_beat_av_abundance, "lnorm")
 
-lme.insect_pitfall_av_abundance.fishbiomass<-lme(insect_pitfall_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-# lme.insect_pitfall_av_abundance.fishbiomass_log<-lme(log(insect_pitfall_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.insect_beat_av_abundance.fishbiomass<-lme(insect_beat_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_beat_av_abundance.fishbiomass_log<-lme(log(insect_beat_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 # 
-# glmm.insect_pitfall_av_abundance.fishbiomass<-glmmTMB((insect_pitfall_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# glmm.insect_beat_av_abundance.fishbiomass<-glmmTMB((insect_beat_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
 # 
 # 
-# AICtab( lme.insect_pitfall_av_abundance.fishbiomass, lme.insect_pitfall_av_abundance.fishbiomass_log, glmm.insect_pitfall_av_abundance.fishbiomass)
+# AICtab( lme.insect_beat_av_abundance.fishbiomass, lme.insect_beat_av_abundance.fishbiomass_log, glmm.insect_beat_av_abundance.fishbiomass)
 
-summary(lme.insect_pitfall_av_abundance.fishbiomass)
+summary(lme.insect_beat_av_abundance.fishbiomass)
 
 
 colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
-grid.arrange(plot(lme.insect_pitfall_av_abundance.fishbiomass,type=c("p","smooth")),
-             plot(lme.insect_pitfall_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+grid.arrange(plot(lme.insect_beat_av_abundance.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_beat_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
                   col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
                   type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
              ## "sqrt(abs(resid(x)))"),
-             plot(lme.insect_pitfall_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
+             plot(lme.insect_beat_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
                   type=c("p","smooth")),
-             qqnorm(lme.insect_pitfall_av_abundance.fishbiomass,abline=c(0,1),
+             qqnorm(lme.insect_beat_av_abundance.fishbiomass,abline=c(0,1),
                     col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
 
 # Extracting coefficients and plotting
 want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
-mod.insect_pitfall_av_abundance.fishbiomass<-lme.insect_pitfall_av_abundance.fishbiomass 
-ndata.insect_pitfall_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+mod.insect_beat_av_abundance.fishbiomass<-lme.insect_beat_av_abundance.fishbiomass 
+ndata.insect_beat_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
                                                                                  unq_isl = unq_isl[want]))
 
 ## add the fitted values by predicting from the model for the new data
-ndata.insect_pitfall_av_abundance.fishbiomass <- add_column(ndata.insect_pitfall_av_abundance.fishbiomass, fit = predict(mod.insect_pitfall_av_abundance.fishbiomass, newdata = ndata.insect_pitfall_av_abundance.fishbiomass, level=0))
+ndata.insect_beat_av_abundance.fishbiomass <- add_column(ndata.insect_beat_av_abundance.fishbiomass, fit = predict(mod.insect_beat_av_abundance.fishbiomass, newdata = ndata.insect_beat_av_abundance.fishbiomass, level=0))
 
 ###for lmes: from bolker: 
 #http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
-Designmat <- model.matrix(formula(mod.insect_pitfall_av_abundance.fishbiomass)[-2], ndata.insect_pitfall_av_abundance.fishbiomass)
-predvar <- diag(Designmat %*% vcov(mod.insect_pitfall_av_abundance.fishbiomass) %*% t(Designmat)) 
+Designmat <- model.matrix(formula(mod.insect_beat_av_abundance.fishbiomass)[-2], ndata.insect_beat_av_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.insect_beat_av_abundance.fishbiomass) %*% t(Designmat)) 
 
-ndata.insect_pitfall_av_abundance.fishbiomass$SE <- sqrt(predvar) 
-ndata.insect_pitfall_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_pitfall_av_abundance.fishbiomass$sigma^2)
+ndata.insect_beat_av_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.insect_beat_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_beat_av_abundance.fishbiomass$sigma^2)
 
 fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
 
-ndata.insect_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_pitfall_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+ndata.insect_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
 
 
 # plot 
-plt.insect_pitfall_av_abundance.fishbiomass <- ggplot(ndata.insect_pitfall_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+plt.insect_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_beat_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes()) +
-  geom_point(aes(y =insect_pitfall_av_abundance), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect density (#/pitfall)")+  
+  geom_point(aes(y =insect_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect density (#/beat)")+  
   scale_shape_manual(values=c(19))+
-  geom_ribbon(data = ndata.insect_pitfall_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  geom_ribbon(data = ndata.insect_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
-plt.insect_pitfall_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_pitfall_av_abundance_fish_biomass.png")
+plt.insect_beat_av_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_beat_av_abundance_fish_biomass.png")
 
 
 
@@ -1899,12 +2050,12 @@ plt.d15n.fishbiomass <- ggplot(ndata.d15n.fishbiomass, aes(x = fish_biomass_bym3
   theme_classic()+
   geom_line(size=1.5, aes()) +
   geom_point(aes(y =(d15n+1.5)), size=3, data = fish_stats_zscores)+
-  xlab(expression("Fish richness per 100 m3")) + ylab("Soil d15n at shoreline")+  
+  xlab(expression("Fish biomass g per m3")) + ylab("Soil d15n at shoreline")+  
   scale_shape_manual(values=c(19))+
   geom_ribbon(data = ndata.d15n.fishbiomass,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fishbiomass
-ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_catch.png")
+ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fishbiomass.png")
 
 
 # Fish richness and N15 ---------------------------------------------------
@@ -2147,7 +2298,7 @@ plant_plots_cover_richness
 ggplot2::ggsave("C:Plots//Model-fitted//plant_plots_cover_richness.png", width=30, height=10, units="cm")
 
 
-insect_plots_cover<-plot_grid(plt.insect_detritivore_pitfall_av_abundance.fishbiomass,plt.insect_herbivore_pitfall_av_abundance.fishbiomass, plt.insect_carnivore_pitfall_av_abundance.fishbiomass,
+insect_plots_cover<-plot_grid(plt.insect_detritivore_beat_av_abundance.fishbiomass,plt.insect_herbivore_beat_av_abundance.fishbiomass, plt.insect_carnivore_beat_av_abundance.fishbiomass,
                              ncol=3, align='v', axis = 'l')
 insect_plots_cover
 ggplot2::ggsave("C:Plots//Model-fitted//insect_plots_cover.png", width=30, height=10, units="cm")
