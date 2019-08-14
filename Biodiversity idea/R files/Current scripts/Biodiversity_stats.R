@@ -80,7 +80,15 @@ fish_stats_zscores$fish_abundance_bym3<-as.numeric(fish_stats_zscores$fish_abund
 
 
 fish_stats_zscores_cat<-fish_stats_zscores %>% filter(fish_biomass_bym3_cat != "med fish biomass")
+fish_stats_cat<-fish_stats %>% filter(fish_biomass_bym3_cat != "med fish biomass")
+
 head(fish_stats_zscores_cat)
+fish_stats_zscores_cat$fish_biomass_bym3_cat<-factor(fish_stats_zscores_cat$fish_biomass_bym3_cat)
+levels(fish_stats_zscores_cat$fish_biomass_bym3_cat)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+fish_stats_zscores_cat$log_Area.unscaled <-fish_stats_zscores_cat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+fish_stats_zscores_cat$log_Area<-as.numeric(fish_stats_zscores_cat$log_Area)
 
 
 # Shrub cover (total) vs. fish biomass ----------
@@ -878,6 +886,61 @@ plt.insect_carnivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_carniv
   theme(legend.position="none")
 plt.insect_carnivore_beat_av_abundance.fishbiomass
 ggsave("C:Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_biomass.png")
+
+
+
+# insect_carnivore_richness vs. fish biomass ----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_carnivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_carnivore_richness)
+qqp(fish_stats_zscores_cat$insect_carnivore_richness, "lnorm")
+
+lme.insect_carnivore_richness.fishbiomass<-lme(log(insect_carnivore_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_carnivore_richness.fishbiomass)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_carnivore_richness.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_carnivore_richness.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_carnivore_richness.fishbiomass,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_carnivore_richness.fishbiomass,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+fm1<-lme.insect_carnivore_richness.fishbiomass
+newdat <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                      fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat$pred <- predict(fm1, newdat, level = 0)
+
+
+Designmat <- model.matrix(formula(fm1)[-2], newdat)
+predvar <- diag(Designmat %*% vcov(fm1) %*% t(Designmat)) 
+newdat$SE <- sqrt(predvar) 
+newdat$SE2 <- sqrt(predvar+fm1$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.insect_carnivore_richness.fishbiomass <- ggplot(newdat, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(insect_carnivore_richness)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Insect carnivore richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.insect_carnivore_richness.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
+
+
 
 
 # insect_herbivore_beat_av_abundance vs. fish biomass ----------
