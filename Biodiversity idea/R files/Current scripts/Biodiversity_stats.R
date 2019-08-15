@@ -1,4 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 # install.packages("devtools")
 # devtools::install_github("cardiomoon/ggiraphExtra")
@@ -606,6 +606,53 @@ plt.tree_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = l
   theme(legend.position="none")
 plt.tree_richness.Area
 ggsave("C:Plots//Model-fitted//LME_tree_richness_Area.png")
+
+# mammal_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=mammal_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$mammal_richness)
+qqp(fish_stats_zscores_cat$mammal_richness, "lnorm")
+
+lm.mammal_richness.Area<-lm(log(mammal_richness+1) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.mammal_richness.Area)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.mammal_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(mammal_richness+1) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("mammal richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.mammal_richness.Area
+ggsave("C:Plots//Model-fitted//LME_mammal_richness_Area.png")
+
+
+# total_richness vs. Area ----------
+ggplot(fish_stats_zscores_cat, aes(y=total_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$total_richness)
+qqp(fish_stats_zscores_cat$total_richness, "lnorm")
+
+lm.total_richness.Area<-lm(log(total_richness) ~ log_Area*fish_biomass_bym3_cat, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lm.total_richness.Area)
+
+
+# plot 
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+
+plt.total_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(total_richness) ,col=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_point(size=3)+
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  xlab(expression("Island Area (log)")) + ylab("total richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
+  theme(legend.position="none")
+plt.total_richness.Area
+ggsave("C:Plots//Model-fitted//LME_total_richness_Area.png")
 
 
 # bird.density vs. fish richness ----------
