@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 #change to norahbrown if on work computer
 
 
@@ -436,7 +436,7 @@ fish_bycatch_richness_merged_tran_year$marine_richness<-(fish_bycatch_richness_m
 fish_bycatch_richness_merged_tran_year$marine_richness_bym3<-(fish_bycatch_richness_merged_tran_year$fish_richness_bym3+fish_bycatch_richness_merged_tran_year$bycatch_richness_bym3)
 
 #head(fish_bycatch_richness_merged_tran_year)
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 
 
@@ -455,7 +455,7 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Output files//fish_bycatch_
 
 
 #This is working with a 500m radius around the transects instead
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
@@ -471,7 +471,7 @@ fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 by_tran_master_0m<-read.csv("C:Data by person\\Norah.data\\by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
@@ -549,12 +549,15 @@ length(labels4)
 
 
 
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 write.csv(fish_richness_merged_tran_isl, "C:Output files//fish_richness_merged_tran_isl.csv")
 
 #how many beachseine sites - 12, how many transects - 106
 length(unique(fish_richness_merged_tran_isl$site))
 length(unique(fish_richness_merged_tran_isl$unq_tran))
+length(unique(fish_richness_merged_tran_isl$unq_isl))
+
+
 #I think I added more after I fixed the issues with Owen's plots! 
 
 # Determining best scale of comparison -----------------------------------------
@@ -1050,7 +1053,7 @@ ggsave("C:Plots//Transect//Resources_terr_var//marine_richness_terrestrial_isl.p
 
 # Plotting marine resources vs. marine variables----------------------------------------------------------------
 
-setwd("C:/Users/Norah/Dropbox/Projects/100 islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100 islands/Biodiversity idea")
 
 #Just marine variables to eachother
 marine1<-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=fish_richness_corrected, y=bycatch_richness_corrected))+geom_point()+geom_smooth(method="lm")

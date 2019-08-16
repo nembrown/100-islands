@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 # install.packages("devtools")
 # devtools::install_github("cardiomoon/ggiraphExtra")
@@ -536,13 +536,6 @@ qqp(fish_stats_zscores$bird.density)
 qqp(fish_stats_zscores$bird.density, "lnorm")
 
 lm.bird.density.fishbiomass<-lm(bird.density ~ fish_biomass_bym3_mean, data=fish_stats_zscores, na.action=na.omit)
-# lme.bird.density.fishbiomass_log<-lme(log(bird.density+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
-# 
-# glmm.bird.density.fishbiomass<-glmmTMB((bird.density+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
-# 
-# 
-# AICtab( lme.bird.density.fishbiomass, lme.bird.density.fishbiomass_log, glmm.bird.density.fishbiomass)
-
 summary(lm.bird.density.fishbiomass)
 
 
@@ -550,12 +543,12 @@ summary(lm.bird.density.fishbiomass)
 plt.bird.density.fishbiomass <- ggplot(fish_stats_zscores, aes(x = fish_biomass_bym3_mean.unscaled, y = bird.density)) + 
   theme_classic()+
   geom_point(size=3)+
-  xlab(expression("Fish biomass (g per m3)")) + ylab("Bird density (#/m2)")+  
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Bird density (#/hectare)")+  
   scale_shape_manual(values=c(19))+
-  geom_smooth(size=1.5, col="black", alpha=0., method="lm")+
+  geom_smooth(size=1.5, col="black", alpha=0.15, method="lm")+
   theme(legend.position="none")
 plt.bird.density.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_bird.density_fish_biomass.png")
+ggsave("C:Plots//Model-fitted//LM_bird.density_fish_biomass.png", width=15, height=10, units="cm")
 
 # bird.richness vs. Area ----------
 ggplot(fish_stats_zscores_cat, aes(y=bird.richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -569,7 +562,7 @@ summary(lm.bird.richness.Area)
 # plot 
 colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
 
-plt.bird.richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(bird.richness) ,col=fish_biomass_bym3_cat)) + 
+plt.bird.richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area.unscaled, y = log(bird.richness) ,col=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_point(size=3)+
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
@@ -578,7 +571,7 @@ plt.bird.richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = l
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.bird.richness.Area
-ggsave("C:Plots//Model-fitted//LME_bird.richness_Area.png")
+ggsave("C:Plots//Model-fitted//LME_bird.richness_Area.png", width=10, height=10, units="cm")
 
 
 
@@ -596,7 +589,7 @@ summary(lm.tree_richness.Area)
 # plot 
 colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
 
-plt.tree_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = log(tree_richness) ,col=fish_biomass_bym3_cat)) + 
+plt.tree_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area.unscaled, y = log(tree_richness) ,col=fish_biomass_bym3_cat)) + 
   theme_classic()+
   geom_point(size=3)+
   scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
