@@ -801,6 +801,119 @@ ggsave("C:Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_bioma
 
 
 
+# birdfood ----------------------------------------------------------------
+# birdfood insects vs. fish biomass  
+head(fish_stats_zscores)
+lme.insect_birdfood_beat_av_abundance.fishbiomass<-lme(insect_birdfood_beat_av_abundance ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_birdfood_beat_av_abundance.fishbiomass_log<-lme(log(insect_birdfood_beat_av_abundance+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# 
+# glmm.insect_birdfood_beat_av_abundance.fishbiomass<-glmmTMB((insect_birdfood_beat_av_abundance+0.01) ~ fish_biomass_bym3_mean + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# 
+# 
+# AICtab( lme.insect_birdfood_beat_av_abundance.fishbiomass, lme.insect_birdfood_beat_av_abundance.fishbiomass_log, glmm.insect_birdfood_beat_av_abundance.fishbiomass)
+
+
+summary(lme.insect_birdfood_beat_av_abundance.fishbiomass)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_birdfood_beat_av_abundance.fishbiomass,type=c("p","smooth")),
+             plot(lme.insect_birdfood_beat_av_abundance.fishbiomass,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_birdfood_beat_av_abundance.fishbiomass,resid(.,type="pearson")~fish_biomass_bym3_mean,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_birdfood_beat_av_abundance.fishbiomass,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.insect_birdfood_beat_av_abundance.fishbiomass<-lme.insect_birdfood_beat_av_abundance.fishbiomass 
+ndata.insect_birdfood_beat_av_abundance.fishbiomass <- with(fish_stats_zscores, tibble(fish_biomass_bym3_mean = seq(min(fish_biomass_bym3_mean), max(fish_biomass_bym3_mean),length = 100),
+                                                                                        unq_isl = unq_isl[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.insect_birdfood_beat_av_abundance.fishbiomass <- add_column(ndata.insect_birdfood_beat_av_abundance.fishbiomass, fit = predict(mod.insect_birdfood_beat_av_abundance.fishbiomass, newdata = ndata.insect_birdfood_beat_av_abundance.fishbiomass, level=0))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.insect_birdfood_beat_av_abundance.fishbiomass)[-2], ndata.insect_birdfood_beat_av_abundance.fishbiomass)
+predvar <- diag(Designmat %*% vcov(mod.insect_birdfood_beat_av_abundance.fishbiomass) %*% t(Designmat)) 
+
+ndata.insect_birdfood_beat_av_abundance.fishbiomass$SE <- sqrt(predvar) 
+ndata.insect_birdfood_beat_av_abundance.fishbiomass$SE2 <- sqrt(predvar+mod.insect_birdfood_beat_av_abundance.fishbiomass$sigma^2)
+
+fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
+
+ndata.insect_birdfood_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean.unscaled<-ndata.insect_birdfood_beat_av_abundance.fishbiomass$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
+
+
+# plot
+plt.insect_birdfood_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_birdfood_beat_av_abundance.fishbiomass, aes(x = fish_biomass_bym3_mean.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =insect_birdfood_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect birdfood density (#/beat)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.insect_birdfood_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.insect_birdfood_beat_av_abundance.fishbiomass
+ggsave("C:Plots//Model-fitted//LME_insect_birdfood_beat_av_abundance_fish_biomass.png")
+
+# insect_birdfood_richness vs. Area----------
+ggplot(fish_stats_zscores_cat, aes(y=insect_birdfood_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
+qqp(fish_stats_zscores_cat$insect_birdfood_richness)
+qqp(fish_stats_zscores_cat$insect_birdfood_richness, "lnorm")
+
+lme.insect_birdfood_richness.Area<-lme(log(insect_birdfood_richness) ~ log_Area*fish_biomass_bym3_cat, random= ~1|unq_isl, data=fish_stats_zscores_cat, na.action=na.omit)
+summary(lme.insect_birdfood_richness.Area)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_birdfood_richness.Area,type=c("p","smooth")),
+             plot(lme.insect_birdfood_richness.Area,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_birdfood_richness.Area,resid(.,type="pearson")~log_Area,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_birdfood_richness.Area,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores_cat$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+
+fm1_birdfood<-lme.insect_birdfood_richness.Area
+newdat_birdfood <- expand.grid(log_Area = seq(min(fish_stats_zscores_cat$log_Area), max(fish_stats_zscores_cat$log_Area),length = 100),
+                                fish_biomass_bym3_cat=c("low fish biomass", "high fish biomass"))
+newdat_birdfood$pred <- predict(fm1_birdfood, newdat_birdfood, level = 0)
+
+
+Designmat_birdfood <- model.matrix(formula(fm1_birdfood)[-2], newdat_birdfood)
+predvar_birdfood <- diag(Designmat_birdfood %*% vcov(fm1_birdfood) %*% t(Designmat_birdfood)) 
+newdat_birdfood$SE <- sqrt(predvar_birdfood) 
+newdat_birdfood$SE2 <- sqrt(predvar_birdfood+fm1_birdfood$sigma^2)
+
+fish_stats_zscores_cat$log_Area<-scale(fish_stats_cat$log_Area, center=TRUE, scale=TRUE)
+
+newdat_birdfood$log_Area.unscaled<-newdat$log_Area * attr(fish_stats_zscores_cat$log_Area, 'scaled:scale') + attr(fish_stats_zscores_cat$log_Area, 'scaled:center')
+
+
+# plot
+colorset_richness = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+plt.insect_birdfood_richness.Area <- ggplot(newdat_birdfood, aes(x = log_Area.unscaled, y = pred, colour=fish_biomass_bym3_cat)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  scale_colour_manual(values=colorset_richness)+ scale_fill_manual(values=colorset_richness)+
+  geom_point(aes(y =log(insect_birdfood_richness)), size=3, data = fish_stats_zscores_cat)+
+  xlab(expression("Island Area (log)")) + ylab("Insect birdfood richness (log)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = newdat_birdfood,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
+  theme(legend.position="none")
+plt.insect_birdfood_richness.Area
+ggsave("C:Plots//Model-fitted//LME_insect_birdfood_richness_Area.png")
+
+
 # insect_carnivore_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=insect_carnivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
 qqp(fish_stats_zscores_cat$insect_carnivore_richness)
