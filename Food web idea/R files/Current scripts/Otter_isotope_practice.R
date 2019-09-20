@@ -1,4 +1,5 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea/Data by person/Norah.data")
+
+setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea/Data by person/Norah.data")
 otter_isotopes<-read.csv("C:master_otter_isotope_nb_new.csv")
 
 head(otter_isotopes)

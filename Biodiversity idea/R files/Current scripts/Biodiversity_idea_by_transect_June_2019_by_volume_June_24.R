@@ -617,7 +617,7 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_ca
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_herbivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 
 
-
+head(fish_richness_merged_tran_isl)
 
 
 
