@@ -668,12 +668,75 @@ summary(lm.bird.density.fishcatch)
 plt.bird.density.fishcatch <- ggplot(fish_stats_zscores, aes(x = fish_richness_corrected.unscaled, y = bird.density)) + 
   theme_classic()+
   geom_point(size=3)+
-  xlab(expression("Fish richness")) + ylab("Bird density (#/m2)")+  
+  xlab(expression("Fish richness per 100 m3")) + ylab("Bird density (#/hectare)")+  
   scale_shape_manual(values=c(19))+
   geom_smooth(size=1.5, col="black", alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.bird.density.fishcatch
-ggsave("C:Plots//Model-fitted//LME_bird.density_fish_biomass.png")
+ggsave("C:Plots//Model-fitted//LME_bird.density_fish_richness.png")
+
+
+ggplot(fish_stats_zscores, aes(y=insect_detritivore_beat_av_abundance, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
+
+qqp(fish_stats_zscores$insect_detritivore_beat_av_abundance)
+qqp(fish_stats_zscores$insect_detritivore_beat_av_abundance, "lnorm")
+
+lme.insect_detritivore_beat_av_abundance.fishrichness<-lme(insect_detritivore_beat_av_abundance ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# lme.insect_detritivore_beat_av_abundance.fishrichness_log<-lme(log(insect_detritivore_beat_av_abundance+1) ~ fish_richness_corrected, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+# 
+# glmm.insect_detritivore_beat_av_abundance.fishrichness<-glmmTMB((insect_detritivore_beat_av_abundance+0.01) ~ fish_richness_corrected + (1|unq_isl), data=fish_stats_zscores, family="Gamma", na.action=na.omit)
+# 
+# 
+# AICtab( lme.insect_detritivore_beat_av_abundance.fishrichness, lme.insect_detritivore_beat_av_abundance.fishrichness_log, glmm.insect_detritivore_beat_av_abundance.fishrichness)
+
+summary(lme.insect_detritivore_beat_av_abundance.fishrichness)
+
+
+colvec <- c("#ff1111","#007eff") ## second colour matches lattice default
+grid.arrange(plot(lme.insect_detritivore_beat_av_abundance.fishrichness,type=c("p","smooth")),
+             plot(lme.insect_detritivore_beat_av_abundance.fishrichness,sqrt(abs(resid(.)))~fitted(.),
+                  col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2]),
+                  type=c("p","smooth"),ylab=expression(sqrt(abs(resid)))),
+             ## "sqrt(abs(resid(x)))"),
+             plot(lme.insect_detritivore_beat_av_abundance.fishrichness,resid(.,type="pearson")~fish_richness_corrected,
+                  type=c("p","smooth")),
+             qqnorm(lme.insect_detritivore_beat_av_abundance.fishrichness,abline=c(0,1),
+                    col=ifelse(fish_stats_zscores$unq_isl=="CV04",colvec[1],colvec[2])))
+
+# Extracting coefficients and plotting
+want <- seq(1, nrow(fish_stats_zscores), length.out = 100)
+mod.insect_detritivore_beat_av_abundance.fishrichness<-lme.insect_detritivore_beat_av_abundance.fishrichness 
+ndata.insect_detritivore_beat_av_abundance.fishrichness <- with(fish_stats_zscores, tibble(fish_richness_corrected = seq(min(fish_richness_corrected), max(fish_richness_corrected),length = 100),
+                                                                                          unq_isl = unq_isl[want]))
+
+## add the fitted values by predicting from the model for the new data
+ndata.insect_detritivore_beat_av_abundance.fishrichness <- add_column(ndata.insect_detritivore_beat_av_abundance.fishrichness, fit = predict(mod.insect_detritivore_beat_av_abundance.fishrichness, newdata = ndata.insect_detritivore_beat_av_abundance.fishrichness, level=0))
+
+###for lmes: from bolker: 
+#http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#predictions-andor-confidence-or-prediction-intervals-on-predictions
+Designmat <- model.matrix(formula(mod.insect_detritivore_beat_av_abundance.fishrichness)[-2], ndata.insect_detritivore_beat_av_abundance.fishrichness)
+predvar <- diag(Designmat %*% vcov(mod.insect_detritivore_beat_av_abundance.fishrichness) %*% t(Designmat)) 
+
+ndata.insect_detritivore_beat_av_abundance.fishrichness$SE <- sqrt(predvar) 
+ndata.insect_detritivore_beat_av_abundance.fishrichness$SE2 <- sqrt(predvar+mod.insect_detritivore_beat_av_abundance.fishrichness$sigma^2)
+
+fish_stats_zscores$fish_richness_corrected<-scale(fish_stats$fish_richness_corrected, center=TRUE, scale=TRUE)
+
+ndata.insect_detritivore_beat_av_abundance.fishrichness$fish_richness_corrected.unscaled<-ndata.insect_detritivore_beat_av_abundance.fishrichness$fish_richness_corrected * attr(fish_stats_zscores$fish_richness_corrected, 'scaled:scale') + attr(fish_stats_zscores$fish_richness_corrected, 'scaled:center')
+
+
+# plot 
+plt.insect_detritivore_beat_av_abundance.fishrichness <- ggplot(ndata.insect_detritivore_beat_av_abundance.fishrichness, aes(x = fish_richness_corrected.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes()) +
+  geom_point(aes(y =insect_detritivore_beat_av_abundance), size=3, data = fish_stats_zscores)+
+  xlab(expression("Fish biomass (g per m3)")) + ylab("Insect detritivore density (#/beat)")+  
+  scale_shape_manual(values=c(19))+
+  geom_ribbon(data = ndata.insect_detritivore_beat_av_abundance.fishrichness,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
+  theme(legend.position="none")
+plt.insect_detritivore_beat_av_abundance.fishrichness
+ggsave("C:Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
+
 
 
 # insect_detritivore_beat_av_abundance vs. fish biomass ----------
@@ -2567,6 +2630,9 @@ ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_abundance.png")
 
 # Combining Plots ----------------------------------------------------
 library(cowplot)
+
+plot_grid(plt.bird.density.fishbiomass, plt.bird.density.fishcatch,ncol=2, align='v', axis = 'l')
+
 soil_plots<-plot_grid(plt.d15n.fishcatch, plt.d15n.fish_abundance, plt.fish_speciesvabund, ncol=3, align='v', axis = 'l')
 soil_plots
                  
