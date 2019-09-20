@@ -43,7 +43,10 @@ library(doBy)
 library(cowplot)
 library(viridis)
 library(matrixStats)
+library(tidyverse)
 
+#detach(package:plyr)
+#detach(package:dplyr)
 
 # Net dimensions ----------------------------------------------------------
 # take net dimnesion data, make it long for each set to match the other files
@@ -79,8 +82,10 @@ ben_fish_data <- ben_fish_data %>% filter(between(month, 5,8))
 
 ben_fish_data_wide_year <-ben_fish_data %>% group_by(site, year, species) %>% 
   summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
-  spread( species, sum_abundance) %>% 
+  spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
+
+mutate(rn=row_number()) %>% 
 
 head(ben_fish_data_wide_year)
 
@@ -484,17 +489,17 @@ by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, label
 
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Data by person\\Norah.data\\by_tran_master.csv")
-#head(by_tran_master)
+head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 which( colnames(by_tran_master)=="tree_richness" )
 which( colnames(by_tran_master)=="tree_abundance")
 which( colnames(by_tran_master)=="sum_basal")
-# which( colnames(by_tran_master)=="shrub_richness" )
-# which( colnames(by_tran_master)=="shrub_cover")
+which( colnames(by_tran_master)=="site_mean_by_tran" )
+which( colnames(by_tran_master)=="wrack_richness")
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,15,18,19)]
+by_tran_master_subset<-by_tran_master[,c(1,15,18,19, 104, 103)]
 head(by_tran_master_subset)
 
 
@@ -614,15 +619,36 @@ ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_be
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_detritivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_carnivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_herbivore_pitfall_av_abundance))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=bird.richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=bird.richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(site_mean_by_tran + 1), y=bird.richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=insect_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=insect_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=log(site_mean_by_tran+1), y=insect_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+
+head(fish_richness_merged_tran_isl)
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=plant_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=plant_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=tree_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_richness))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 
 
 head(fish_richness_merged_tran_isl)
 
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=bird.density))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=bird.density))+geom_point()+geom_smooth(aes(),method="lm")+scale_colour_viridis_d()
 
 
 View(fish_richness_merged_tran_isl)
