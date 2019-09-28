@@ -1,6 +1,22 @@
 setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea/Data by person")
 soil_s<-read.csv("C:Norah.data/soil_s.csv")
 
+
+# load packages ----------------------------------------------------------
+library(rlang)
+library(tidyr)
+library(vegan)
+library(ggplot2)
+library(ggcorrplot)
+library(doBy)
+library(plyr)
+library(dplyr)
+library(doBy)
+library(cowplot)
+library(viridis)
+library(matrixStats)
+library(tidyverse)
+
 head(soil_s)
 
 subsample_owen_soils<-read.csv("C:Owen's data/subsample_owen_soil.csv")
