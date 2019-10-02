@@ -1,4 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 #This script plots the locations of collected samples from three separate datasets
 #Transects from 100 islands project, Beachsines from Hakai Nearshore, and Otter scats from Andrew Sheriff
@@ -36,7 +36,7 @@ fish_richness_merged_tran_isl<-fish_richness_merged_tran_isl[,-1]
 
 
 #loading information from 100 islands project
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
+setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Food web idea")
 
 #Island level location information
 by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
@@ -44,12 +44,12 @@ head(by_isl_master)
 by_isl_master<-by_isl_master[,-1]
 
 #Transect-level information
-by_tran_master<-read.csv("C:Data by person//Norah.data//by_tran_master.csv")
+by_tran_master<-read.csv("C:Data by person//norahbrown.data//by_tran_master.csv")
 by_tran_master<-by_tran_master[,-1]
 
 
 #isotopes on the island-level
-isotope_by_isl_gathered4<- read.csv("C:Data by person//Norah.data/isotope_by_isl_gathered4.csv")
+isotope_by_isl_gathered4<- read.csv("C:Data by person//norahbrown.data/isotope_by_isl_gathered4.csv")
 isotope_by_isl_gathered4<-isotope_by_isl_gathered4[,-1]
 
 
@@ -104,7 +104,7 @@ bbox_marine <- make_bbox(df.SF_marine$long, df.SF_marine$lat, f = 0.01)
 bbox_marine_big <- make_bbox(df.SF_marine$long, df.SF_marine$lat, f = 5)
 map_toner_lite_marine <- get_stamenmap(bbox_marine, source="stamen", maptype= "toner-lite", crop=FALSE)
 map_marine <- get_stamenmap(bbox_marine, source="stamen", maptype= "terrain", crop=FALSE)
-map_marine_big <- get_stamenmap(bbox_marine_big, source="stamen", maptype= "terrain", crop=FALSE, zoom=7)
+map_marine_big <- get_stamenmap(bbox_marine_big, source="stamen", maptype= "terrain", crop=FALSE, zoom=8)
 
 
 ggmap(map_marine) + geom_point(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
@@ -162,7 +162,7 @@ library(beyonce)
 
 colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
 
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
 ggsave("C:Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
@@ -195,7 +195,7 @@ ggsave("C:Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, un
 
 # Adding in some data to map just to beachseine dataset ----------------------------------------------
 head(ben_beachseine)
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
+setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 fish_bycatch_richness_merged_tran_year<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
 fish_bycatch_richness_merged_tran_year<-fish_bycatch_richness_merged_tran_year[,-1]
@@ -281,7 +281,7 @@ ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=2
 
 # Adding in otter locations -----------------------------------------------
 
-otter_isotopes<-read.csv("C:Data by person//Norah.data//master_otter_isotope_nb_new.csv")
+otter_isotopes<-read.csv("C:Data by person//norahbrown.data//master_otter_isotope_nb_new.csv")
 head(otter_isotopes)
 otter_isotopes_simple<-otter_isotopes[,c(7,9,10)]
 head(otter_isotopes_simple)
