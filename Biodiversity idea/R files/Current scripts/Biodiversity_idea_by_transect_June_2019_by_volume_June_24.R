@@ -1,8 +1,4 @@
-install.packages("here")
 library(here)
-
-#The here package is aware of this and the presence of an .Rproj 
-#is one of the ways it recognizes the top-level folder for a project.
 
 #here() starts at C:/Users/norahbrown/Dropbox/Projects/100-islands
 
@@ -478,7 +474,7 @@ fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
-by_tran_master_0m<-read.csv("C:Food web idea idea//Data by person\\Norah.data\\by_tran_master_0m.csv")
+by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
 head(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
@@ -489,7 +485,7 @@ by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, label
 
 
 ### adding in tree diversity (transect level)
-by_tran_master<-read.csv("C:Food web idea idea//Data by person\\Norah.data\\by_tran_master.csv")
+by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
 head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 which( colnames(by_tran_master)=="tree_richness" )
@@ -506,7 +502,7 @@ head(by_tran_master_subset)
 
 
 #adding in a few interesting island-level components
-by_isl_master<-read.csv("C:Food web idea idea//Data by person\\Owen's data//by_isl_master.csv")
+by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 by_isl_master<-by_isl_master[,-1]
 head(by_isl_master)
 paste(
@@ -531,7 +527,7 @@ paste(
 )
 
 by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65)]
-#head(by_isl_master_subset)
+head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran", all=TRUE)
