@@ -1,4 +1,3 @@
-setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
 #This script plots the locations of collected samples from three separate datasets
 #Transects from 100 islands project, Beachsines from Hakai Nearshore, and Otter scats from Andrew Sheriff
@@ -7,6 +6,7 @@ setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 #library(devtools)
 #install_github("r-spatial/sf")
 
+library(here)
 library(sf)
 library(raster)
 library(spData)
@@ -27,29 +27,28 @@ library(mapdata)
 
 
 #loading in information on beachseine location
-ben_habitat_data<-read.csv("C:Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
+ben_habitat_data<-read.csv("C:Biodiversity idea//Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
 head(ben_habitat_data)
 
 #loading in beachseine data that's combined with transect information 
-fish_richness_merged_tran_isl<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+fish_richness_merged_tran_isl<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
 fish_richness_merged_tran_isl<-fish_richness_merged_tran_isl[,-1]
 
 
 #loading information from 100 islands project
-setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Food web idea")
 
 #Island level location information
-by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
+by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 head(by_isl_master)
 by_isl_master<-by_isl_master[,-1]
 
 #Transect-level information
-by_tran_master<-read.csv("C:Data by person//norahbrown.data//by_tran_master.csv")
+by_tran_master<-read.csv("C:Food web idea//Data by person//norahbrown.data//by_tran_master.csv")
 by_tran_master<-by_tran_master[,-1]
 
 
 #isotopes on the island-level
-isotope_by_isl_gathered4<- read.csv("C:Data by person//norahbrown.data/isotope_by_isl_gathered4.csv")
+isotope_by_isl_gathered4<- read.csv("C:Food web idea//Data by person//norahbrown.data/isotope_by_isl_gathered4.csv")
 isotope_by_isl_gathered4<-isotope_by_isl_gathered4[,-1]
 
 
@@ -162,15 +161,13 @@ library(beyonce)
 
 colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
 
-setwd("C:/Users/norahbrownbrown/Dropbox/Projects/100-islands/Biodiversity idea")
-
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
-ggsave("C:Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
 
 # Map at 1km radius only -------------------------------------------------------
 
-hakai_sites_distance_tran<-read.csv("C:Output files//paired_sites_by_radius.csv")
+hakai_sites_distance_tran<-read.csv("C:Biodiversity idea//Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
 
@@ -187,7 +184,7 @@ df.SF_transects_marine_1k <-rbind(df.SF_transects_marine_1k_unq_tran, df.SF_tran
 head(df.SF_transects_marine_1k)
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine_1k, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
-ggsave("C:Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, unit="cm")
 
 
 
@@ -195,9 +192,8 @@ ggsave("C:Plots//Maps//map_transects_beachseine_1k.png", width=40, height=20, un
 
 # Adding in some data to map just to beachseine dataset ----------------------------------------------
 head(ben_beachseine)
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Biodiversity idea")
 
-fish_bycatch_richness_merged_tran_year<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
+fish_bycatch_richness_merged_tran_year<-read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
 fish_bycatch_richness_merged_tran_year<-fish_bycatch_richness_merged_tran_year[,-1]
 head(fish_bycatch_richness_merged_tran_year)
 
@@ -213,75 +209,75 @@ bbox_marine_beachseine <- make_bbox(ben_beachseine$long, ben_beachseine$lat, f =
 map_marine_beachseine <- get_stamenmap(bbox_marine_beachseine, source="stamen", maptype= "terrain", crop=FALSE)
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_richness_corrected))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_biomass.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_biomass.png", width=40, height=20, unit="cm")
 
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_biomass_bym3_sd))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_biomass_sd.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_biomass_sd.png", width=40, height=20, unit="cm")
 
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_length))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_length.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_biomass_v_length.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_biomass_bym3_mean, size=fish_abundance_bym3))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_biomass_v_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_biomass_v_abundance.png", width=40, height=20, unit="cm")
 
 
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=pelagic_abundance_bym3))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=demersal_abundance_bym3))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_demersal_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_demersal_abundance.png", width=40, height=20, unit="cm")
 
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=fish_length))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_length.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_length.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(fish_abundance_bym3+1)))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_abundance_bym3.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_abundance_bym3.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(fish_biomass_bym3)))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_fish_biomass_bym3.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_fish_biomass_bym3.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=bycatch_richness_corrected))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_bycatch_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_bycatch_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(bycatch_abundance_corrected+1)))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_bycatch_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_bycatch_abundance.png", width=40, height=20, unit="cm")
 
 
 
 
 ### Pelagic vs. demersal fish 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=pelagic_richness_corrected))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_pelagic_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_pelagic_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=demersal_richness_corrected))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_demersal_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_demersal_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=prop_pelagic_richness))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_prop_pelagic_richness.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_prop_pelagic_richness.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=prop_pelagic_abundance))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_prop_pelagic_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_prop_pelagic_abundance.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(pelagic_abundance_bym3+1)))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=log(demersal_abundance_bym3+1)))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_demersal_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_demersal_abundance.png", width=40, height=20, unit="cm")
 
 ggmap(map_marine_beachseine) + geom_point(data=ben_beachseine, aes(x = long, y = lat, col=pelagic_abundance))+  scale_colour_viridis()
-ggsave("C:Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_pelagic_abundance.png", width=40, height=20, unit="cm")
 
 
 # Adding in otter locations -----------------------------------------------
 
-otter_isotopes<-read.csv("C:Data by person//norahbrown.data//master_otter_isotope_nb_new.csv")
+otter_isotopes<-read.csv("C:Food web idea//Data by person//norahbrown.data//master_otter_isotope_nb_new.csv")
 head(otter_isotopes)
 otter_isotopes_simple<-otter_isotopes[,c(7,9,10)]
 head(otter_isotopes_simple)
@@ -309,7 +305,7 @@ df.SF_transects_marine_otter$long<-st_coordinates(df.SF_transects_marine_otter)[
 df.SF_transects_marine_otter$lat<-st_coordinates(df.SF_transects_marine_otter)[,2]
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine_otter, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
-ggsave("C:Plots//map_transects_beachseine_otter.png", width=40, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//map_transects_beachseine_otter.png", width=40, height=20, unit="cm")
 
 
 
