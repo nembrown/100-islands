@@ -55,13 +55,24 @@ ben_netdimensions$replicate[ben_netdimensions$replicate=="vol_set1"]<-"1"
 ben_netdimensions$replicate[ben_netdimensions$replicate=="vol_set2"]<-"2"
 head(ben_netdimensions)
 
+##adding area in here for the percent cover of eelgrass calculations later
+ben_netdimensions<-ben_netdimensions %>% gather(area_replicate, area, area_set1,area_set2)
+ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set1"]<-"1"
+ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set2"]<-"2"
+head(ben_netdimensions)
+
+
 # use only summer months data (July and August 7&8)
 #use the dnetdimensions where we don't estimate missing data
 # mean net volume used at that site in the summer
 ben_netdimensions$volume<-as.numeric(ben_netdimensions$volume)
+ben_netdimensions$area<-as.numeric(ben_netdimensions$area)
 ben_netdimensions_year <-ben_netdimensions %>% filter(between(month, 5,8)) %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-ben_netdimensions_year <- ben_netdimensions_year[,c(1,13)]
+ben_netdimensions_year <- ben_netdimensions_year[,c(1,11,12)]
 head(ben_netdimensions_year)
+
+
+
 
 #sum of total net volume in given summer
 ben_netdimensions_summer <-ben_netdimensions%>% filter(between(month, 5,8)) %>% group_by(site, year) %>% 
@@ -83,8 +94,6 @@ ben_fish_data_wide_year <-ben_fish_data %>% group_by(site, year, species) %>%
   summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
   spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
-
-mutate(rn=row_number()) %>% 
 
 head(ben_fish_data_wide_year)
 
@@ -440,8 +449,29 @@ fish_bycatch_richness_merged_tran_year$marine_richness<-(fish_bycatch_richness_m
 fish_bycatch_richness_merged_tran_year$marine_richness_bym3<-(fish_bycatch_richness_merged_tran_year$fish_richness_bym3+fish_bycatch_richness_merged_tran_year$bycatch_richness_bym3)
 fish_bycatch_richness_merged_tran_year$marine_richness_corrected<-(fish_bycatch_richness_merged_tran_year$fish_richness_corrected+fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected)
 
-#head(fish_bycatch_richness_merged_tran_year)
+head(fish_bycatch_richness_merged_tran_year)
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
+
+####
+head(ben_habitat_data)
+which( colnames(ben_habitat_data)=="subtidal_primary_macroveg" )
+fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_habitat_data, by="site")
+
+fish_bycatch_richness_merged_tran_year$eelgrass_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_primary_cover)/100)
+fish_bycatch_richness_merged_tran_year$fucus_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$intertidal_primary_cover)/100)
+
+
+ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=eelgrass_area, y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year%>% filter(intertidal_primary_macroveg=="fucus"), aes(x=fucus_area, y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+
+ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(col=node, x=eelgrass_area, y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+
 
 
 # Matching terrestrial transects to beachseine sites ----------------------
@@ -493,10 +523,16 @@ which( colnames(by_tran_master)=="tree_abundance")
 which( colnames(by_tran_master)=="sum_basal")
 which( colnames(by_tran_master)=="site_mean_by_tran" )
 which( colnames(by_tran_master)=="wrack_richness")
+which( colnames(by_tran_master)=="HAB2000")
+which( colnames(by_tran_master)=="MEAN_egarea1k")
+which( colnames(by_tran_master)=="MEAN_kparea1k")
+
+
+
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,15,18,19, 104, 103)]
+by_tran_master_subset<-by_tran_master[,c(1,15,18,19, 104, 103, 100,47,58)]
 head(by_tran_master_subset)
 
 
@@ -523,10 +559,11 @@ paste(
   which( colnames(by_isl_master)=="size.cat2" ),
   which( colnames(by_isl_master)=="eagles" ),
   which( colnames(by_isl_master)=="ravens" ),
+  which( colnames(by_isl_master)=="node" ),
   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65)]
+by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65, 107)]
 head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
@@ -536,11 +573,10 @@ by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_sub
 head(by_tran_master_0m_with_isl)
 
 
-#head(fish_bycatch_richness_merged_tran)
+head(fish_bycatch_richness_merged_tran)
 
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all.y=TRUE)
-# fish_richness_merged_tran_isl<-merge(fish_richness_merged_tran_isl, ben_habitat_data, by="site")
 head(fish_richness_merged_tran_isl)
 
 xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
@@ -553,6 +589,8 @@ length(labels4)
 
 fish_richness_merged_tran_isl$combined_richness_corrected<-fish_richness_merged_tran_isl$wrack_richness+fish_richness_merged_tran_isl$marine_richness_corrected
 
+head(fish_richness_merged_tran_isl)
+
 
 write.csv(fish_richness_merged_tran_isl, "C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
 
@@ -563,6 +601,15 @@ length(unique(fish_richness_merged_tran_isl$unq_isl))
 
 
 #I think I added more after I fixed the issues with Owen's plots! 
+
+head(fish_richness_merged_tran_isl)
+ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(x=MEAN_egarea1k, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(MEAN_egarea1k+1), y=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+
 
 # Determining best scale of comparison -----------------------------------------
 
