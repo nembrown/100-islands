@@ -1,5 +1,4 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
-#change to norahbrown if on work computer
+library(here)
 
 #read in necessary packages
 library(tidyr)
@@ -32,14 +31,14 @@ library(beyonce)
 
 ##### DEB
 #Deb's soil data and Deb's shore dist
-i.soil.all<-read.csv("C:Data by person//Deb.data//i-soil-all.csv")
+i.soil.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-soil-all.csv")
 #this is isotopes
 head(i.soil.all)
 
-shoredist.deb<-read.csv("C:Data by person//Deb.data//shoredist.csv")
+shoredist.deb<-read.csv("C:Food web idea//Data by person//Deb.data//shoredist.csv")
 #this is the point count to distance to shore data
 
-pointcount.gps<-read.csv("C:Data by person//Deb.data//pointcounts.csv")
+pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv")
 head(pointcount.gps)
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
@@ -66,7 +65,7 @@ head(soil.deb)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("c:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -78,12 +77,12 @@ names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
 #Owen's key data
-owen_key<-read.csv("c:Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_isl))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("c:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
@@ -92,7 +91,7 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_isl))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("c:Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
 head(owen_coords)
 owen_coords<-owen_coords[,c(1:9)]
 
@@ -161,6 +160,10 @@ paste(
 soil_owen_deb<-rbind(soil_merge[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
 head(soil_owen_deb)
 
+write.csv(soil_owen_deb, "C:Food web idea//Data by person//Norah.data/soil_owen_deb.csv")
+
+
+
 length(soil.deb$unq_plot)
 length(soil_merge$unq_plot)
 length(soil_owen_deb$unq_plot)
@@ -190,7 +193,7 @@ head(soil_owen_deb_by_isl)
 # Vegetation --------------------------------------------------------------
 
 
-owen.veg<-read.csv("C:Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
+owen.veg<-read.csv("C:Food web idea//Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
 head(owen.veg)
 owen.veg<-owen.veg[,-1]
 names(owen.veg)[3]<-"n"
@@ -203,7 +206,7 @@ names(owen.veg)[2]<-"group"
 
 
 library(car)
-deb.veg<-read.csv("C:Data by person//Deb.data//i-veg-all (1).csv")
+deb.veg<-read.csv("C:Food web idea//Data by person//Deb.data//i-veg-all (1).csv")
 head(deb.veg)
 deb.veg<-deb.veg[,-1]
 names(deb.veg)[6]<-"group"
@@ -275,9 +278,9 @@ isotope_by_isl_gathered<-veg_soil_owen_deb_by_isl
 
 
 #loading all the data
-i.feces.all<-read.csv("C:Data by person//Deb.data//i-feces-all.csv")
-i.feathers.all<-read.csv("C:Data by person//Deb.data//i-feathers-all (1).csv")
-feathers.key<-read.csv("c:Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
+i.feces.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-feces-all.csv")
+i.feathers.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-feathers-all (1).csv")
+feathers.key<-read.csv("C:Food web idea//Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
 
 
 #birds
@@ -350,7 +353,7 @@ head(isotope_by_isl_gathered2)
 # Mammals -----------------------------------------------------------------
 
 
-katie.mammal<-read.csv("c:Data by person//Katie.data//katie.mammal.csv", header=TRUE, sep=",")
+katie.mammal<-read.csv("C:Food web idea//Data by person//Katie.data//katie.mammal.csv", header=TRUE, sep=",")
 head(katie.mammal)
 katie.mammal$s<-"NA"
 katie.mammal$s<-as.numeric(katie.mammal$s)
@@ -434,7 +437,7 @@ head(isotope_by_isl_gathered3)
 
 # Insects -----------------------------------------------------------------
 
-chris.isotopes<-read.csv("c:Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
+chris.isotopes<-read.csv("C:Food web idea//Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
 head(chris.isotopes)
 chris.isotopes$s<-as.numeric(chris.isotopes$s)
 
@@ -446,7 +449,7 @@ length(chris.isotopes.isl$unq_isl[chris.isotopes$group=="insects_ISO"])
 isotope_by_isl_gathered4<-rbind(isotope_by_isl_gathered3,chris.isotopes.isl[,c(1,3,4,5,6,8,7,2)] )
 
 head(isotope_by_isl_gathered4)
-write.csv(isotope_by_isl_gathered4, "C:Norah.data/isotope_by_isl_gathered4.csv")
+write.csv(isotope_by_isl_gathered4, "C:Food web idea//Norah.data/isotope_by_isl_gathered4.csv")
 
 ####
 
@@ -464,7 +467,7 @@ write.csv(isotope_by_isl_gathered4, "C:Norah.data/isotope_by_isl_gathered4.csv")
 # Adding habitat characteristics, terrestrial diversity, nearby marine biodiversity -------------------------
 
 #terrestrial diversity
-by_isl_master<-read.csv("C:Data by person//Owen's data//by_isl_master.csv")
+by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 head(by_isl_master)
 head(isotope_by_isl_gathered4)
 which( colnames(by_isl_master)=="d15n" )
@@ -479,7 +482,7 @@ node.adding<-unique(node.adding)
 isotope_master<-merge(isotope_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(isotope_master, "C:Data by person//Owen's data/isotope_master.csv")
+write.csv(isotope_master, "C:Food web idea//Data by person//Owen's data/isotope_master.csv")
 
 
 #marine biodiversity
@@ -500,7 +503,7 @@ colorset = c("soil_0m"="#482576FF" ,"gash"="#B5C5D5","soil_whole_island"= "#7959
 
 #isotope biplot
 ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=d13c, y=d15n))+geom_point()+ stat_ellipse() +scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
-ggsave("C:Plots//Biplots//Isotope biplot.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biplots//Isotope biplot.png", width=30, height=20, unit="cm")
 
 #d15n vs. n
 d15n_n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -511,7 +514,7 @@ d15n_n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feather
 d15n_n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(d15n_n_10+ theme(legend.position="bottom"))
 plot_grid(d15n_n_10+ theme(legend.position="none"),d15n_n_13,d15n_n_12,d15n_n_11,d15n_n_14,d15n_n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biplots//d15n_n.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biplots//d15n_n.png", width=30, height=20, unit="cm")
 
 
 ggplot(filter(isotope_master, group %in% c("bird_feathers","bird_feces")), aes(fill=group, col=group,x=d13c, y=d15n, size=Area))+geom_point()+scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
@@ -536,7 +539,7 @@ nutrient_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathe
 nutrient_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(nutrient_0+ theme(legend.position="bottom"))
 plot_grid(nutrient_0+ theme(legend.position="none"),nutrient_3,nutrient_2,nutrient_1,nutrient_4,nutrient_5,legend, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots///Richness_nut//Richness_d15n.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots///Richness_nut//Richness_d15n.png", width=30, height=20, unit="cm")
 
 #Evenness vs. dn15 and log_Area, only plants and insects
 nut_evenness_0<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=total_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -547,7 +550,7 @@ nut_evenness_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_fe
 #nut_evenness_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(nut_evenness_0+ theme(legend.position="bottom"))
 plot_grid(nut_evenness_3+ theme(legend.position="none"),nut_evenness_2,nut_evenness_1,nut_evenness_4, legend, ncol=4, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Richness_nut//Evenness_d15n.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Richness_nut//Evenness_d15n.png", width=30, height=20, unit="cm")
 
 
 nut_evenness_11<-ggplot(isotope_master, aes(y=insect_evenness, x=log(Area)))+ylim(0,1) + geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
@@ -568,7 +571,7 @@ nutrient_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feath
 nutrient_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=d13c))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(nutrient_10+ theme(legend.position="bottom"))
 plot_grid(nutrient_10+ theme(legend.position="none"),nutrient_13,nutrient_12,nutrient_11,nutrient_14,nutrient_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Richness_nut//Richness_d13c.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Richness_nut//Richness_d13c.png", width=30, height=20, unit="cm")
 
 
 #d13c vs. richness (axes flipped)
@@ -580,7 +583,7 @@ nutrient_141<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feat
 nutrient_151<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=mammal_richness, y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nutrient_101+ theme(legend.position="bottom"))
 plot_grid(nutrient_101+ theme(legend.position="none"),nutrient_131,nutrient_121,nutrient_111,nutrient_141,nutrient_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Richness_nut//d13c_richness.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Richness_nut//d13c_richness.png", width=30, height=20, unit="cm")
 
 #Richness dn15 corrected by area
 area_nutrient_0<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=((total_richness)/(log(Area))), x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -591,7 +594,7 @@ area_nutrient_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_f
 area_nutrient_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=((mammal_richness)/(log(Area))), x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_0 <- get_legend(area_nutrient_0+ theme(legend.position="bottom"))
 plot_grid(area_nutrient_0+ theme(legend.position="none"),area_nutrient_3,area_nutrient_2,area_nutrient_1,area_nutrient_4,area_nutrient_5,legend_0, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Richness_nut//Richness_d15n_corrected.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Richness_nut//Richness_d15n_corrected.png", width=30, height=20, unit="cm")
 
 #Richness d13c corrected by area
 area_nutrient_c_1<-ggplot(filter(isotope_master, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,x=((insect_richness)/(log(Area))), y=d13c))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
@@ -601,7 +604,7 @@ area_nutrient_c_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird
 area_nutrient_c_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=((mammal_richness)/(log(Area))), y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_0 <- get_legend(area_nutrient_c_0+ theme(legend.position="bottom"))
 plot_grid(area_nutrient_c_1+ theme(legend.position="none"),area_nutrient_c_3,area_nutrient_c_2,area_nutrient_c_4,area_nutrient_c_5,legend_0, ncol=3)
-ggsave("C:Plots//Richness_nut//Richness_d13c_corrected.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Richness_nut//Richness_d13c_corrected.png", width=30, height=20, unit="cm")
 
 
 ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers")), aes(fill=group, col=group,x=bird.density, y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
@@ -617,7 +620,7 @@ total_N_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feather
 total_N_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(total_N_0+ theme(legend.position="bottom"))
 plot_grid(total_N_0+ theme(legend.position="none"),total_N_3,total_N_2,total_N_1,total_N_4,total_N_5,legend, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots///Richness_nut//Richness_total_N.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots///Richness_nut//Richness_total_N.png", width=30, height=20, unit="cm")
 
 #Richness vs. total_C
 total_C_0<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=total_richness, x=c))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -628,9 +631,9 @@ total_C_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feather
 total_C_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=c))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(total_C_0+ theme(legend.position="bottom"))
 plot_grid(total_C_0+ theme(legend.position="none"),total_C_3,total_C_2,total_C_1,total_C_4,total_C_5,legend, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots///Richness_nut//Richness_total_C.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots///Richness_nut//Richness_total_C.png", width=30, height=20, unit="cm")
 
-#Richness vs. c:n
+#Richness vs. C:Food web idea//n
 cn_0<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=total_richness, x=cn))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
 cn_1<-ggplot(filter(isotope_master, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,y=insect_richness, x=cn))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))  +ylim(0,350)+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
 cn_2<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi")), aes(fill=group, col=group,y=tree_richness, x=cn))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+ylim(0,10)+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
@@ -639,9 +642,9 @@ cn_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers")),
 cn_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=cn))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(cn_0+ theme(legend.position="bottom"))
 plot_grid(cn_0+ theme(legend.position="none"),cn_3,cn_2,cn_1,cn_4,cn_5,legend, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots///Richness_nut//Richness_cn.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots///Richness_nut//Richness_cn.png", width=30, height=20, unit="cm")
 
-#Richness vs. c:n
+#Richness vs. C:Food web idea//n
 s_0<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=total_richness, x=s))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
 s_1<-ggplot(filter(isotope_master, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,y=insect_richness, x=s))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))  +ylim(0,350)+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
 s_2<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi")), aes(fill=group, col=group,y=tree_richness, x=s))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+ylim(0,10)+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
@@ -650,7 +653,7 @@ s_4<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers")), 
 s_5<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,y=mammal_richness, x=s))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend <- get_legend(s_0+ theme(legend.position="bottom"))
 plot_grid(s_0+ theme(legend.position="none"),s_3,s_2,s_1,s_4,s_5,legend, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots///Richness_nut//Richness_s.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots///Richness_nut//Richness_s.png", width=30, height=20, unit="cm")
 
 
 # Plotting nutrients and biogeography -------------------------------------
@@ -665,7 +668,7 @@ area_141<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers
 area_151<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log(Area), y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(area_101+ theme(legend.position="bottom"))
 plot_grid(area_101+ theme(legend.position="none"),area_131,area_121,area_111,area_141,area_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d13c_Area.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d13c_Area.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. log_Area
@@ -677,7 +680,7 @@ area_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers"
 area_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log(Area), y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(area_10+ theme(legend.position="bottom"))
 plot_grid(area_10+ theme(legend.position="none"),area_13,area_12,area_11,area_14,area_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_log_Area.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_log_Area.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. Area
@@ -688,7 +691,7 @@ area_gam_13<-ggplot(filter(isotope_master, group %in% c("gash","midi")), aes(fil
 area_gam_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers")), aes(fill=group, col=group,x=Area, y=d15n))+geom_point()+geom_smooth(aes(),method="gam", formula=y~s(log(x))) +  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(area_gam_10+ theme(legend.position="bottom"))
 plot_grid(area_gam_10+ theme(legend.position="none"),area_gam_13,area_gam_12,area_gam_11,area_gam_14,legend_10, ncol=3, rel_heights = c(1,1))
-ggsave("C:Plots//Biogeog_nut//d15n_Area.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_Area.png", width=30, height=20, unit="cm")
 
 
 #finding the gam inflection point: 
@@ -729,7 +732,7 @@ neighb_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feather
 neighb_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=Neighb_250, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(neighb_10+ theme(legend.position="bottom"))
 plot_grid(neighb_10+ theme(legend.position="none"),neighb_13,neighb_12,neighb_11,neighb_14,neighb_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_exposure.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_exposure.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. Distance to mainland
@@ -741,7 +744,7 @@ DM_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers"))
 DM_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=DistW_ML, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(DM_10+ theme(legend.position="bottom"))
 plot_grid(DM_10+ theme(legend.position="none"),DM_13,DM_12,DM_11,DM_14,DM_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_Distance_mainland.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_Distance_mainland.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. northing
@@ -753,7 +756,7 @@ C_Northing_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_fea
 C_Northing_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Northing, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(C_Northing_10+ theme(legend.position="bottom"))
 plot_grid(C_Northing_10+ theme(legend.position="none"),C_Northing_13,C_Northing_12,C_Northing_11,C_Northing_14,C_Northing_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_Northing.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_Northing.png", width=30, height=20, unit="cm")
 
 #d15n vs. Easting
 C_Easting_d15n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -764,7 +767,7 @@ C_Easting_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird
 C_Easting_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(C_Easting_d15n_10+ theme(legend.position="bottom"))
 plot_grid(C_Easting_d15n_10+ theme(legend.position="none"),C_Easting_d15n_13,C_Easting_d15n_12,C_Easting_d15n_11,C_Easting_d15n_14,C_Easting_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_Easting.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_Easting.png", width=30, height=20, unit="cm")
 
 #cn vs. Easting
 C_Easting_cn_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=cn))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -775,7 +778,7 @@ C_Easting_cn_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_f
 C_Easting_cn_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=cn))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(C_Easting_cn_10+ theme(legend.position="bottom"))
 plot_grid(C_Easting_cn_10+ theme(legend.position="none"),C_Easting_cn_13,C_Easting_cn_12,C_Easting_cn_11,C_Easting_cn_14,C_Easting_cn_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//cn_Easting.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//cn_Easting.png", width=30, height=20, unit="cm")
 
 
 #n vs. Easting
@@ -787,7 +790,7 @@ C_Easting_n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_fe
 C_Easting_n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(C_Easting_n_10+ theme(legend.position="bottom"))
 plot_grid(C_Easting_n_10+ theme(legend.position="none"),C_Easting_n_13,C_Easting_n_12,C_Easting_n_11,C_Easting_n_14,C_Easting_n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//n_Easting.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//n_Easting.png", width=30, height=20, unit="cm")
 
 #s vs. Easting
 C_Easting_s_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=s))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -798,7 +801,7 @@ C_Easting_s_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_fe
 C_Easting_s_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=C_Easting, y=s))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(C_Easting_s_10+ theme(legend.position="bottom"))
 plot_grid(C_Easting_s_10+ theme(legend.position="none"),C_Easting_s_13,C_Easting_s_12,C_Easting_s_11,C_Easting_s_14,C_Easting_s_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//s_Easting.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//s_Easting.png", width=30, height=20, unit="cm")
 
 #d15n vs. log_Dist_Near
 Dist_Near_d15n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log(Dist_Near), y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -809,7 +812,7 @@ Dist_Near_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird
 Dist_Near_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log(Dist_Near), y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(Dist_Near_d15n_10+ theme(legend.position="bottom"))
 plot_grid(Dist_Near_d15n_10+ theme(legend.position="none"),Dist_Near_d15n_13,Dist_Near_d15n_12,Dist_Near_d15n_11,Dist_Near_d15n_14,Dist_Near_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_log_Dist_Near.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_log_Dist_Near.png", width=30, height=20, unit="cm")
 
 #d15n vs. slope_mean
 slope_mean_d15n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=slope_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -820,7 +823,7 @@ slope_mean_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bir
 slope_mean_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=slope_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(slope_mean_d15n_10+ theme(legend.position="bottom"))
 plot_grid(slope_mean_d15n_10+ theme(legend.position="none"),slope_mean_d15n_13,slope_mean_d15n_12,slope_mean_d15n_11,slope_mean_d15n_14,slope_mean_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_slope_mean.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_slope_mean.png", width=30, height=20, unit="cm")
 
 #d15n vs. SLOPE
 SLOPE_d15n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=SLOPE, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -831,7 +834,7 @@ SLOPE_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_fea
 SLOPE_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=SLOPE, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(SLOPE_d15n_10+ theme(legend.position="bottom"))
 plot_grid(SLOPE_d15n_10+ theme(legend.position="none"),SLOPE_d15n_13,SLOPE_d15n_12,SLOPE_d15n_11,SLOPE_d15n_14,SLOPE_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Biogeog_nut//d15n_SLOPE.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Biogeog_nut//d15n_SLOPE.png", width=30, height=20, unit="cm")
 
 
 
@@ -846,7 +849,7 @@ nut_fish_141<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soi
 nut_fish_151<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_fish_101+ theme(legend.position="bottom"))
 plot_grid(nut_fish_101+ theme(legend.position="none"),nut_fish_131,nut_fish_121,nut_fish_111,nut_fish_141,nut_fish_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_marine_catch.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d15n_marine_catch.png", width=30, height=20, unit="cm")
 
 
 
@@ -859,7 +862,7 @@ nut_fish_c_141<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","s
 nut_fish_c_151<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_fish_c_101+ theme(legend.position="bottom"))
 plot_grid(nut_fish_c_101+ theme(legend.position="none"),nut_fish_c_131,nut_fish_c_121,nut_fish_c_111,nut_fish_c_141,nut_fish_c_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d13c_marine_catch.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d13c_marine_catch.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. fish_biomass_bym3_mean
@@ -871,7 +874,7 @@ nut_bycatch_141<-ggplot(filter(isotope_master_2, group %in% c("bird_feces","bird
 nut_bycatch_151<-ggplot(filter(isotope_master_2, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_bycatch_101+ theme(legend.position="bottom"))
 plot_grid(nut_bycatch_101+ theme(legend.position="none"),nut_bycatch_131,nut_bycatch_121,nut_bycatch_111,nut_bycatch_141,nut_bycatch_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_biomass.png", width=40, height=30, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d15n_biomass.png", width=40, height=30, unit="cm")
 
 #d15n vs. bycatch_richness_corrected
 nut_bycatch_101<-ggplot(filter(isotope_master_2, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -882,7 +885,7 @@ nut_bycatch_141<-ggplot(filter(isotope_master_2, group %in% c("bird_feces","bird
 nut_bycatch_151<-ggplot(filter(isotope_master_2, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_bycatch_101+ theme(legend.position="bottom"))
 plot_grid(nut_bycatch_101+ theme(legend.position="none"),nut_bycatch_131,nut_bycatch_121,nut_bycatch_111,nut_bycatch_141,nut_bycatch_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_bycatch_richness.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d15n_bycatch_richness.png", width=30, height=20, unit="cm")
 
 
 #d13c vs. bycatch_abundance_corrected
@@ -894,7 +897,7 @@ nut_bycatch_c_141<-ggplot(filter(isotope_master_2, group %in% c("bird_feces","bi
 nut_bycatch_c_151<-ggplot(filter(isotope_master_2, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=bycatch_abundance_corrected, y=d13c))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_101 <- get_legend(nut_bycatch_c_101+ theme(legend.position="bottom"))
 plot_grid(nut_bycatch_c_101+ theme(legend.position="none"),nut_bycatch_c_131,nut_bycatch_c_121,nut_bycatch_c_111,nut_bycatch_c_141,nut_bycatch_c_151,legend_101, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d13c_bycatch_abundance.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d13c_bycatch_abundance.png", width=30, height=20, unit="cm")
 
 
 #d15n vs. log_HAB2000
@@ -906,7 +909,7 @@ HAB2000_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_f
 HAB2000_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log_HAB2000, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(HAB2000_d15n_10+ theme(legend.position="bottom"))
 plot_grid(HAB2000_d15n_10+ theme(legend.position="none"),HAB2000_d15n_13,HAB2000_d15n_12,HAB2000_d15n_11,HAB2000_d15n_14,HAB2000_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_log_HAB2000.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d15n_log_HAB2000.png", width=30, height=20, unit="cm")
 
 #d15n vs. log_site_sum_by_isl
 site_sum_by_isl_d15n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log_site_sum_by_isl, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
@@ -917,11 +920,11 @@ site_sum_by_isl_d15n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces"
 site_sum_by_isl_d15n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=log_site_sum_by_isl, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(site_sum_by_isl_d15n_10+ theme(legend.position="bottom"))
 plot_grid(site_sum_by_isl_d15n_10+ theme(legend.position="none"),site_sum_by_isl_d15n_13,site_sum_by_isl_d15n_12,site_sum_by_isl_d15n_11,site_sum_by_isl_d15n_14,site_sum_by_isl_d15n_15,legend_10, ncol=3, rel_heights = c(1,1, .2))
-ggsave("C:Plots//Marine_nut//d15n_log_site_sum_by_isl.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Plots//Marine_nut//d15n_log_site_sum_by_isl.png", width=30, height=20, unit="cm")
 
 ggplot(isotope_master, aes(y=log_site_sum_by_isl, x=Neighb_250))+geom_point()+geom_smooth(aes(),method="lm")
-ggsave("C:Plots//Marine_nut//Neighb250_log_site_sum_by_isl.png")
+ggsave("C:Food web idea//Plots//Marine_nut//Neighb250_log_site_sum_by_isl.png")
 
 ggplot(isotope_master, aes(y=log_site_sum_by_isl, x=slope_mean))+geom_point()+geom_smooth(aes(),method="lm")
-ggsave("C:Plots//Marine_nut//slope_mean_log_site_sum_by_isl.png")
+ggsave("C:Food web idea//Plots//Marine_nut//slope_mean_log_site_sum_by_isl.png")
 

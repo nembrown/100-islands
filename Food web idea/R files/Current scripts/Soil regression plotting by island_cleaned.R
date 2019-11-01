@@ -1,6 +1,4 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
-#change to norahbrown if on work computer
-
+library(here)
 #read in necessary packages
 
 library(tidyr)
@@ -33,13 +31,13 @@ library(forcats)
 
 ##### DEB
 #Deb's soil data and Deb's shore dist
-i.soil.all<-read.csv("C:Data by person//Deb.data//i-soil-all.csv")
+i.soil.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-soil-all.csv")
 #this is isotopes
 
-shoredist.deb<-read.csv("C:Data by person//Deb.data//shoredist.csv")
+shoredist.deb<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//shoredist.csv")
 #this is the point count to distance to shore data
 
-pointcount.gps<-read.csv("C:Data by person//Deb.data//pointcounts.csv")
+pointcount.gps<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//pointcounts.csv")
 head(pointcount.gps)
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
@@ -66,7 +64,7 @@ head(soil.deb)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("C:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -78,12 +76,12 @@ names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
 #Owen's key data
-owen_key<-read.csv("C:Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_isl))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("C:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
@@ -92,7 +90,7 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_isl))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Food web idea//Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
 head(owen_coords)
 
 owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
@@ -183,11 +181,11 @@ length(soil_owen_deb_by_isl$unq_isl)
 
 # Adding habitat class and island characteristics -------------------------
 
-habitat_class<-read.csv("C:Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+habitat_class<-read.csv("C:Food web idea//Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 head(habitat_class)
 length(habitat_class$unq_isl)
 
-island_data_wiebe<-read.csv("C:Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
+island_data_wiebe<-read.csv("C:Food web idea//Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
 head(island_data_wiebe)
 names(island_data_wiebe)[1]<-"unq_isl"
 
@@ -201,7 +199,7 @@ str(habitat_soil_by_isl)
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees<-read.csv("C:Food web idea//Food web idea//Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
 becky_trees<-becky_trees[,-1]
 head(becky_trees)
 names(becky_trees)[1]<-"unq_isl"
@@ -248,7 +246,7 @@ length(habitat_soil_by_isl$unq_isl)
 
 #this loads data from "Habitation data" R script
 
-longform_plant_percentcover<-read.csv("C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Food web idea//Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 head(longform_plant_percentcover)
 
@@ -349,7 +347,7 @@ head(habitat_veg_soil_by_isl)
 
 # Adding in bird richness -------------------------------------------------
 
-birdrichness<-read.csv("C:Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
+birdrichness<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
 head(birdrichness)
 names(birdrichness)[1]<-"unq_isl"
 names(birdrichness)[6]<-"bird.richness"
@@ -364,7 +362,7 @@ head(habitat_veg_bird_soil_by_isl)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
-seawrack_key<-read.csv("C:Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
+seawrack_key<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
 seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
 seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
@@ -372,7 +370,7 @@ seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
 head(seawrack_key)
 
 
-sara_habitat<-read.csv("C:Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
+sara_habitat<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
 head(sara_habitat_merged)
@@ -406,7 +404,7 @@ str(sara_habitat_merged_by_isl )
 
 
 #### Seaweed composition
-sara_composition<-read.csv("C:Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
+sara_composition<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 head(sara_composition)
 #this is by transect
 
@@ -443,7 +441,7 @@ head(habitat_veg_bird_wrack_soil_by_isl)
 # Adding in eagles and ravens pointcounts ---------------------------------------------
 
 
-ravens <- read.csv("C:Data by person//Deb.data/ravens.csv")
+ravens <- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/ravens.csv")
 
 cora.isls <- unique(ravens$island)
 cora.isls <- as.data.frame(cora.isls)
@@ -452,7 +450,7 @@ names(cora.isls) <- c("unq_isl", "ravens")
 
 by_isl_master<-merge(habitat_veg_bird_wrack_soil_by_isl, cora.isls, by.x="unq_isl", all=TRUE)
 
-eagles <- read.csv("C:Data by person//Deb.data/eagles.csv")
+eagles <- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/eagles.csv")
 baea.isls <- unique(eagles$island)
 baea.isls <- as.data.frame(baea.isls)
 baea.isls$eagles <- 1
@@ -469,7 +467,7 @@ head(by_isl_master)
 
 
 #can do the same thing for SOSP if we want ... 
-# pc<- read.csv("C:Data by person//Deb.data/pointcounts.csv")
+# pc<- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/pointcounts.csv")
 # head(pc)
 # sosp <- pc[pc$spp == "SOSP", ]
 # head(sosp)
@@ -491,7 +489,7 @@ head(by_isl_master)
 # Chris insects -----------------------------------------------------------
 
 #new data July 2019 
-chris_insects_master<-read.csv("C:Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
+chris_insects_master<-read.csv("C:Food web idea//Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
 head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
@@ -519,7 +517,7 @@ head(chris_insects_master_wide_richness)
 
 
 #now a more standardized abundance measure per beat or pitfall trap on the island
-chris_trapline_data<-read.csv("C:Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
+chris_trapline_data<-read.csv("C:Food web idea//Food web idea//Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
 chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
 chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
@@ -805,7 +803,7 @@ by_isl_master<-merge(by_isl_master, chris_insects_master_wide_richness, by="unq_
 
 # Mammal richness ---------------------------------------------------------
 
-katie_mammals<-read.csv("C:Data by person//Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
+katie_mammals<-read.csv("C:Food web idea//Food web idea//Data by person//Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
 head(katie_mammals)
 names(katie_mammals)[2]<-"unq_isl"
 katie_mammals_simple<-katie_mammals[,-c(1,3, 13)]
@@ -864,7 +862,7 @@ node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(by_isl_master, "C:Data by person//Owen's data/by_isl_master.csv")
+write.csv(by_isl_master, "C:Food web idea//Food web idea//Data by person//Owen's data/by_isl_master.csv")
 head(by_isl_master)
 
 # Plotting correlations ---------------------------------------------------
@@ -936,7 +934,7 @@ na3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.ca
 na4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 na5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(na0,na3,na2,na1,na4,na5, ncol=3)
-ggsave("C:Data by person//Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
 
 nam0<-ggplot(by_isl_master, aes(y=total_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.75))
 nam1<-ggplot(by_isl_master, aes(y=insect_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,350)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+theme(legend.position="none")
@@ -945,7 +943,7 @@ nam3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.c
 nam4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nam5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nam0,nam3,nam2,nam1,nam4,nam5, ncol=3)
-ggsave("C:Data by person//Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
 
 
 nan0<-ggplot(by_isl_master, aes(y=total_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.15))
@@ -955,7 +953,7 @@ nan3<-ggplot(by_isl_master, aes(y=plant_richness, x=log_Area, colour=d15n.cat, f
 nan4<-ggplot(by_isl_master, aes(y=bird.richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nan5<-ggplot(by_isl_master, aes(y=mammal_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nan0,nan3,nan2,nan1,nan4,nan5, ncol=3)
-ggsave("C:Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
 
 
 ggplot(by_isl_master, aes(y=shrub_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
@@ -1005,7 +1003,7 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=d15n))+geom_point()
 insects7<-ggplot(by_isl_master, aes(y=crustacea_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2,insects7,  ncol=4)
-ggsave("C:Data by person//Plots//Species_nut//Insects_d15n.png")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_d15n.png")
 
 
 
@@ -1019,7 +1017,7 @@ abund.insects6<-ggplot(by_isl_master, aes(y=gastropoda_abundance, x=d15n))+geom_
 #abund.insects7<-ggplot(by_isl_master, aes(y=log(beetles_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "gaussian"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(abund.insects0,abund.insects1,abund.insects6,abund.insects3,abund.insects4,abund.insects5,abund.insects2, ncol=4)
-ggsave("C:Data by person//Plots//Species_nut//Insects_Abundance_d15n.png")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_Abundance_d15n.png")
 
 
 ##### Plotting insects
@@ -1033,7 +1031,7 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=log_Area))+geom_poi
 #insects7<-ggplot(by_isl_master, aes(y=beetles_richness, x=log_Area))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2, ncol=4)
-ggsave("C:Data by person//Plots//Species_nut//Insects_Area.png")
+ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_Area.png")
 
 
 
@@ -1042,13 +1040,13 @@ ggsave("C:Data by person//Plots//Species_nut//Insects_Area.png")
 
 head(by_isl_master)
 
-write.csv(by_isl_master, "C:Data by person//Owen's data/by_isl_master.csv")
+write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv")
 
 
-feathers.key<-read.csv("C:Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
+feathers.key<-read.csv("C:Food web idea//Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
 head(feathers.key)
 
-i.feathers.all<-read.csv("C:Data by person//Deb.data//i-feathers-all (1).csv")
+i.feathers.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-feathers-all (1).csv")
 head(i.feathers.all)
 length(unique(i.feathers.all$unq_isl))
 
@@ -1165,11 +1163,11 @@ ggbiplot(multi.marine.pca, ellipse = TRUE, groups = by_isl_multivariate_env$node
 
 ### not sure about this::: 
 #Adding in information about seaweed, eagles, otters
-wrack.sara<-read.csv("C:Data by person//Sara's data//wrack.isotopes.cn.csv")
-wrack.key<-read.csv("C:Data by person//Sara's data//wrack.key.csv")
-ang.seaweed<-read.csv("C:Data by person//Ang's data//chokedpass_macrophytes_AMO2015.csv", header=TRUE, sep=",")
-becky.eagles<-read.csv("C:Data by person//Becky.data//becky.isotopes.csv", header=TRUE, sep=",")
-otter_chris<-read.csv("C:Data by person//Chris.data//otter_sia.csv")
+wrack.sara<-read.csv("C:Food web idea//Data by person//Sara's data//wrack.isotopes.cn.csv")
+wrack.key<-read.csv("C:Food web idea//Data by person//Sara's data//wrack.key.csv")
+ang.seaweed<-read.csv("C:Food web idea//Data by person//Ang's data//chokedpass_macrophytes_AMO2015.csv", header=TRUE, sep=",")
+becky.eagles<-read.csv("C:Food web idea//Data by person//Becky.data//becky.isotopes.csv", header=TRUE, sep=",")
+otter_chris<-read.csv("C:Food web idea//Data by person//Chris.data//otter_sia.csv")
 
 
 #otter isotopes
@@ -1204,7 +1202,7 @@ names(becky.eagles.tree)[5]<-"d15n"
 
 
 #### plotting soil at 0m, on sites without likely wrack (machine learning)
-wrackfree<-read.csv("C:Data by person//Pat.data//wrackfree.csv", header=TRUE, sep=",")
+wrackfree<-read.csv("C:Food web idea//Data by person//Pat.data//wrackfree.csv", header=TRUE, sep=",")
 head(wrackfree)
 
 
