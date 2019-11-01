@@ -456,13 +456,32 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 head(ben_habitat_data)
 which( colnames(ben_habitat_data)=="subtidal_primary_macroveg" )
 fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_year, ben_habitat_data, by="site")
+head(fish_bycatch_richness_merged_tran_year)
+
 
 fish_bycatch_richness_merged_tran_year$eelgrass_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_primary_cover)/100)
 fish_bycatch_richness_merged_tran_year$fucus_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$intertidal_primary_cover)/100)
+fish_bycatch_richness_merged_tran_year$subtidal_total_cover<- fish_bycatch_richness_merged_tran_year$subtidal_primary_cover+fish_bycatch_richness_merged_tran_year$subtidal_secondary_cover
+
+fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/100)
+
 
 
 ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=eelgrass_area, y=fish_biomass_bym3_mean))+
   geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_biomass_mean))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_richness))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+
+
+ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=subtidal_primary_cover, y=fish_richness_corrected))+
+  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+
+
 
 ggplot(fish_bycatch_richness_merged_tran_year%>% filter(intertidal_primary_macroveg=="fucus"), aes(x=fucus_area, y=fish_biomass_bym3_mean))+
   geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
