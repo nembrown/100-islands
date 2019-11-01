@@ -49,6 +49,8 @@ soil_owen_deb_s<- soil_owen_deb_s%>% mutate(Area_cat = cut(Area, xs2, labels = l
 ggplot(soil_owen_deb_s,aes(y=d15n, x=d34s))+geom_point()+geom_smooth(method="lm")
 
 ggplot(soil_owen_deb_s,aes(y=d15n, x=d34s, col=Area_cat))+geom_point()+geom_smooth(method="lm")
+ggplot(soil_owen_deb_s,aes(y=d15n, x=d34s, col=slope_mean))+geom_point()
+ggplot(soil_owen_deb_s,aes( y=d34s, x=slope_mean))+geom_point()+geom_smooth(method="lm")
 
 
 ggplot(soil_owen_deb_s,aes(y=d13c, x=d34s))+geom_point()+geom_smooth(method="lm")
@@ -59,14 +61,3 @@ ggplot(soil_owen_deb_s,aes(x=shore_dist, y=s))+geom_point()+geom_smooth(method="
 ggplot(soil_owen_deb_s,aes(x=s, y=d34s))+geom_point()+geom_smooth(method="lm")
 
 
-
-# subsample_owen_soils<-read.csv("C:Owen's data/subsample_owen_soil.csv")
-# head(subsample_owen_soils)
-# 
-# 
-# subsample_owen_soils_s<-merge(subsample_owen_soils, soil_s, by="unq_plot", all=TRUE)
-# head(subsample_owen_soils_s)
-# 
-# ggplot(subsample_owen_soils_s,aes(x=s, y=d34s, colour=node))+geom_point()
-# ggplot(subsample_owen_soils_s,aes(y=d34s, x=lat, colour=node, size=4))+geom_point()
-# ggplot(subsample_owen_soils_s,aes(y=d15n, x=n, colour=node, size=1))+geom_point()
