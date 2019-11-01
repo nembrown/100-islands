@@ -85,6 +85,15 @@ ben_habitat_data_simple.SP <- st_as_sf(ben_habitat_data_simple, coords = c("long
 head(ben_habitat_data_simple.SP)
 ben_habitat_data_simple.SP$site_type<-"beachseine"
 
+ben_habitat_data_simple.SP$long<-st_coordinates(ben_habitat_data_simple.SP)[,1] # get coordinates
+ben_habitat_data_simple.SP$lat<-st_coordinates(ben_habitat_data_simple.SP)[,2]
+ben_habitat_data_simple.SP$site<-as.factor(ben_habitat_data_simple.SP$site)
+ggmap(map_marine) + geom_point(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type, label=site))+ 
+  scale_colour_viridis_d()+geom_text(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type,label=site))
+  
+
+
+
 ### Islands level data just site-information
 head(df.SF)
 df.SF_simple<-df.SF[,1]
