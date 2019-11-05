@@ -1,11 +1,6 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Food web idea")
-#change to Norah if on work computer
-
-# this is the by transect file, if there are multiple plots within transect they are averaged. 
-
 
 #read in necessary packages
-
+library(here)
 library(tidyr)
 library(plyr)
 library(dplyr)
@@ -36,7 +31,7 @@ library(cowplot)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("C:Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -50,12 +45,12 @@ names(soil_clean)[7]<-"d15n"
 head(soil_clean)
 
 #Owen's key data
-owen_key<-read.csv("C:Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_tran))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("C:Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
@@ -64,7 +59,7 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_tran))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
 head(owen_coords)
 owen_coords<-owen_coords[,c(1:9)]
 head(owen_coords)
@@ -85,21 +80,24 @@ head(owen_key_expanded)
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
 head(soil_merge)
 
+
+### add in d34s here
+soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
+head(soil_s)
+
+soil_merge<-merge(soil_merge, soil_s, by="unq_plot")
+
 soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(soil_merge_mean)
 
 soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
 
-#soil_merge_0m <- soil_merge %>% filter(shore_dist == 0)
 
-#head(soil_merge_0m)
-
-#write.csv(soil_merge_0m, "C:Data by person//Norah.data\\soil_merge_0m.csv")
 
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees_tran<-read.csv("C:Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees_tran<-read.csv("C:Food web idea//Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
 becky_trees_tran<-becky_trees_tran[,-1]
 head(becky_trees_tran)
 names(becky_trees_tran)[1]<-"unq_isl"
@@ -143,7 +141,7 @@ head(habitat_soil_by_tran)
 
 #this loads data from "Habitation data" R script
 
-longform_plant_percentcover<-read.csv("C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 head(longform_plant_percentcover)
 
@@ -206,7 +204,7 @@ head(habitat_veg_soil_by_tran)
 # Vegetation isotopes -----------------------------------------------------
 
 
-owen.veg_tran<-read.csv("C:Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
+owen.veg_tran<-read.csv("C:Food web idea//Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
 head(owen.veg_tran)
 owen.veg_tran<-owen.veg_tran[,-1]
 
@@ -249,7 +247,7 @@ head(habitat_veg_soil_by_tran)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
-seawrack_key<-read.csv("C:Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
+seawrack_key<-read.csv("C:Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
 seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
 seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
@@ -257,7 +255,7 @@ seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
 head(seawrack_key)
 
 
-sara_habitat<-read.csv("C:Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
+sara_habitat<-read.csv("C:Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
 head(sara_habitat_merged)
@@ -265,7 +263,7 @@ which( colnames(sara_habitat_merged)=="unq_isl" )
 sara_habitat_merged<-sara_habitat_merged[,-62]
 
 #### Seaweed composition
-sara_composition<-read.csv("C:Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
+sara_composition<-read.csv("C:Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 head(sara_composition)
 #this is by transect
 
@@ -294,7 +292,7 @@ head(habitat_veg_wrack_soil_by_tran)
 
 # Chris insects diversity -----------------------------------------------------------
 
-chris_insects_master<-read.csv("C:Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
+chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
 head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
@@ -322,7 +320,7 @@ head(chris_insects_master_wide_tran_richness)
 
 
 #now a more standardized abundance measure per beat or pitfall trap on the island
-chris_trapline_data<-read.csv("C:Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
+chris_trapline_data<-read.csv("C:Food web idea//Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
 chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
 chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
@@ -602,7 +600,7 @@ head(by_tran_master)
 # Insect isotopes  ---------------------------------------------------------
 
 
-chris.isotopes<-read.csv("C:Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
+chris.isotopes<-read.csv("C:Food web idea//Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
 head(chris.isotopes)
 chris.isotopes$s<-as.numeric(chris.isotopes$s)
 
@@ -648,7 +646,7 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 # Tidying up -------------------------------------------------------------
 
 head(by_tran_master)
-write.csv(by_tran_master, "C:Data by person//Norah.data/by_tran_master.csv")
+write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv")
 
 
 

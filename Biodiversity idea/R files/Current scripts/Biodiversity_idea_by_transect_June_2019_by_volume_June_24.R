@@ -553,13 +553,14 @@ which( colnames(by_tran_master)=="wrack_richness")
 which( colnames(by_tran_master)=="HAB2000")
 which( colnames(by_tran_master)=="MEAN_egarea1k")
 which( colnames(by_tran_master)=="MEAN_kparea1k")
+which( colnames(by_tran_master)=="d34s")
 
 
 
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,15,18,19, 104, 103, 100,47,58)]
+by_tran_master_subset<-by_tran_master[,c(1,16,19,20,105,104,101,48,59,15)]
 head(by_tran_master_subset)
 
 
@@ -635,12 +636,12 @@ ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=fish_biomass_bym3_mean,co
 ggplot(fish_richness_merged_tran_isl, aes(x=MEAN_egarea1k, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=log(MEAN_egarea1k+1), y=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(y=log(MEAN_egarea1k+1), x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
 
 
 # Determining best scale of comparison -----------------------------------------
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+geom_text(aes(label=unq_tran))
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
 ggplot(fish_richness_merged_tran_isl, aes(x=marine_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
@@ -658,7 +659,7 @@ ggplot(fish_richness_merged_tran_isl, aes(x=log(fish_abundance_bym3+1), y=d15n))
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
 ggplot(fish_richness_merged_tran_isl, aes(y=fish_biomass_bym3_sd, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(aes(),method="lm")
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="gam")
+ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d34s))+geom_point()+geom_smooth(aes(),method="gam")
 
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=d15n, colour=size.cat2))+geom_point()+geom_smooth(aes(),method="gam")+scale_colour_viridis_d()

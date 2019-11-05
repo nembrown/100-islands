@@ -60,4 +60,5 @@ ggplot(soil_owen_deb_s,aes(x=shore_dist, y=d15n))+geom_point()+geom_smooth(metho
 ggplot(soil_owen_deb_s,aes(x=shore_dist, y=s))+geom_point()+geom_smooth(method="lm")
 ggplot(soil_owen_deb_s,aes(x=s, y=d34s))+geom_point()+geom_smooth(method="lm")
 
+ggplot(soil_owen_deb_s,aes(x=log(Area), y=d34s, col=shore_dist))+geom_point()+geom_smooth(method="lm")
 
