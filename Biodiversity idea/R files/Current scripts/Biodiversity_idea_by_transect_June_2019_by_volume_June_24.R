@@ -474,8 +474,16 @@ ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_biomas
   geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()
 
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_richness))+
-  geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
+  geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
 
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_richness))+
+  geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
+
+#if I can find % cover for the radius results.... that should work. 
+# check out the two outliers in fish biomass ... why are there some above 40? 
 
 
 ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=subtidal_primary_cover, y=fish_richness_corrected))+
