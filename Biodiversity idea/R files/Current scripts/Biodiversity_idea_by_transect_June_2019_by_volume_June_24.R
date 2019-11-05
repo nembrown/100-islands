@@ -641,6 +641,7 @@ ggplot(fish_richness_merged_tran_isl, aes(y=log(MEAN_egarea1k+1), x=fish_biomass
 
 # Determining best scale of comparison -----------------------------------------
 
+###adding a change here
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
