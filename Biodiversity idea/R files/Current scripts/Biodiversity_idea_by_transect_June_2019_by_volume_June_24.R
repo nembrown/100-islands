@@ -470,8 +470,12 @@ fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_mer
 ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=eelgrass_area, y=fish_biomass_bym3_mean))+
   geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()+theme_bw()
 
-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_biomass_mean))+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_mean))+
   geom_point()+geom_smooth(aes(), method="lm")+scale_colour_viridis_d()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_mean, col=node))+
+  geom_point()+geom_line()+scale_colour_viridis_d()
+
 
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_richness))+
   geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
@@ -479,7 +483,7 @@ ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_richne
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_richness))+
   geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
 
-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_bym3_mean))+
+ggplot(fish_bycatch_richness_merged_tran_year%>% filter(subtidal_primary_macroveg=="zostera"), aes(x=subtidal_total_cover, y=fish_biomass_bym3_mean))+
   geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
 
 #if I can find % cover for the radius results.... that should work. 
@@ -545,22 +549,26 @@ by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, label
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
 head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
-which( colnames(by_tran_master)=="tree_richness" )
-which( colnames(by_tran_master)=="tree_abundance")
-which( colnames(by_tran_master)=="sum_basal")
-which( colnames(by_tran_master)=="site_mean_by_tran" )
-which( colnames(by_tran_master)=="wrack_richness")
-which( colnames(by_tran_master)=="HAB2000")
-which( colnames(by_tran_master)=="MEAN_egarea1k")
-which( colnames(by_tran_master)=="MEAN_kparea1k")
-which( colnames(by_tran_master)=="d34s")
-
+paste(
+which( colnames(by_tran_master)=="tree_richness" ),
+which( colnames(by_tran_master)=="tree_abundance"),
+which( colnames(by_tran_master)=="sum_basal"),
+which( colnames(by_tran_master)=="site_mean_by_tran" ),
+which( colnames(by_tran_master)=="wrack_richness"),
+which( colnames(by_tran_master)=="HAB2000"),
+which( colnames(by_tran_master)=="MEAN_egarea1k"),
+which( colnames(by_tran_master)=="MEAN_kparea1k"),
+which( colnames(by_tran_master)=="d34s"),
+which( colnames(by_tran_master)=="Radius_m_1000"),
+which( colnames(by_tran_master)=="sum_1km"),
+sep=","
+)
 
 
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,16,19,20,105,104,101,48,59,15)]
+by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108, 81)]
 head(by_tran_master_subset)
 
 
@@ -618,6 +626,11 @@ length(xs4)
 length(labels4)
 
 fish_richness_merged_tran_isl$combined_richness_corrected<-fish_richness_merged_tran_isl$wrack_richness+fish_richness_merged_tran_isl$marine_richness_corrected
+fish_richness_merged_tran_isl$eelgrass_cover_1km<-(fish_richness_merged_tran_isl$MEAN_egarea1k)/(fish_richness_merged_tran_isl$Radius_m_1000)
+fish_richness_merged_tran_isl$habitat_cover_1km<-(fish_richness_merged_tran_isl$sum_1km)/(fish_richness_merged_tran_isl$Radius_m_1000)
+
+
+
 
 head(fish_richness_merged_tran_isl)
 
@@ -634,11 +647,14 @@ length(unique(fish_richness_merged_tran_isl$unq_isl))
 
 head(fish_richness_merged_tran_isl)
 ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=eelgrass_cover_1km, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
 
-ggplot(fish_richness_merged_tran_isl, aes(x=MEAN_egarea1k, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=eelgrass_cover_1km, y=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl, aes(y=log(MEAN_egarea1k+1), x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=subtidal_total_cover))+geom_point()+geom_smooth(method="lm")
+
+
 
 
 # Determining best scale of comparison -----------------------------------------
