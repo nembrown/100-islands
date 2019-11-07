@@ -588,10 +588,12 @@ paste(
   which( colnames(by_isl_master)=="eagles" ),
   which( colnames(by_isl_master)=="ravens" ),
   which( colnames(by_isl_master)=="node" ),
-  sep=","
+  which( colnames(by_isl_master)=="SLOPE" ),
+  which( colnames(by_isl_master)=="slope_mean" ),
+   sep=","
 )
 
-by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65, 107)]
+by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65,107,53,30)]
 head(by_isl_master_subset)
 
 by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
@@ -642,7 +644,25 @@ ggplot(fish_richness_merged_tran_isl, aes(y=log(MEAN_egarea1k+1), x=fish_biomass
 # Determining best scale of comparison -----------------------------------------
 
 ###adding a change here
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(y=HAB2000, x=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(y=fish_biomass_bym3_mean, x=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(HAB2000), y=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=log(HAB2000), y=d15n, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=slope_mean, y=d15n, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=slope_mean, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(x=SLOPE, y=d15n, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=SLOPE, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=slope_mean, y=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=slope_mean, y=d34s))+geom_point()+geom_smooth(aes(),method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(x=SLOPE, y=slope_mean, col=d34s))+geom_point()+geom_smooth(aes(),method="lm")+ geom_abline(intercept = 0, slope = 1)+scale_colour_viridis()
+
 
 ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
 ggplot(fish_richness_merged_tran_isl, aes(x=marine_richness_corrected, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")
