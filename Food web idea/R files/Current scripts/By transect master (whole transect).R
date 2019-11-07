@@ -262,6 +262,16 @@ head(sara_habitat_merged)
 which( colnames(sara_habitat_merged)=="unq_isl" )
 sara_habitat_merged<-sara_habitat_merged[,-62]
 
+### add in water area (calculated by Will)
+water_area<-read.csv("C:Food web idea//Data by person//Norah.data//WaterArea.csv", header=TRUE, sep=",")
+head(water_area)
+water_area<-water_area[,-1]
+water_area<-water_area %>% group_by(unq_tran)%>% spread(Radius_m, WaterArea_m2, sep="_")
+water_area<-water_area[,c(6,11:17)]
+
+sara_habitat_merged<-merge(sara_habitat_merged, water_area, by="unq_tran")
+
+
 #### Seaweed composition
 sara_composition<-read.csv("C:Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 head(sara_composition)
