@@ -476,8 +476,7 @@ ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fis
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_mean, col=node))+
   geom_point()+geom_line()+scale_colour_viridis_d()
 
-##supernode?
-
+ad60cb0bae84cd3b1d261f04d4973f7243e2240f
 
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=habitat_area, y=fish_richness))+
   geom_point()+geom_smooth(aes(), method="gam")+scale_colour_viridis_d()+theme_bw()
