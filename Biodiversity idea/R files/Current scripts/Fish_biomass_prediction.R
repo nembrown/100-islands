@@ -223,7 +223,9 @@ fish_bycatch_richness_merged_tran_year_2$fish_richness_corrected<-((fish_bycatch
 #### Adding environmental data
 head(ben_environment_data)
 ben_environment_data_d1<-ben_environment_data %>% filter(location=="d1")
-fish_bycatch_richness_merged_tran_year_2<-merge(fish_bycatch_richness_merged_tran_year_2, ben_environment_data_d1, by=c("site", "year", "month", "day"))
+ben_environment_data_d10<-ben_environment_data %>% filter(location=="d10")
+
+fish_bycatch_richness_merged_tran_year_2<-merge(fish_bycatch_richness_merged_tran_year_2, ben_environment_data_d10, by=c("site", "year", "month", "day"))
 
 
 #### Adding habitat data
@@ -251,7 +253,7 @@ ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_biomass_bym3_mean
 ggplot(fish_biomass_day, aes(x=temp, y=log(fish_biomass_bym3_mean+1)))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
-ggplot(fish_biomass_day, aes(x=as.numeric(salinity), y=log(fish_biomass_bym3_mean+1), col=freshwater_input))+
+ggplot(fish_biomass_day, aes(x=as.numeric(salinity), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 
@@ -259,7 +261,11 @@ ggplot(fish_biomass_day, aes(x=ph, y=log(fish_biomass_bym3_mean+1)))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 ggplot(fish_biomass_day, aes(x=temp, y=fish_richness_corrected))+
-  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+  geom_point()+geom_smooth(aes(), method="gam", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_biomass_day, aes(x=ph, y=fish_richness_corrected))+
+  geom_point()+geom_smooth(aes(), method="gam", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
 
 ggplot(fish_biomass_day, aes(x=as.numeric(secchi), y=log(fish_biomass_bym3_mean+1)))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
