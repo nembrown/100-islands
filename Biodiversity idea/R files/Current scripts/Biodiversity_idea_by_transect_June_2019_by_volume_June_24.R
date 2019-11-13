@@ -464,7 +464,9 @@ fish_bycatch_richness_merged_tran_year$total_habitat_cover<- (fish_bycatch_richn
 
 #fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/100)
 
-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=total_habitat_cover, y=log(fish_biomass_bym3_mean + 1)))+
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=total_habitat_cover, y=fish_biomass_bym3_mean, col=super_node))+
+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 
