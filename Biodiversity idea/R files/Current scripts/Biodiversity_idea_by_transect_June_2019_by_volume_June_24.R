@@ -458,21 +458,50 @@ fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_
 head(fish_bycatch_richness_merged_tran_year)
 
 
-fish_bycatch_richness_merged_tran_year$eelgrass_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_primary_cover)/100)
-fish_bycatch_richness_merged_tran_year$fucus_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$intertidal_primary_cover)/100)
 fish_bycatch_richness_merged_tran_year$subtidal_total_cover<- fish_bycatch_richness_merged_tran_year$subtidal_primary_cover+fish_bycatch_richness_merged_tran_year$subtidal_secondary_cover
+fish_bycatch_richness_merged_tran_year$intertidal_total_cover<- fish_bycatch_richness_merged_tran_year$intertidal_primary_cover+fish_bycatch_richness_merged_tran_year$intertidal_secondary_cover
+fish_bycatch_richness_merged_tran_year$total_habitat_cover<- (fish_bycatch_richness_merged_tran_year$intertidal_total_cover+fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/2
 
-fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/100)
+#fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/100)
 
-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_biomass_bym3_mean, col=super_node))+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=total_habitat_cover, y=fish_biomass_bym3_mean, col=super_node))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 
-ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=fish_richness_corrected, col=super_node))+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=lat, y=fish_richness_corrected))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=exposure, y=fish_biomass_bym3_mean))+
+  geom_boxplot()+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=intertidal_primary_substrate, y=fish_biomass_bym3_mean))+
+  geom_boxplot()+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=aspect, y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=as.numeric(slope_intertidal), y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=as.numeric(slope_subtidal), y=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=freshwater_input, y=fish_biomass_bym3_mean))+
+  geom_boxplot()+scale_colour_viridis_d()+theme_bw()+ylim(0,20)
+#maybe want to only have no freshwater input sites? 
+
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=total_habitat_cover, y=fish_richness_corrected, col=super_node))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=bycatch_richness_corrected, col=super_node))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_bycatch_richness_merged_tran_year, aes(x=subtidal_total_cover, y=marine_richness_corrected, col=super_node))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
 
 #if I can find % cover for the radius results.... that should work. 
 # check out the two outliers in fish biomass ... why are there some above 40? 
