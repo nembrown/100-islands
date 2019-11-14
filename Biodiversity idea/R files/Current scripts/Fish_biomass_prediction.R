@@ -262,6 +262,12 @@ ggplot(fish_biomass_day, aes(x=as.numeric(secchi), y=log(fish_biomass_bym3_mean+
 
 
 ggplot(fish_biomass_day, aes(x=as.numeric(temp), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
+<<<<<<< HEAD
+=======
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
+
+ggplot(fish_biomass_day, aes(x=as.numeric(aspect), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
+>>>>>>> fcc0af288ff1a924984f70a46331f9bf6ef49238
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 ggplot(fish_biomass_day, aes(x=as.numeric(aspect), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
@@ -277,6 +283,16 @@ fish_biomass_day_circular<-fish_biomass_day
 fish_biomass_day_circular<- circular(fish_biomass_day_circular, units = "degrees", template = "geographics") 
 
 plot.circular(fish_biomass_day$aspect, col=factor(fish_biomass_day$fish_richness_corrected))
+
+
+ggplot(fish_biomass_day, aes(x=aspect, y=fish_richness_corrected))+plot.circular(fish_biomass_day$aspect)
+
+install.packages("circular")
+library(circular)
+
+fish_biomass_day$aspect<- circular(fish_biomass_day$aspect, units = "degrees", template = "geographics") 
+
+plot.circular(fish_biomass_day$aspect, col=as.factor(fish_biomass_day$month))
 
 
 ggplot(fish_biomass_day, aes(x=aspect, y=fish_richness_corrected))+plot.circular(fish_biomass_day$aspect)
