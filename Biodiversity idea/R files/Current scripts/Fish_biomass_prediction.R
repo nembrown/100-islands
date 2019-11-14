@@ -262,12 +262,6 @@ ggplot(fish_biomass_day, aes(x=as.numeric(secchi), y=log(fish_biomass_bym3_mean+
 
 
 ggplot(fish_biomass_day, aes(x=as.numeric(temp), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
-<<<<<<< HEAD
-=======
-  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
-
-ggplot(fish_biomass_day, aes(x=as.numeric(aspect), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
->>>>>>> fcc0af288ff1a924984f70a46331f9bf6ef49238
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 ggplot(fish_biomass_day, aes(x=as.numeric(aspect), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
