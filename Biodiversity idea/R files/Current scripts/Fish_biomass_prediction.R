@@ -230,13 +230,17 @@ fish_bycatch_richness_merged_tran_year_2<-merge(fish_bycatch_richness_merged_tra
 
 #### Adding habitat data
 head(ben_habitat_data)
+###change back to 2 here
 fish_bycatch_richness_merged_tran_year_2<-merge(fish_bycatch_richness_merged_tran_year_2, ben_habitat_data, by="site")
 head(fish_bycatch_richness_merged_tran_year_2)
+
 
 
 fish_bycatch_richness_merged_tran_year_2$subtidal_total_cover<- fish_bycatch_richness_merged_tran_year_2$subtidal_primary_cover+fish_bycatch_richness_merged_tran_year_2$subtidal_secondary_cover
 fish_bycatch_richness_merged_tran_year_2$intertidal_total_cover<- fish_bycatch_richness_merged_tran_year_2$intertidal_primary_cover+fish_bycatch_richness_merged_tran_year_2$intertidal_secondary_cover
 fish_bycatch_richness_merged_tran_year_2$total_habitat_cover<- (fish_bycatch_richness_merged_tran_year_2$intertidal_total_cover+fish_bycatch_richness_merged_tran_year_2$subtidal_total_cover)/2
+ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_biomass_bym3_mean+1)))+
+  geom_point(aes(col=exposure))+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 #fish_bycatch_richness_merged_tran_year$habitat_area<- (fish_bycatch_richness_merged_tran_year$area)*((fish_bycatch_richness_merged_tran_year$subtidal_total_cover)/100)
 
@@ -247,10 +251,18 @@ write.csv(fish_bycatch_richness_merged_tran_year_2, "C:Biodiversity idea//Output
 fish_biomass_day<-fish_bycatch_richness_merged_tran_year_2
 
 
-ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_biomass_bym3_mean+1)))+
-  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
-ggplot(fish_biomass_day, aes(x=temp, y=log(fish_biomass_bym3_mean+1)))+
+demersal_plot<-ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_demersal_biomass_bym3_mean+1)))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()+ggtitle("Demersal fish")
+
+pelagic_plot<-ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_pelagic_biomass_bym3_mean+1)))+
+  geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()+ggtitle("Pelagic fish")
+
+library(cowplot)
+plot_grid(demersal_plot, pelagic_plot, ncol=2)
+
+
+ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_biomass_bym3_mean+1), col=exposure))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()
 
 ggplot(fish_biomass_day, aes(x=as.numeric(salinity), y=log(fish_biomass_bym3_mean+1), col=as.factor(month)))+
