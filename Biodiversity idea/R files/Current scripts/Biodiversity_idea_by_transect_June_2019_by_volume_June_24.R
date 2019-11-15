@@ -468,7 +468,7 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 
 
 
-#This is working with a 500m radius around the transects instead
+#This is working with a 1km radius around the transects instead
 hakai_sites_distance_tran<-read.csv("C:Biodiversity idea//Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
 head(hakai_sites_distance_tran)
