@@ -59,7 +59,7 @@ head(ben_netdimensions)
 ben_netdimensions<-ben_netdimensions %>% gather(area_replicate, area, area_set1,area_set2)
 ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set1"]<-"1"
 ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set2"]<-"2"
-head(ben_netdimensions)
+View(ben_netdimensions)
 
 
 # use only summer months data (July and August 7&8)
@@ -78,9 +78,8 @@ head(ben_netdimensions_year)
 ben_netdimensions_summer <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year) %>% 
   summarise(sum_volume = sum(volume, na.rm=TRUE)) 
 ben_netdimensions_summer$sum_volume[ben_netdimensions_summer$sum_volume==0]<-"NA"
-head(ben_netdimensions_summer)
+str(ben_netdimensions_summer)
 ben_netdimensions_summer$sum_volume<-as.numeric(ben_netdimensions_summer$sum_volume)
-
 
 # Fish abundance data cleaning ------------------------------------------------------
 #only summer months 
@@ -95,7 +94,7 @@ ben_fish_data_wide_year <-ben_fish_data %>% group_by(site, year, species) %>%
   spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
 
-head(ben_fish_data_wide_year)
+str(ben_fish_data_wide_year)
 
 #calculate richness & abundance  from the wide dataframe
 ben_fish_data_wide_year_richness<-ben_fish_data_wide_year[,c(1,2)]
@@ -283,20 +282,20 @@ ben_fish_data_wide_year_4<- ben_fish_data_wide_year_4[,-90]
 ben_biomass_data_wide_year<-(ben_weights_wide_year_4[,-c(1,2,3,4,5)])*(ben_fish_data_wide_year_4[,-c(1,2,3,4,5)])
 ben_biomass_data_wide_year_nf<-ben_weights_wide_year_4[,c(1,2,3,4,5)]
 ben_biomass_data_wide_year_nf$fish_biomass<-rowSums(ben_biomass_data_wide_year)
-head(ben_biomass_data_wide_year_nf)
+str(ben_biomass_data_wide_year_nf)
 
 #correcting for total net volume
-ben_netdimensions_summer4 <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year, month, replicate) %>% 
+ben_netdimensions_summer4 <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year, month, day, replicate) %>% 
   summarise(sum_volume = sum(volume, na.rm=TRUE)) 
 ben_netdimensions_summer4$sum_volume[ben_netdimensions_summer4$sum_volume==0]<-"NA"
-head(ben_netdimensions_summer4)
+View(ben_netdimensions_summer4)
 ben_netdimensions_summer4$sum_volume<-as.numeric(ben_netdimensions_summer4$sum_volume)
 
 ben_biomass_data_wide_year_nf<-merge(ben_biomass_data_wide_year_nf, ben_netdimensions_summer4)
 ben_biomass_data_wide_year_nf$fish_biomass_bym3<-ben_biomass_data_wide_year_nf$fish_biomass/(ben_biomass_data_wide_year_nf$sum_volume)
 
 ben_biomass_data_wide_year_nf2 <-ben_biomass_data_wide_year_nf[,-c(2,3,4,5)]%>% group_by(site) %>% summarise_if(is.numeric, list(~mean(., na.rm=TRUE), ~sd(., na.rm=TRUE)))
-head(ben_biomass_data_wide_year_nf2)
+str(ben_biomass_data_wide_year_nf2)
 
 
 # Pelagic and demersal biomass --------------------------------------------
@@ -410,6 +409,7 @@ head(ben_weights_wide_year_richness)
 head(ben_biomass_data_wide_year_nf)
 head(ben_pelagic_biomass_data_wide_year_nf)
 head(ben_netdimensions_year)
+head(ben_biomass_data_wide_year_nf2)
 
 fish_richness_merged_tran_year<-merge(ben_fish_data_wide_year_richness, ben_netdimensions_year, by="site", all=TRUE)
 fish_bycatch_richness_merged_tran_year<-merge(fish_richness_merged_tran_year, ben_bycatch_data_wide_year_richness[,-4], by="site", all=TRUE)
