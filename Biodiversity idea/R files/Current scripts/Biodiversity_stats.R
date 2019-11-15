@@ -1,4 +1,3 @@
-setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 
 # install.packages("devtools")
 # devtools::install_github("cardiomoon/ggiraphExtra")
@@ -6,11 +5,11 @@ setwd("C:/Users/Norah/Dropbox/Projects/100-islands/Biodiversity idea")
 library(installr) # install+load installr
 
 # updateR()
+library(here)
 library(ggiraphExtra)
 library(bbmle) 
 library(glmmTMB)
 library(grid)
-library(glmmADMB)
 library(betareg)
 library(lmtest)
 library(fitdistrplus)
@@ -45,7 +44,7 @@ library(gamm4)
 
 # Reading data -------------------------------------------------------------------------
 #Reading in the data and making scaled
-fish_stats<-read.csv("C:Output files//fish_richness_merged_tran_isl.csv")
+fish_stats<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
 head(fish_stats)
 fish_stats<-fish_stats[,-1]
 # fish_stats<-fish_stats %>% filter(Distance < 1)
@@ -93,14 +92,6 @@ fish_stats_zscores_cat$log_Area<-as.numeric(fish_stats_zscores_cat$log_Area)
 
 # Shrub cover (total) vs. fish biomass ----------
 ggplot(fish_stats_zscores, aes(y=shrub_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$shrub_cover)
-
-qqp(log(fish_stats_zscores$shrub_cover+1))
-
-qqp(fish_stats_zscores$shrub_cover, "lnorm")
-
-gamma.12.evenness<-fitdistr(fish_stats_zscores$shrub_cover+0.01, "gamma")
-qqp(fish_stats_zscores$shrub_cover, "gamma", shape = gamma.12.evenness$estimate[[1]], rate = gamma.12.evenness$estimate[[2]])
 
 
 # 
@@ -214,7 +205,7 @@ grid.arrange(plot(lme.shrub_cover.fishbiomass,type=c("p","smooth")),
     geom_ribbon(data = ndata.shrub_cover.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
     theme(legend.position="none")
   plt.shrub_cover.fishbiomass
-  ggsave("C:Plots//Model-fitted//LME_shrub_cover_fish_biomass.png")
+  ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_shrub_cover_fish_biomass.png")
 
 
 # Herb cover (total) vs. fish biomass ----------
@@ -277,11 +268,9 @@ plt.herb_cover.fishbiomass <- ggplot(ndata.herb_cover.fishbiomass, aes(x = fish_
   geom_ribbon(data = ndata.herb_cover.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.herb_cover.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_herb_cover_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_herb_cover_fish_biomass.png")
 
 ggplot(fish_stats_zscores, aes(y=herb_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
-qqp(fish_stats_zscores$herb_cover)
-qqp(fish_stats_zscores$herb_cover, "lnorm")
 
 
 #Total plant cover -----
@@ -340,7 +329,7 @@ plt.total_cover.fishbiomass <- ggplot(ndata.total_cover.fishbiomass, aes(x = fis
   geom_ribbon(data = ndata.total_cover.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_cover.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_total_cover_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_total_cover_fish_biomass.png")
 
 
 
@@ -400,7 +389,7 @@ plt.NDVI_mean.fishbiomass <- ggplot(fish_stats_zscores, aes(x = fish_biomass_bym
   geom_smooth(method="lm", col="black", alpha=0.10, size=1.5)+
   theme(legend.position="none")
 plt.NDVI_mean.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_NDVI_mean_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_NDVI_mean_fish_biomass.png")
 
 
 
@@ -463,7 +452,7 @@ plt.tree_abundance.fishbiomass <- ggplot(ndata.tree_abundance.fishbiomass, aes(x
   geom_ribbon(data = ndata.tree_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.tree_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_tree_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_tree_abundance_fish_biomass.png")
 
 
 
@@ -528,7 +517,7 @@ plt.sum_basal.fishbiomass <- ggplot(ndata.sum_basal.fishbiomass, aes(x = fish_bi
   geom_ribbon(data = ndata.sum_basal.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.sum_basal.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_sum_basal_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_sum_basal_fish_biomass.png")
 
 # bird.density vs. fish biomass ----------
 ggplot(fish_stats_zscores, aes(y=bird.density, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
@@ -548,7 +537,7 @@ plt.bird.density.fishbiomass <- ggplot(fish_stats_zscores, aes(x = fish_biomass_
   geom_smooth(size=1.5, col="black", alpha=0.15, method="lm")+
   theme(legend.position="none")
 plt.bird.density.fishbiomass
-ggsave("C:Plots//Model-fitted//LM_bird.density_fish_biomass.png", width=15, height=10, units="cm")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LM_bird.density_fish_biomass.png", width=15, height=10, units="cm")
 
 # bird.richness vs. Area ----------
 ggplot(fish_stats_zscores_cat, aes(y=bird.richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -571,7 +560,7 @@ plt.bird.richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area.unscal
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.bird.richness.Area
-ggsave("C:Plots//Model-fitted//LME_bird.richness_Area.png", width=10, height=10, units="cm")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_bird.richness_Area.png", width=10, height=10, units="cm")
 
 
 
@@ -598,7 +587,7 @@ plt.tree_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area.unscal
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.tree_richness.Area
-ggsave("C:Plots//Model-fitted//LME_tree_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_tree_richness_Area.png")
 
 # mammal_richness vs. Area ----------
 ggplot(fish_stats_zscores_cat, aes(y=mammal_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -621,7 +610,7 @@ plt.mammal_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y =
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.mammal_richness.Area
-ggsave("C:Plots//Model-fitted//LME_mammal_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_mammal_richness_Area.png")
 
 
 # total_richness vs. Area ----------
@@ -645,7 +634,7 @@ plt.total_richness.Area <- ggplot(fish_stats_zscores_cat, aes(x = log_Area, y = 
   geom_smooth(aes(col=fish_biomass_bym3_cat, fill=fish_biomass_bym3_cat),size=1.5, alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.total_richness.Area
-ggsave("C:Plots//Model-fitted//LME_total_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_total_richness_Area.png")
 
 
 # bird.density vs. fish richness ----------
@@ -673,7 +662,7 @@ plt.bird.density.fishcatch <- ggplot(fish_stats_zscores, aes(x = fish_richness_c
   geom_smooth(size=1.5, col="black", alpha=0.2, method="lm")+
   theme(legend.position="none")
 plt.bird.density.fishcatch
-ggsave("C:Plots//Model-fitted//LME_bird.density_fish_richness.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_bird.density_fish_richness.png")
 
 
 ggplot(fish_stats_zscores, aes(y=insect_detritivore_beat_av_abundance, x=fish_richness_corrected))+geom_point()+geom_smooth(method="lm")
@@ -735,7 +724,7 @@ plt.insect_detritivore_beat_av_abundance.fishrichness <- ggplot(ndata.insect_det
   geom_ribbon(data = ndata.insect_detritivore_beat_av_abundance.fishrichness,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_detritivore_beat_av_abundance.fishrichness
-ggsave("C:Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
 
 
 
@@ -799,7 +788,7 @@ plt.insect_detritivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_detr
   geom_ribbon(data = ndata.insect_detritivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_detritivore_beat_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_detritivore_beat_av_abundance_fish_biomass.png")
 
 # insect_carnivore_beat_av_abundance vs. fish biomass ----------
 ggplot(fish_stats_zscores, aes(y=insect_carnivore_beat_av_abundance, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
@@ -860,7 +849,7 @@ plt.insect_carnivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_carniv
   geom_ribbon(data = ndata.insect_carnivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_carnivore_beat_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_carnivore_beat_av_abundance_fish_biomass.png")
 
 
 
@@ -922,7 +911,7 @@ plt.insect_birdfood_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_birdfoo
   geom_ribbon(data = ndata.insect_birdfood_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_birdfood_beat_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_birdfood_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_birdfood_beat_av_abundance_fish_biomass.png")
 
 # insect_birdfood_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=insect_birdfood_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -974,7 +963,7 @@ plt.insect_birdfood_richness.Area <- ggplot(newdat_birdfood, aes(x = log_Area.un
   geom_ribbon(data = newdat_birdfood,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.insect_birdfood_richness.Area
-ggsave("C:Plots//Model-fitted//LME_insect_birdfood_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_birdfood_richness_Area.png")
 
 
 # insect_carnivore_richness vs. Area----------
@@ -1027,7 +1016,7 @@ plt.insect_carnivore_richness.Area <- ggplot(newdat_carnivore, aes(x = log_Area.
   geom_ribbon(data = newdat_carnivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.insect_carnivore_richness.Area
-ggsave("C:Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_carnivore_richness_Area.png")
 
 # insect_detritivore_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=insect_detritivore_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -1078,7 +1067,7 @@ plt.insect_detritivore_richness.Area <- ggplot(newdat_detritivore, aes(x = log_A
   geom_ribbon(data = newdat_detritivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.insect_detritivore_richness.Area
-ggsave("C:Plots//Model-fitted//LME_insect_detritivore_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_detritivore_richness_Area.png")
 
 
 # insect_herbivore_richness vs. Area----------
@@ -1130,7 +1119,7 @@ plt.insect_herbivore_richness.Area <- ggplot(newdat_herbivore, aes(x = log_Area.
   geom_ribbon(data = newdat_herbivore,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.insect_herbivore_richness.Area
-ggsave("C:Plots//Model-fitted//LME_insect_herbivore_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_herbivore_richness_Area.png")
 
 # insect_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=insect_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -1182,7 +1171,7 @@ plt.insect_richness.Area <- ggplot(newdat_insect, aes(x = log_Area.unscaled, y =
   geom_ribbon(data = newdat_insect,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.insect_richness.Area
-ggsave("C:Plots//Model-fitted//LME_insect_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_richness_Area.png")
 
 # plant_richness vs. Area----------
 ggplot(fish_stats_zscores_cat, aes(y=plant_richness, x=log_Area))+geom_point()+geom_smooth(method="lm")
@@ -1234,7 +1223,7 @@ plt.plant_richness.Area <- ggplot(newdat_plant, aes(x = log_Area.unscaled, y = p
   geom_ribbon(data = newdat_plant,aes(ymin = pred - 2*SE, ymax =  pred+ 2*SE, fill=fish_biomass_bym3_cat, colour=fish_biomass_bym3_cat), alpha = 0.10, colour = NA)+
   theme(legend.position="none")
 plt.plant_richness.Area
-ggsave("C:Plots//Model-fitted//LME_plant_richness_Area.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_plant_richness_Area.png")
 
 
 # insect_herbivore_beat_av_abundance vs. fish biomass ----------
@@ -1296,7 +1285,7 @@ plt.insect_herbivore_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_herbiv
   geom_ribbon(data = ndata.insect_herbivore_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_herbivore_beat_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_herbivore_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_herbivore_beat_av_abundance_fish_biomass.png")
 
 
 # insect_beat_av_abundance vs. fish biomass ----------
@@ -1358,7 +1347,7 @@ plt.insect_beat_av_abundance.fishbiomass <- ggplot(ndata.insect_beat_av_abundanc
   geom_ribbon(data = ndata.insect_beat_av_abundance.fishbiomass,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_beat_av_abundance.fishbiomass
-ggsave("C:Plots//Model-fitted//LME_insect_beat_av_abundance_fish_biomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_beat_av_abundance_fish_biomass.png")
 
 
 
@@ -1424,7 +1413,7 @@ plt.shrub_cover.fishcatch <- ggplot(ndata.shrub_cover.fishcatch, aes(x = fish_ri
   geom_ribbon(data = ndata.shrub_cover.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.shrub_cover.fishcatch
-ggsave("C:Plots//Model-fitted//LME_shrub_cover_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_shrub_cover_fish_catch.png")
 
 
 # NDVI vs. fish richness -----------------------------------------------------
@@ -1488,7 +1477,7 @@ plt.NDVI_mean.fishcatch <- ggplot(fish_stats_zscores, aes(x = fish_richness_corr
   geom_smooth(method="lm", alpha = 0.10, col="black", size=1.5)+
   theme(legend.position="none")
 plt.NDVI_mean.fishcatch
-ggsave("C:Plots//Model-fitted//LME_NDVI_mean_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_NDVI_mean_fish_catch.png")
 
 
 #Sum basal vs. fish richness -----------------------------------------------------
@@ -1553,7 +1542,7 @@ plt.sum_basal.fishcatch <- ggplot(ndata.sum_basal.fishcatch, aes(x = fish_richne
   geom_ribbon(data = ndata.sum_basal.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.sum_basal.fishcatch
-ggsave("C:Plots//Model-fitted//LME_sum_basal_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_sum_basal_fish_catch.png")
 
 #Sum basal vs. fish richness -----------------------------------------------------
 #visualize different distributions
@@ -1617,7 +1606,7 @@ plt.insect_pitfall_av_abundance.fishcatch <- ggplot(ndata.insect_pitfall_av_abun
   geom_ribbon(data = ndata.insect_pitfall_av_abundance.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.insect_pitfall_av_abundance.fishcatch
-ggsave("C:Plots//Model-fitted//LME_insect_pitfall_av_abundance_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_insect_pitfall_av_abundance_fish_catch.png")
 
 
 # Total cover vs. fish richness -----------------------------------------------------
@@ -1682,7 +1671,7 @@ plt.total_cover.fishcatch <- ggplot(ndata.total_cover.fishcatch, aes(x = fish_ri
   geom_ribbon(data = ndata.total_cover.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_cover.fishcatch
-ggsave("C:Plots//Model-fitted//LME_Poisson_total_cover_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_Poisson_total_cover_fish_catch.png")
 
 
 
@@ -1745,7 +1734,7 @@ plt.shrub_cover.fish_abundance <- ggplot(ndata.shrub_cover.fish_abundance, aes(x
   geom_ribbon(data = ndata.shrub_cover.fish_abundance,aes(ymin = fit - 2*SE, ymax = fit+2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.shrub_cover.fish_abundance
-ggsave("C:Plots//Model-fitted//LME_shrub_cover_fish_abundance.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_shrub_cover_fish_abundance.png")
 
 
 
@@ -1817,7 +1806,7 @@ plt.plant_evenness.fishcatch <- ggplot(ndata.plant_evenness.fishcatch, aes(x = f
   geom_ribbon(data = ndata.plant_evenness.fishcatch,aes(ymin = fit - 2*SE, ymax =  fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.plant_evenness.fishcatch
-ggsave("C:Plots//Model-fitted//LME_Poisson_plant_evenness_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_Poisson_plant_evenness_fish_catch.png")
 
 
 
@@ -1882,7 +1871,7 @@ plt.plant_evenness.fish_abundance <- ggplot(ndata.plant_evenness.fish_abundance,
   geom_ribbon(data = ndata.plant_evenness.fish_abundance,aes(ymin = fit - 2*SE, ymax = fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.plant_evenness.fish_abundance
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_evenness_fish_abundance.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Poisson_plant_evenness_fish_abundance.png")
 
 
 
@@ -1982,7 +1971,7 @@ plt.plant_richness.fishcatch <- ggplot(ndata.plant_richness.fishcatch, aes(x = f
   geom_ribbon(data = ndata.plant_richness.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.plant_richness.fishcatch
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_catch.png")
 
 
 ##### gg predict is not for mixed models
@@ -2084,7 +2073,7 @@ plt.plant_richness.fish_abundance <- ggplot(ndata.plant_richness.fish_abundance,
   geom_ribbon(data = ndata.plant_richness.fish_abundance,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.plant_richness.fish_abundance
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_abundance.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Poisson_plant_richness_fish_abundance.png")
 
 
 # Tree richness vs. fish richness -----------------------------------------------------------
@@ -2156,7 +2145,7 @@ plt.tree_richness.fishcatch <- ggplot(ndata.tree_richness.fishcatch, aes(x = fis
   geom_ribbon(data = ndata.tree_richness.fishcatch,aes(ymin = fit - 2*SE, ymax = fit + 2*SE), alpha = 0.10)+
   theme(legend.position="none")
 plt.tree_richness.fishcatch
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_catch.png")
 
 
 
@@ -2224,11 +2213,11 @@ plt.tree_richness.fish_abundance <- ggplot(ndata.tree_richness.fish_abundance, a
   geom_ribbon(data = ndata.tree_richness.fish_abundance,aes(ymin = fit - 2*SE2, ymax = fit + 2*SE2), alpha = 0.10)+
   theme(legend.position="none")
 plt.tree_richness.fish_abundance
-ggsave("C:Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_abundance.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Poisson_tree_richness_fish_abundance.png")
 
 # Beachseine only data ----------------------------------------------------
 
-beachseine_stats<-read.csv("C:Output files//fish_bycatch_richness_merged_tran_year.csv")
+beachseine_stats<-read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
 
 beachseine_stats<-beachseine_stats[,-1]
 beachseine_stats$fish_abundance_bym3_log<-log(beachseine_stats$fish_richness_bym3+1)
@@ -2305,7 +2294,7 @@ plt.fish_speciesvabund <- ggplot(ndata.fish_speciesvabund, aes(x = fish_abundanc
   geom_ribbon(data = ndata.fish_speciesvabund,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.fish_speciesvabund
-ggsave("C:Plots//Model-fitted//LM_fish_speciesvabund.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//LM_fish_speciesvabund.png")
 
 # Fish biomass and N15 ---------------------------------------------------
 
@@ -2412,7 +2401,7 @@ plt.d15n.fishbiomass <- ggplot(ndata.d15n.fishbiomass, aes(x = fish_biomass_bym3
   geom_ribbon(data = ndata.d15n.fishbiomass,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fishbiomass
-ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fishbiomass.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Gamma_d15n_fishbiomass.png")
 
 
 # Fish richness and N15 ---------------------------------------------------
@@ -2522,7 +2511,7 @@ plt.d15n.fishcatch <- ggplot(ndata.d15n.fishcatch, aes(x = fish_richness_correct
   geom_ribbon(data = ndata.d15n.fishcatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fishcatch
-ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_catch.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Gamma_d15n_fish_catch.png")
 
 
 # Fish abundance and N15 ----------------------------------------------------------
@@ -2624,7 +2613,7 @@ plt.d15n.fish_abundance <- ggplot(ndata.d15n.fish_abundance, aes(x = fish_abunda
   geom_ribbon(data = ndata.d15n.fish_abundance,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.fish_abundance
-ggsave("C:Plots//Model-fitted//GLMM_Gamma_d15n_fish_abundance.png")
+ggsave("C:Biodiversity idea//Plots//Model-fitted//GLMM_Gamma_d15n_fish_abundance.png")
 
 
 
@@ -2636,45 +2625,45 @@ plot_grid(plt.bird.density.fishbiomass, plt.bird.density.fishcatch,ncol=2, align
 soil_plots<-plot_grid(plt.d15n.fishcatch, plt.d15n.fish_abundance, plt.fish_speciesvabund, ncol=3, align='v', axis = 'l')
 soil_plots
                  
-ggplot2::ggsave("C:Plots//Model-fitted//soil_plots.png", width=60, height=20, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//soil_plots.png", width=60, height=20, units="cm")
                           
 
 plant_plots<-plot_grid(plt.plant_richness.fishcatch, plt.plant_evenness.fishcatch, plt.shrub_cover.fishcatch,
                        plt.plant_richness.fish_abundance, plt.plant_evenness.fish_abundance, plt.shrub_cover.fish_abundance , ncol=3, align='v', axis = 'l')
 plant_plots
 
-ggplot2::ggsave("C:Plots//Model-fitted//plant_plots.png", width=60, height=40, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//plant_plots.png", width=60, height=40, units="cm")
 
 plant_plots_cover<-plot_grid(plt.total_cover.fishbiomass, plt.sum_basal.fishbiomass, plt.NDVI_mean.fishbiomass,
                         ncol=3, align='v', axis = 'l')
 plant_plots_cover
 
-ggplot2::ggsave("C:Plots//Model-fitted//plant_plots_cover.png", width=30, height=10, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//plant_plots_cover.png", width=30, height=10, units="cm")
 
 
 plant_plots_cover_richness<-plot_grid(plt.total_cover.fishcatch, plt.sum_basal.fishcatch, plt.NDVI_mean.fishcatch,
                              ncol=3, align='v', axis = 'l')
 plant_plots_cover_richness
-ggplot2::ggsave("C:Plots//Model-fitted//plant_plots_cover_richness.png", width=30, height=10, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//plant_plots_cover_richness.png", width=30, height=10, units="cm")
 
 
 insect_plots_cover<-plot_grid(plt.insect_detritivore_beat_av_abundance.fishbiomass,plt.insect_herbivore_beat_av_abundance.fishbiomass, plt.insect_carnivore_beat_av_abundance.fishbiomass,
                              ncol=3, align='v', axis = 'l')
 insect_plots_cover
-ggplot2::ggsave("C:Plots//Model-fitted//insect_plots_cover.png", width=30, height=10, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//insect_plots_cover.png", width=30, height=10, units="cm")
 
 
 insect_plots_Area<-plot_grid(plt.insect_detritivore_richness.Area,plt.insect_herbivore_richness.Area, plt.insect_carnivore_richness.Area,
                               ncol=3, align='v', axis = 'l')
 insect_plots_Area
-ggplot2::ggsave("C:Plots//Model-fitted//insect_plots_Area.png", width=30, height=10, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//insect_plots_Area.png", width=30, height=10, units="cm")
 
 
 
 plant_plots_Area<-plot_grid(plt.plant_richness.Area, plt.tree_richness.Area,
                                       ncol=2, align='v', axis = 'l')
 plant_plots_Area
-ggplot2::ggsave("C:Plots//Model-fitted//plant_plots_Area.png", width=20, height=10, units="cm")
+ggplot2::ggsave("C:Biodiversity idea//Plots//Model-fitted//plant_plots_Area.png", width=20, height=10, units="cm")
 
 
 
@@ -2734,7 +2723,7 @@ plt.d15n.marinecatch <- ggplot(ndata.d15n.marinecatch, aes(x = marine_richness_c
   geom_ribbon(data = ndata.d15n.marinecatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d15n.marinecatch
-ggsave("C:Plots//Transect//GLM_Gamma_d15n_marine_catch.png")
+ggsave("C:Biodiversity idea//Plots//Transect//GLM_Gamma_d15n_marine_catch.png")
 
 
 # Marine catch and 13c ----------------------------------------------------
@@ -2800,6 +2789,6 @@ plt.d13c.marinecatch <- ggplot(ndata.d13c.marinecatch, aes(x = marine_richness_c
   geom_ribbon(data = ndata.d13c.marinecatch,aes(ymin = right_lwr, ymax = right_upr), alpha = 0.10)+
   theme(legend.position="none")
 plt.d13c.marinecatch
-ggsave("C:Plots//Transect//GAM_lm_d13c_marine_catch.png")
+ggsave("C:Biodiversity idea//Plots//Transect//GAM_lm_d13c_marine_catch.png")
 
 
