@@ -43,12 +43,12 @@ head(by_isl_master)
 by_isl_master<-by_isl_master[,-1]
 
 #Transect-level information
-by_tran_master<-read.csv("C:Food web idea//Data by person//norahbrown.data//by_tran_master.csv")
+by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
 by_tran_master<-by_tran_master[,-1]
 
 
 #isotopes on the island-level
-isotope_by_isl_gathered4<- read.csv("C:Food web idea//Data by person//norahbrown.data/isotope_by_isl_gathered4.csv")
+isotope_by_isl_gathered4<- read.csv("C:Food web idea//Data by person//Norah.data/isotope_by_isl_gathered4.csv")
 isotope_by_isl_gathered4<-isotope_by_isl_gathered4[,-1]
 
 
@@ -80,17 +80,18 @@ head(df.SF)
 head(ben_habitat_data)
 ben_habitat_data_simple<-ben_habitat_data[,c(1:3)]
 head(ben_habitat_data_simple)
-ben_habitat_data_simple$long<--(ben_habitat_data_simple$long)
+ben_habitat_data_simple$long<-(ben_habitat_data_simple$long)
 ben_habitat_data_simple.SP <- st_as_sf(ben_habitat_data_simple, coords = c("long", "lat"), crs = 4326)
 head(ben_habitat_data_simple.SP)
 ben_habitat_data_simple.SP$site_type<-"beachseine"
 
-ben_habitat_data_simple.SP$long<-st_coordinates(ben_habitat_data_simple.SP)[,1] # get coordinates
-ben_habitat_data_simple.SP$lat<-st_coordinates(ben_habitat_data_simple.SP)[,2]
-ben_habitat_data_simple.SP$site<-as.factor(ben_habitat_data_simple.SP$site)
-ggmap(map_marine) + geom_point(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type, label=site))+ 
-  scale_colour_viridis_d()+geom_text(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type,label=site))
-  
+#  ben_habitat_data_simple.SP$long<-st_coordinates(ben_habitat_data_simple.SP)[,1] # get coordinates
+#  ben_habitat_data_simple.SP$lat<-st_coordinates(ben_habitat_data_simple.SP)[,2]
+#  ben_habitat_data_simple.SP$site<-as.factor(ben_habitat_data_simple.SP$site)
+# 
+# ggmap(map_marine) + geom_point(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type, label=site))+ 
+#   scale_colour_viridis_d()+geom_text(data=ben_habitat_data_simple.SP, aes(x = long, y = lat, col=site_type,label=site))
+#   
 
 
 
@@ -138,7 +139,7 @@ head(df.SF_transects)
 
 
 head(ben_habitat_data)
-ben_habitat_data_simple<-ben_habitat_data[,c(1:3)]
+ben_habitat_data_simple<-ben_habitat_data[,c(3:5)]
 head(ben_habitat_data_simple)
 ben_habitat_data_simple$long<--(ben_habitat_data_simple$long)
 ben_habitat_data_simple.SP <- st_as_sf(ben_habitat_data_simple, coords = c("long", "lat"), crs = 4326)
@@ -165,7 +166,6 @@ map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "
 # ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 # ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
- devtools::install_github("dill/beyonce")
 library(beyonce)
 
 colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
@@ -286,7 +286,7 @@ ggsave("C:Biodiversity idea//Plots//Maps//map_beachseine_pelagic_abundance.png",
 
 # Adding in otter locations -----------------------------------------------
 
-otter_isotopes<-read.csv("C:Food web idea//Data by person//norahbrown.data//master_otter_isotope_nb_new.csv")
+otter_isotopes<-read.csv("C:Food web idea//Data by person//Norah.data//master_otter_isotope_nb_new.csv")
 head(otter_isotopes)
 otter_isotopes_simple<-otter_isotopes[,c(7,9,10)]
 head(otter_isotopes_simple)
