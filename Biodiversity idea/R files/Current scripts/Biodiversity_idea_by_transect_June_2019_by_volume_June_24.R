@@ -59,7 +59,7 @@ head(ben_netdimensions)
 ben_netdimensions<-ben_netdimensions %>% gather(area_replicate, area, area_set1,area_set2)
 ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set1"]<-"1"
 ben_netdimensions$area_replicate[ben_netdimensions$area_replicate=="area_set2"]<-"2"
-View(ben_netdimensions)
+head(ben_netdimensions)
 
 
 # use only summer months data (July and August 7&8)
@@ -288,7 +288,7 @@ str(ben_biomass_data_wide_year_nf)
 ben_netdimensions_summer4 <-ben_netdimensions%>% filter(between(month, 7,8)) %>% group_by(site, year, month, day, replicate) %>% 
   summarise(sum_volume = sum(volume, na.rm=TRUE)) 
 ben_netdimensions_summer4$sum_volume[ben_netdimensions_summer4$sum_volume==0]<-"NA"
-View(ben_netdimensions_summer4)
+head(ben_netdimensions_summer4)
 ben_netdimensions_summer4$sum_volume<-as.numeric(ben_netdimensions_summer4$sum_volume)
 
 ben_biomass_data_wide_year_nf<-merge(ben_biomass_data_wide_year_nf, ben_netdimensions_summer4)
@@ -510,6 +510,7 @@ which( colnames(by_tran_master)=="MEAN_kparea1k"),
 which( colnames(by_tran_master)=="d34s"),
 which( colnames(by_tran_master)=="Radius_m_1000"),
 which( colnames(by_tran_master)=="sum_1km"),
+which( colnames(by_tran_master)=="WAVE_EXPOSURE"),
 sep=","
 )
 
@@ -517,7 +518,7 @@ sep=","
 # which( colnames(by_tran_master)=="herb_richness" )
 # which( colnames(by_tran_master)=="herb_cover")
 
-by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108, 81)]
+by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108,81,99)]
 head(by_tran_master_subset)
 
 
@@ -569,7 +570,7 @@ head(fish_richness_merged_tran_isl)
 xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
 labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
 fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
-head(fish_richness_merged_tran_isl)
+View(fish_richness_merged_tran_isl)
 
 length(xs4)
 length(labels4)
@@ -579,10 +580,12 @@ fish_richness_merged_tran_isl$eelgrass_cover_1km<-(fish_richness_merged_tran_isl
 fish_richness_merged_tran_isl$habitat_cover_1km<-(fish_richness_merged_tran_isl$sum_1km)/(fish_richness_merged_tran_isl$Radius_m_1000)
 
 
-
-
-head(fish_richness_merged_tran_isl)
-
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="VP"]<-1
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="P"]<-2
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="SP"]<-3
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="SE"]<-4
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="E"]<-5
+levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="CE"]<-6
 
 write.csv(fish_richness_merged_tran_isl, "C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
 
@@ -595,13 +598,18 @@ length(unique(fish_richness_merged_tran_isl$unq_isl))
 #I think I added more after I fixed the issues with Owen's plots! 
 
 head(fish_richness_merged_tran_isl)
-ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
 ggplot(fish_richness_merged_tran_isl, aes(x=eelgrass_cover_1km, y=fish_biomass_bym3_mean,col=node))+geom_point()+geom_smooth(method="lm")
 
 ggplot(fish_richness_merged_tran_isl, aes(x=eelgrass_cover_1km, y=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=subtidal_total_cover))+geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=fish_demersal_biomass_bym3_mean, col=d34s))+
+  geom_point()+geom_smooth(method="lm")+scale_colour_viridis()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=fish_demersal_biomass_bym3_mean, col=d15n))+
+  geom_point()+geom_smooth(method="lm")+scale_colour_viridis()
 
 
 
@@ -609,7 +617,11 @@ ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=subtidal_total_
 # Determining best scale of comparison -----------------------------------------
 
 ###adding a change here
-ggplot(fish_richness_merged_tran_isl, aes(y=HAB2000, x=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+ggplot(fish_richness_merged_tran_isl, aes(x=as.numeric(WAVE_EXPOSURE), y=habitat_cover_1km, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+
+ggplot(fish_richness_merged_tran_isl, aes(y=habitat_cover_1km, x=d15n, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
+
+
 ggplot(fish_richness_merged_tran_isl, aes(y=fish_biomass_bym3_mean, x=d34s, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
 ggplot(fish_richness_merged_tran_isl, aes(y=fish_biomass_bym3_mean, x=d15n, col=size.cat2))+geom_point()+geom_smooth(aes(),method="lm")
 
@@ -960,7 +972,7 @@ ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=pelagic_richness_correct
 ggplot(fish_richness_merged_tran_isl_300, aes(y=d15n, x=demersal_richness_corrected))+geom_point()+geom_smooth(aes(),method="lm") +  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75, 0.75))
 
 
-View(fish_richness_merged_tran_isl_300)
+head(fish_richness_merged_tran_isl_300)
 
 #transect level
 marine_plant<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected, y=plant.richness))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
