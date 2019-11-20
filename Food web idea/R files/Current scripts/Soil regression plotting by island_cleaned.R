@@ -34,22 +34,22 @@ library(forcats)
 i.soil.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-soil-all.csv")
 #this is isotopes
 
-shoredist.deb<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//shoredist.csv")
+shoredist.deb<-read.csv("C:Food web idea//Data by person//Deb.data//shoredist.csv")
 #this is the point count to distance to shore data
 
-pointcount.gps<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//pointcounts.csv")
-head(pointcount.gps)
+pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv")
+#head(pointcount.gps)
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
 pointcount.gps<-pointcount.gps[!duplicated(pointcount.gps$pcid),]
 #sometimes taken twice...  
   
 shoredist.deb<-merge(shoredist.deb, pointcount.gps, by.x="pcid", all=TRUE)
-head(shoredist.deb)
+#head(shoredist.deb)
 length(i.soil.all$sample.id)
 
 soil.deb<-merge(i.soil.all, shoredist.deb, by.x="pcid", all=TRUE)
-head(soil.deb)
+#head(soil.deb)
 names(soil.deb)[16]<-"shore_dist"
 names(soil.deb)[11]<-"unq_isl"
 names(soil.deb)[4]<-"c"
@@ -59,13 +59,13 @@ names(soil.deb)[7]<-"cn"
 names(soil.deb)[1]<-"unq_plot"
 
 length(soil.deb$unq_plot)
-head(soil.deb)
+#head(soil.deb)
 
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
-head(soil_clean)
+soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
+#head(soil_clean)
 length((soil_clean$unq_plot))
 
 #duplicated plots: 
@@ -76,38 +76,38 @@ names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
 #Owen's key data
-owen_key<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
-head(owen_key)
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
+#head(owen_key)
 length(unique(owen_key$unq_isl))
 
 #Owen's plot-level soil info - moisture, slope etc
-hakai_plot<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
+hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
-head(hakai_plot)
+#head(hakai_plot)
 
 owen_key_expanded<-merge(owen_key, hakai_plot, by.x="unq_plot", all=TRUE)
-head(owen_key_expanded)
+#head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_isl))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Food web idea//Food web idea//Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
-head(owen_coords)
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
+#head(owen_coords)
 
 owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
 owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
 
 owen_coords<-owen_coords[,c(3,4, 14)]
-head(owen_coords)
+#head(owen_coords)
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
 
 owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
-head(owen_key_expanded)
+#head(owen_key_expanded)
 
 
 #put isotope data together with the key
 soil_merge_isl<-merge(soil_clean, owen_key_expanded, by.x="unq_plot")
-head(soil_merge_isl)
+#head(soil_merge_isl)
 
 
 soil_merge_isl[duplicated(soil_merge_isl$unq_plot),]
@@ -158,7 +158,7 @@ which( colnames(soil.deb)=="cn" ),
 )
 
 soil_owen_deb<-rbind(soil_merge_isl[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
-head(soil_owen_deb)
+#head(soil_owen_deb)
 
 length(soil.deb$unq_plot)
 length(soil_merge_isl$unq_plot)
@@ -170,7 +170,7 @@ length(unique(soil_owen_deb$unq_isl))
 #now we want one value per island: 
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(soil_owen_deb_by_isl)
+#head(soil_owen_deb_by_isl)
 length(soil_owen_deb_by_isl$unq_isl)
 
 #we could change this to weight different points differently but here just a mean of all samples on the island...
@@ -181,27 +181,30 @@ length(soil_owen_deb_by_isl$unq_isl)
 
 # Adding habitat class and island characteristics -------------------------
 
-habitat_class<-read.csv("C:Food web idea//Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
-head(habitat_class)
+habitat_class<-read.csv("C:Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+
+#head(habitat_class)
+
 length(habitat_class$unq_isl)
 
-island_data_wiebe<-read.csv("C:Food web idea//Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
-head(island_data_wiebe)
+island_data_wiebe<-read.csv("C:Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
+#head(island_data_wiebe)
+
 names(island_data_wiebe)[1]<-"unq_isl"
 
 habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,19)])
 
 habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by.x="unq_isl", all=TRUE)
-head(habitat_soil_by_isl)
+#head(habitat_soil_by_isl)
 str(habitat_soil_by_isl)
 
 
 
 # Becky's tree density and diversity data --------------------------
 
-becky_trees<-read.csv("C:Food web idea//Food web idea//Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
+becky_trees<-read.csv("C:Food web idea//Data by person//Becky.data//data_tree_abund_cover.csv", header=TRUE, sep=",")
 becky_trees<-becky_trees[,-1]
-head(becky_trees)
+#head(becky_trees)
 names(becky_trees)[1]<-"unq_isl"
 names(becky_trees)[3]<-"species"
 becky_trees<-as.data.frame(becky_trees)
@@ -210,7 +213,7 @@ becky_trees_wide <-becky_trees %>% group_by(unq_isl, species) %>%
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
   spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
-head(becky_trees_wide)
+#head(becky_trees_wide)
 
 
 #just getting absolute abundance ... what about relative? 
@@ -223,7 +226,7 @@ becky_trees_wide_richness$tree_evenness<-becky_trees_wide_richness$tree_diversit
 
 
 becky_trees_wide_richness$tree_abundance<-rowSums(becky_trees_wide[,-1],na.rm = TRUE)
-head(becky_trees_wide_richness)
+#head(becky_trees_wide_richness)
 
 
 #summed total basal area of all species in that island= "cover" type thing 
@@ -232,13 +235,13 @@ becky_trees_2<-becky_trees %>% group_by(unq_isl) %>%
   replace(is.na(.), 0) 
 
 
-head(becky_trees_2)
+#head(becky_trees_2)
 becky_trees_wide_richness<-merge(becky_trees_wide_richness, becky_trees_2)
 
 
 
 habitat_soil_by_isl<-merge(habitat_soil_by_isl,becky_trees_wide_richness, by="unq_isl", all=TRUE)
-head(habitat_soil_by_isl)
+#head(habitat_soil_by_isl)
 length(habitat_soil_by_isl$unq_isl)
 
 
@@ -246,9 +249,9 @@ length(habitat_soil_by_isl$unq_isl)
 
 #this loads data from "Habitation data" R script
 
-longform_plant_percentcover<-read.csv("C:Food web idea//Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
-head(longform_plant_percentcover)
+#head(longform_plant_percentcover)
 
 longform_plant_percentcover$unq_isl<-fct_explicit_na(longform_plant_percentcover$unq_isl)
 
@@ -257,7 +260,7 @@ longform_plant_percentcover2 <- longform_plant_percentcover[,c(1:7)]%>%
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
 #copmmented outt his section, I think the source file changed so there is no longer random "marine" etc remains. Need to check habitation file to see what happened
-# head(longform_plant_percentcover2)
+# #head(longform_plant_percentcover2)
 # 
 # longform_plant_percentcover2$marine<-longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
 # longform_plant_percentcover2$free_space<-longform_plant_percentcover2$bare+longform_plant_percentcover2$`bare ground`+longform_plant_percentcover2$`sandy soil`+longform_plant_percentcover2$`o soil`+longform_plant_percentcover2$gravel+longform_plant_percentcover2$rock
@@ -300,7 +303,7 @@ longform_plant_percentcover2 <- longform_plant_percentcover[,c(1:7)]%>%
 # )
 # 
 # longform_plant_percentcover_species<-longform_plant_percentcover2[,-c(1,172,173,13,14,171,170,115,88,122,61,109,81,2,39, 48, 59, 60,118,121,119,120,137,134,151,153,154,157)]
-# head(longform_plant_percentcover_species)
+# #head(longform_plant_percentcover_species)
 
 
 longform_plant_percentcover_shrub<- longform_plant_percentcover%>% filter(herb_shrub=="shrub")
@@ -317,14 +320,14 @@ longform_plant_percentcover2_isl_herb <- longform_plant_percentcover_herb[,c(1:7
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
 
 longform_plant_percentcover_species_isl<-longform_plant_percentcover2
-head(longform_plant_percentcover_species_isl)
+#head(longform_plant_percentcover_species_isl)
 
 which( colnames(longform_plant_percentcover2)=="gash" )
 which( colnames(longform_plant_percentcover2)=="midi" )
 
 
 longform_plant_percentcover3_isl<-longform_plant_percentcover2[,c(1,37,52)]
-head(longform_plant_percentcover3_isl)
+#head(longform_plant_percentcover3_isl)
 longform_plant_percentcover3_isl$plant_richness<-specnumber(longform_plant_percentcover_species_isl[,-c(1)])
 longform_plant_percentcover3_isl$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_isl[,-c(1)], index="shannon")
 longform_plant_percentcover3_isl$plant_evenness<-longform_plant_percentcover3_isl$plant_shannon.diversity/(log(longform_plant_percentcover3_isl$plant_richness))
@@ -335,45 +338,45 @@ longform_plant_percentcover3_isl$shrub_cover<-rowSums(longform_plant_percentcove
 longform_plant_percentcover3_isl$herb_richness<-specnumber(longform_plant_percentcover2_isl_herb[,-c(1)])
 longform_plant_percentcover3_isl$herb_cover<-rowSums(longform_plant_percentcover2_isl_herb[,-c(1)], na.rm=TRUE)
 
-head(longform_plant_percentcover3_isl)
+#head(longform_plant_percentcover3_isl)
 
 
-head(soil_merge)
+#head(soil_merge)
 
 habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
-head(habitat_veg_soil_by_isl)
+#head(habitat_veg_soil_by_isl)
 
 
 
 # Adding in bird richness -------------------------------------------------
 
-birdrichness<-read.csv("C:Food web idea//Food web idea//Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
-head(birdrichness)
+birdrichness<-read.csv("C:Food web idea//Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
+#head(birdrichness)
 names(birdrichness)[1]<-"unq_isl"
 names(birdrichness)[6]<-"bird.richness"
 names(birdrichness)[4]<-"bird.density"
 birdrichness$bird.evenness<-birdrichness$evenness/(log(birdrichness$bird.richness))
-head(birdrichness)
+#head(birdrichness)
 
 habitat_veg_bird_soil_by_isl<-merge(habitat_veg_soil_by_isl, birdrichness[,c(1,4,6,11)], by.x="unq_isl", all=TRUE)
-head(habitat_veg_bird_soil_by_isl)
+#head(habitat_veg_bird_soil_by_isl)
 
 
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
-seawrack_key<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
-head(seawrack_key)
+seawrack_key<-read.csv("C:Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
+#head(seawrack_key)
 seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
 seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
 seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
-head(seawrack_key)
+#head(seawrack_key)
 
 
-sara_habitat<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
-head(sara_habitat)
+sara_habitat<-read.csv("C:Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
+#head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
-head(sara_habitat_merged)
+#head(sara_habitat_merged)
 
 which( colnames(sara_habitat_merged)=="unq_isl" )
 which( colnames(sara_habitat_merged)=="unq_tran" )
@@ -396,22 +399,22 @@ which( colnames(sara_habitat_merged)=="MEAN_egarea100" )
 
 
 sara_habitat_merged_simple<-sara_habitat_merged[,c(1,62,8,19,30,41,56,57,60,61, 35, 36, 37, 38, 4)]
-head(sara_habitat_merged_simple)
+#head(sara_habitat_merged_simple)
 sara_habitat_merged_by_isl <- sara_habitat_merged_simple %>% group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(sara_habitat_merged_by_isl )
+#head(sara_habitat_merged_by_isl )
 length(sara_habitat_merged_by_isl$unq_isl)
 str(sara_habitat_merged_by_isl )
 
 
 #### Seaweed composition
-sara_composition<-read.csv("C:Food web idea//Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
-head(sara_composition)
+sara_composition<-read.csv("C:Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
+#head(sara_composition)
 #this is by transect
 
 #make it by island
 sara_composition_means <- sara_composition %>%  
   group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(sara_composition_means)
+#head(sara_composition_means)
 
 which( colnames(sara_composition_means)=="SITE_SUM" )
 #take out site sum and island and unq_isl
@@ -422,26 +425,26 @@ sara_composition_means_richness$site_mean_by_isl<-sara_composition_means$SITE_SU
 
 sara_composition_sums<-sara_composition %>%  
   group_by(unq_isl)%>% summarise_if(is.numeric, sum, na.rm=TRUE)
-head(sara_composition_sums)
+#head(sara_composition_sums)
 
 sara_composition_means_richness$site_sum_by_isl<-sara_composition_sums$SITE_SUM
 
 
 # add in diversity to full wrack story
 sara_habitat_merged_by_isl<-merge(sara_habitat_merged_by_isl, sara_composition_means_richness, by.x="unq_isl", all=TRUE)
-head(sara_habitat_merged_by_isl)
+#head(sara_habitat_merged_by_isl)
 
 
 #add in wrack to birds, veg, habitat
 habitat_veg_bird_wrack_soil_by_isl<-merge(habitat_veg_bird_soil_by_isl, sara_habitat_merged_by_isl, by.x="unq_isl", all=TRUE)
-head(habitat_veg_bird_wrack_soil_by_isl)
+#head(habitat_veg_bird_wrack_soil_by_isl)
 
 
 
 # Adding in eagles and ravens pointcounts ---------------------------------------------
 
 
-ravens <- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/ravens.csv")
+ravens <- read.csv("C:Food web idea//Data by person//Deb.data/ravens.csv")
 
 cora.isls <- unique(ravens$island)
 cora.isls <- as.data.frame(cora.isls)
@@ -450,34 +453,34 @@ names(cora.isls) <- c("unq_isl", "ravens")
 
 by_isl_master<-merge(habitat_veg_bird_wrack_soil_by_isl, cora.isls, by.x="unq_isl", all=TRUE)
 
-eagles <- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/eagles.csv")
+eagles <- read.csv("C:Food web idea//Data by person//Deb.data/eagles.csv")
 baea.isls <- unique(eagles$island)
 baea.isls <- as.data.frame(baea.isls)
 baea.isls$eagles <- 1
 names(baea.isls) <- c("unq_isl", "eagles")
-head(baea.isls)
+#head(baea.isls)
 
 
 by_isl_master <- merge(by_isl_master, baea.isls, all.x = TRUE)
 
 by_isl_master$ravens[is.na(by_isl_master$ravens)] <- 0
 by_isl_master$eagles[is.na(by_isl_master$eagles)] <- 0
-head(by_isl_master)
+#head(by_isl_master)
 
 
 
 #can do the same thing for SOSP if we want ... 
-# pc<- read.csv("C:Food web idea//Food web idea//Data by person//Deb.data/pointcounts.csv")
-# head(pc)
+# pc<- read.csv("C:Food web idea//Data by person//Deb.data/pointcounts.csv")
+# #head(pc)
 # sosp <- pc[pc$spp == "SOSP", ]
-# head(sosp)
+# #head(sosp)
 # 
 # sosp.isls <- unique(sosp$island)
 # 
 # sosp.isls <- as.data.frame(sosp.isls)
 # sosp.isls$sosp <- 1
 # names(sosp.isls) <- c("unq_isl", "sosp")
-# head(sosp.isls)
+# #head(sosp.isls)
 # by_isl_master_2 <- merge(sosp.isls, by_isl_master, all.y = TRUE)
 # by_isl_master_2$sosp[is.na(by_isl_master_2$sosp)] <- 0
 # View(by_isl_master_2)
@@ -489,12 +492,12 @@ head(by_isl_master)
 # Chris insects -----------------------------------------------------------
 
 #new data July 2019 
-chris_insects_master<-read.csv("C:Food web idea//Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
-head(chris_insects_master)
+chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
+#head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
 chris_insects_master$plot<-substr(chris_insects_master$Trapline, 5, 5)
-head(chris_insects_master)
+#head(chris_insects_master)
 
 # I still want to divde by groups BUT I will do all insects as a whole first then break into groups
 
@@ -505,7 +508,7 @@ chris_insects_master_wide <-chris_insects_master %>% group_by(unq_isl, SpeciesID
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide)
+#head(chris_insects_master_wide)
 #659 Species!!! 
 
 chris_insects_master_wide_richness<-chris_insects_master_wide[,1]
@@ -513,15 +516,15 @@ chris_insects_master_wide_richness$insect_richness<-specnumber(chris_insects_mas
 chris_insects_master_wide_richness$insect_abs_abundance<-rowSums(chris_insects_master_wide[,-1],na.rm = TRUE)
 chris_insects_master_wide_richness$insect_diversity<-diversity(chris_insects_master_wide[,-1],index="shannon")
 chris_insects_master_wide_richness$insect_evenness<-chris_insects_master_wide_richness$insect_diversity/(log(chris_insects_master_wide_richness$insect_richness))
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 #now a more standardized abundance measure per beat or pitfall trap on the island
-chris_trapline_data<-read.csv("C:Food web idea//Food web idea//Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
+chris_trapline_data<-read.csv("C:Food web idea//Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
 chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
 chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
-head(chris_trapline_data)
+#head(chris_trapline_data)
 
 #sum number of insects found on that trapline/traptype
 chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
@@ -529,7 +532,7 @@ chris_insects_master_by_trap<-chris_insects_master %>% group_by(unq_tran, Trap) 
 
 chris_insects_master_by_trap<-merge(chris_insects_master_by_trap, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-head(chris_insects_master_by_trap)
+#head(chris_insects_master_by_trap)
 
 chris_insects_master_by_trap$insect_beat_abundance<-chris_insects_master_by_trap$sum_abundance/chris_insects_master_by_trap$BeatTime
 
@@ -548,25 +551,25 @@ chris_insects_master_by_trap_pitfall<-chris_insects_master_by_trap %>%  filter(T
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #########now the same measures but for a few different categories. 
-head(chris_insects_master)
+#head(chris_insects_master)
 
 ###Are they eaten by birds or not? 
 chris_insects_master_wide_birdfood <-chris_insects_master %>% filter(BirdFood=="Yes") %>% group_by(unq_isl, SpeciesID) %>% 
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_birdfood)
+#head(chris_insects_master_wide_birdfood)
 #359 Species that are potential birdfood!!! 
 
 chris_insects_master_wide_birdfood_richness<-chris_insects_master_wide_birdfood[,1]
 chris_insects_master_wide_birdfood_richness$insect_birdfood_richness<-specnumber(chris_insects_master_wide_birdfood[,-1])
 chris_insects_master_wide_birdfood_richness$insect_birdfood_abs_abundance<-rowSums(chris_insects_master_wide_birdfood[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_birdfood_richness)
+#head(chris_insects_master_wide_birdfood_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_birdfood_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 chris_insects_master_by_trap_birdfood<-chris_insects_master %>% filter(BirdFood=="Yes")%>% group_by(unq_tran, Trap) %>% 
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE))
@@ -587,7 +590,7 @@ chris_insects_master_by_trap_birdfood_pitfall<-chris_insects_master_by_trap_bird
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_birdfood_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_birdfood_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 
@@ -600,15 +603,15 @@ chris_insects_master_wide_herbivore <-chris_insects_master %>% filter(Trophic=="
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_herbivore)
+#head(chris_insects_master_wide_herbivore)
 #359 Species that are potential herbivore!!! 
 
 chris_insects_master_wide_herbivore_richness<-chris_insects_master_wide_herbivore[,1]
 chris_insects_master_wide_herbivore_richness$insect_herbivore_richness<-specnumber(chris_insects_master_wide_herbivore[,-1])
 chris_insects_master_wide_herbivore_richness$insect_herbivore_abs_abundance<-rowSums(chris_insects_master_wide_herbivore[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_herbivore_richness)
+#head(chris_insects_master_wide_herbivore_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_herbivore_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_herbivore<-chris_insects_master %>% filter(Trophic=="Herbivore")%>% group_by(unq_tran, Trap) %>% 
@@ -632,7 +635,7 @@ chris_insects_master_by_trap_herbivore_pitfall<-chris_insects_master_by_trap_her
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_herbivore_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_herbivore_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 
@@ -641,15 +644,15 @@ chris_insects_master_wide_omnivore <-chris_insects_master %>% filter(Trophic=="O
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_omnivore)
+#head(chris_insects_master_wide_omnivore)
 #359 Species that are potential omnivore!!! 
 
 chris_insects_master_wide_omnivore_richness<-chris_insects_master_wide_omnivore[,1]
 chris_insects_master_wide_omnivore_richness$insect_omnivore_richness<-specnumber(chris_insects_master_wide_omnivore[,-1])
 chris_insects_master_wide_omnivore_richness$insect_omnivore_abs_abundance<-rowSums(chris_insects_master_wide_omnivore[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_omnivore_richness)
+#head(chris_insects_master_wide_omnivore_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_omnivore_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_omnivore<-chris_insects_master %>% filter(Trophic=="Omnivore")%>% group_by(unq_tran, Trap) %>% 
@@ -673,7 +676,7 @@ chris_insects_master_by_trap_omnivore_pitfall<-chris_insects_master_by_trap_omni
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_omnivore_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_omnivore_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 ### carnivores
@@ -681,15 +684,15 @@ chris_insects_master_wide_carnivore <-chris_insects_master %>% filter(Trophic=="
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_carnivore)
+#head(chris_insects_master_wide_carnivore)
 #359 Species that are potential carnivore!!! 
 
 chris_insects_master_wide_carnivore_richness<-chris_insects_master_wide_carnivore[,1]
 chris_insects_master_wide_carnivore_richness$insect_carnivore_richness<-specnumber(chris_insects_master_wide_carnivore[,-1])
 chris_insects_master_wide_carnivore_richness$insect_carnivore_abs_abundance<-rowSums(chris_insects_master_wide_carnivore[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_carnivore_richness)
+#head(chris_insects_master_wide_carnivore_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_carnivore_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_carnivore<-chris_insects_master %>% filter(Trophic=="Carnivore")%>% group_by(unq_tran, Trap) %>% 
@@ -713,7 +716,7 @@ chris_insects_master_by_trap_carnivore_pitfall<-chris_insects_master_by_trap_car
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_carnivore_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_carnivore_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 ### detritivores
@@ -721,15 +724,15 @@ chris_insects_master_wide_detritivore <-chris_insects_master %>% filter(Trophic=
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_detritivore)
+#head(chris_insects_master_wide_detritivore)
 #359 Species that are potential detritivore!!! 
 
 chris_insects_master_wide_detritivore_richness<-chris_insects_master_wide_detritivore[,1]
 chris_insects_master_wide_detritivore_richness$insect_detritivore_richness<-specnumber(chris_insects_master_wide_detritivore[,-1])
 chris_insects_master_wide_detritivore_richness$insect_detritivore_abs_abundance<-rowSums(chris_insects_master_wide_detritivore[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_detritivore_richness)
+#head(chris_insects_master_wide_detritivore_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_detritivore_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_detritivore<-chris_insects_master %>% filter(Trophic=="Detritivore")%>% group_by(unq_tran, Trap) %>% 
@@ -753,7 +756,7 @@ chris_insects_master_by_trap_detritivore_pitfall<-chris_insects_master_by_trap_d
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_detritivore_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_detritivore_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 
 ### parasites
@@ -761,15 +764,15 @@ chris_insects_master_wide_parasite <-chris_insects_master %>% filter(Trophic %in
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-head(chris_insects_master_wide_parasite)
+#head(chris_insects_master_wide_parasite)
 #359 Species that are potential parasite!!! 
 
 chris_insects_master_wide_parasite_richness<-chris_insects_master_wide_parasite[,1]
 chris_insects_master_wide_parasite_richness$insect_parasite_richness<-specnumber(chris_insects_master_wide_parasite[,-1])
 chris_insects_master_wide_parasite_richness$insect_parasite_abs_abundance<-rowSums(chris_insects_master_wide_parasite[,-1],na.rm = TRUE)
-head(chris_insects_master_wide_parasite_richness)
+#head(chris_insects_master_wide_parasite_richness)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_wide_parasite_richness, all=TRUE)
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #now a standardized abundance
 chris_insects_master_by_trap_parasite<-chris_insects_master %>% filter(Trophic %in% c("Parasitic","Parasitoid"))%>% group_by(unq_tran, Trap) %>% 
@@ -793,7 +796,7 @@ chris_insects_master_by_trap_parasite_pitfall<-chris_insects_master_by_trap_para
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_parasite_beat, all=TRUE)
 chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, chris_insects_master_by_trap_parasite_pitfall, all=TRUE)
 
-head(chris_insects_master_wide_richness)
+#head(chris_insects_master_wide_richness)
 
 #New branch here, deleting the previous work on separating into taxonomic groups - that's more for Chris to work on. 
 
@@ -803,11 +806,11 @@ by_isl_master<-merge(by_isl_master, chris_insects_master_wide_richness, by="unq_
 
 # Mammal richness ---------------------------------------------------------
 
-katie_mammals<-read.csv("C:Food web idea//Food web idea//Data by person//Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
-head(katie_mammals)
+katie_mammals<-read.csv("C:Food web idea//Data by person//Katie.data//100_Islands_mammal_team_diversity_data_2018_03_17.csv", header=TRUE, sep=",")
+#head(katie_mammals)
 names(katie_mammals)[2]<-"unq_isl"
 katie_mammals_simple<-katie_mammals[,-c(1,3, 13)]
-head(katie_mammals_simple)
+#head(katie_mammals_simple)
 names(katie_mammals_simple)[10]<-"mammal_richness"
 katie_mammals_simple<-katie_mammals[,-c(1,3, 13)]
 katie_mammals_wide<-as_data_frame(katie_mammals[,-c(1,3, 12, 13)])
@@ -819,14 +822,14 @@ katie_richness$mammal_richness<-specnumber(katie_mammals_wide[,-1])
 #katie_richness$mammal_diversity<-diversity(katie_mammals_wide[,-1],index="shannon")
 #katie_richness$mammal_evenness<-katie_richness$mammal_diversity/(log(katie_richness$mammal_richness))
 
-head(katie_richness)
+#head(katie_richness)
 
 by_isl_master<-merge(by_isl_master, katie_richness, by="unq_isl", all=TRUE)
 
 
 # Tiidying up -------------------------------------------------------------
 
-head(by_isl_master)
+#head(by_isl_master)
 
 by_isl_master$log_Area<-log(by_isl_master$Area)
 by_isl_master$log_SITE_SUM<-log(by_isl_master$SITE_SUM+1)
@@ -835,9 +838,9 @@ by_isl_master$log_HAB2000<-log(by_isl_master$HAB2000+1)
 
 by_isl_master_habitat<-by_isl_master[,24:28]
 by_isl_master$habitat_het<-diversity(by_isl_master_habitat)
-head(by_isl_master)
+#head(by_isl_master)
 by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_richness+by_isl_master$insect_richness+by_isl_master$bird.richness+by_isl_master$mammal_richness
-head(by_isl_master)
+#head(by_isl_master)
 
 
 #Label small islands as those with Area less than 6000m2
@@ -855,15 +858,15 @@ by_isl_master<- by_isl_master %>% mutate(size.cat = cut(Area, xs, labels = label
 by_isl_master<- by_isl_master %>% mutate(size.cat2 = cut(Area, xs2, labels = labels2))
 by_isl_master<- by_isl_master %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
 
-head(soil_owen_deb)
+#head(soil_owen_deb)
 node.adding<-soil_owen_deb[,c(2,10)]
-head(node.adding)
+#head(node.adding)
 node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(by_isl_master, "C:Food web idea//Food web idea//Data by person//Owen's data/by_isl_master.csv")
-head(by_isl_master)
+write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv")
+#head(by_isl_master)
 
 # Plotting correlations ---------------------------------------------------
 
@@ -893,16 +896,16 @@ which( colnames(by_isl_master)=="habitat_het" ),sep=","
 )
 
 str(by_isl_master)
-head(by_isl_master)
+#head(by_isl_master)
 
 corr_by_isl_selected<-by_isl_master[,c(34,33,58,59,2,3,35,36,39,37,5,63,10,18,22,8,60,47,62,64)]
 str(corr_by_isl_selected)
 #can extract only numeric with select(if.numeric) 
 
 corr_by_isl_selected_2 <- round(cor(corr_by_isl_selected, use="pairwise.complete.obs"), 1)
-head(corr_by_isl_selected_2[, 1:6])
+#head(corr_by_isl_selected_2[, 1:6])
 p.mat_by_isl_selected_2 <- cor_pmat(corr_by_isl_selected)
-head(p.mat_by_isl_selected_2[, 1:4])
+#head(p.mat_by_isl_selected_2[, 1:4])
 
 ggcorrplot(corr_by_isl_selected_2)
 ggcorrplot(corr_by_isl_selected_2, hc.order = TRUE, type = "lower",
@@ -934,7 +937,7 @@ na3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.ca
 na4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 na5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat2, fill=size.cat2))+geom_point()+geom_smooth(aes(fill=size.cat2),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(na0,na3,na2,na1,na4,na5, ncol=3)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category.png", width=30, height=20, unit="cm")
 
 nam0<-ggplot(by_isl_master, aes(y=total_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.75))
 nam1<-ggplot(by_isl_master, aes(y=insect_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,350)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+theme(legend.position="none")
@@ -943,7 +946,7 @@ nam3<-ggplot(na.omit(by_isl_master), aes(y=plant_richness, x=d15n, colour=size.c
 nam4<-ggplot(by_isl_master, aes(y=bird.richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nam5<-ggplot(by_isl_master, aes(y=mammal_richness, x=d15n, colour=size.cat, fill=size.cat))+geom_point()+geom_smooth(aes(fill=size.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nam0,nam3,nam2,nam1,nam4,nam5, ncol=3)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Data by person//Plots//Richness_nut//Richness_d15n_area_category_3.png", width=30, height=20, unit="cm")
 
 
 nan0<-ggplot(by_isl_master, aes(y=total_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position=c(0.75,0.15))
@@ -953,7 +956,7 @@ nan3<-ggplot(by_isl_master, aes(y=plant_richness, x=log_Area, colour=d15n.cat, f
 nan4<-ggplot(by_isl_master, aes(y=bird.richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+ylim(0,25)+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 nan5<-ggplot(by_isl_master, aes(y=mammal_richness, x=log_Area, colour=d15n.cat, fill=d15n.cat))+geom_point()+geom_smooth(aes(fill=d15n.cat),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 plot_grid(nan0,nan3,nan2,nan1,nan4,nan5, ncol=3)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
+ggsave("C:Food web idea//Data by person//Plots//Richness_nut//Richness_area_d15n_category.png", width=30, height=20, unit="cm")
 
 
 ggplot(by_isl_master, aes(y=shrub_richness, x=d15n))+geom_point()+geom_smooth(method="glm", method.args = list(family = "poisson"))
@@ -1003,7 +1006,7 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=d15n))+geom_point()
 insects7<-ggplot(by_isl_master, aes(y=crustacea_richness, x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2,insects7,  ncol=4)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_d15n.png")
+ggsave("C:Food web idea//Data by person//Plots//Species_nut//Insects_d15n.png")
 
 
 
@@ -1017,7 +1020,7 @@ abund.insects6<-ggplot(by_isl_master, aes(y=gastropoda_abundance, x=d15n))+geom_
 #abund.insects7<-ggplot(by_isl_master, aes(y=log(beetles_abundance), x=d15n))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "gaussian"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(abund.insects0,abund.insects1,abund.insects6,abund.insects3,abund.insects4,abund.insects5,abund.insects2, ncol=4)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_Abundance_d15n.png")
+ggsave("C:Food web idea//Data by person//Plots//Species_nut//Insects_Abundance_d15n.png")
 
 
 ##### Plotting insects
@@ -1031,51 +1034,51 @@ insects6<-ggplot(by_isl_master, aes(y=gastropoda_richness, x=log_Area))+geom_poi
 #insects7<-ggplot(by_isl_master, aes(y=beetles_richness, x=log_Area))+geom_point()+geom_smooth(aes(),method="glm", method.args = list(family = "poisson"))+  scale_fill_viridis(discrete=TRUE)+  scale_colour_viridis(discrete=TRUE)+ theme(legend.position="none")
 
 plot_grid(insects0,insects1,insects6,insects3,insects4,insects5,insects2, ncol=4)
-ggsave("C:Food web idea//Food web idea//Data by person//Plots//Species_nut//Insects_Area.png")
+ggsave("C:Food web idea//Data by person//Plots//Species_nut//Insects_Area.png")
 
 
 
 # Multivariate ordination for marine evidence -----------------------------
 
 
-head(by_isl_master)
+#head(by_isl_master)
 
 write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv")
 
 
 feathers.key<-read.csv("C:Food web idea//Data by person//Deb.data//banding-all.csv", header=TRUE, sep=",")
-head(feathers.key)
+#head(feathers.key)
 
 i.feathers.all<-read.csv("C:Food web idea//Data by person//Deb.data//i-feathers-all (1).csv")
-head(i.feathers.all)
+#head(i.feathers.all)
 length(unique(i.feathers.all$unq_isl))
 
 feathers.merge<-merge(feathers.key, i.feathers.all, by="band")
-head(feathers.merge)
+#head(feathers.merge)
 
 
 which( colnames(feathers.merge)=="island" )
 which( colnames(feathers.merge)=="d13c" )
 names(feather.)
 feather.simple<-feathers.merge[,c(37,43)]
-head(feather.simple)
+#head(feather.simple)
 
 feather.simple.means<- feather.simple %>% group_by(island)%>% summarise_all(funs(mean))
 length(unique(feather.simple.means$island))
 names(feather.simple.means)[1]<-"unq_isl"
 
 by_isl_multivariate<-merge(feather.simple.means, by_isl_master[, c(1, 2,3,48,49,10)])
-head(by_isl_multivariate)
+#head(by_isl_multivariate)
 by_isl_multivariate<-na.omit(by_isl_multivariate)
 length(by_isl_multivariate$unq_isl)
 #56 islands
 
-head(owen_key)
+#head(owen_key)
 by_isl_multivariate_env<-merge(unique(owen_key[,c(2,3)]), by_isl_multivariate)
-head(by_isl_multivariate_env)
+#head(by_isl_multivariate_env)
 
 
-head(by_isl_master)
+#head(by_isl_master)
 which( colnames(by_isl_master)=="log_Area" )
 by_isl_feathers<-merge(feather.simple.means, by_isl_master[, c(1, 2,3,46,48,49,10)])
 
@@ -1087,7 +1090,7 @@ ggplot(by_isl_feathers, aes(x=log_Area, y=d13c))+geom_point()+geom_smooth(method
 
 
 size.cat.frame<-merge(Veg_means_by_island, by_isl_multivariate_env)
-head(size.cat.frame)
+#head(size.cat.frame)
 size.cat.frame<-size.cat.frame[,c(1,8)]
 size.cat.frame<-unique(size.cat.frame)
 
@@ -1171,7 +1174,7 @@ otter_chris<-read.csv("C:Food web idea//Data by person//Chris.data//otter_sia.cs
 
 
 #otter isotopes
-head(otter_chris)
+#head(otter_chris)
 names(otter_chris)[6]<-"d13c"
 names(otter_chris)[8]<-"d15n"
 names(otter_chris)[13]<-"group"
@@ -1203,7 +1206,7 @@ names(becky.eagles.tree)[5]<-"d15n"
 
 #### plotting soil at 0m, on sites without likely wrack (machine learning)
 wrackfree<-read.csv("C:Food web idea//Data by person//Pat.data//wrackfree.csv", header=TRUE, sep=",")
-head(wrackfree)
+#head(wrackfree)
 
 
 
