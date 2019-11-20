@@ -141,7 +141,7 @@ head(df.SF_transects)
 head(ben_habitat_data)
 ben_habitat_data_simple<-ben_habitat_data[,c(3:5)]
 head(ben_habitat_data_simple)
-ben_habitat_data_simple$long<--(ben_habitat_data_simple$long)
+ben_habitat_data_simple$long<- -(ben_habitat_data_simple$long)
 ben_habitat_data_simple.SP <- st_as_sf(ben_habitat_data_simple, coords = c("long", "lat"), crs = 4326)
 head(ben_habitat_data_simple.SP)
 ben_habitat_data_simple.SP$site_type<-"beachseine"
