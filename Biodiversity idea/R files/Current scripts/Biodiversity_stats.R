@@ -47,8 +47,6 @@ library(gamm4)
 fish_stats<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
 head(fish_stats)
 fish_stats<-fish_stats[,-1]
-# fish_stats<-fish_stats %>% filter(Distance < 1)
-fish_stats_zscores$d15n<-as.numeric(fish_stats_zscores$d15n)
 
 data_subset3 <- fish_stats[ , "fish_biomass_bym3_cat"]
 fish_stats<- fish_stats[complete.cases(data_subset3), ] 
@@ -67,6 +65,7 @@ fish_stats_zscores$fish_richness_corrected<-as.numeric(fish_stats_zscores$fish_r
 fish_stats_zscores$fish_biomass_bym3_mean<-scale(fish_stats$fish_biomass_bym3_mean, center=TRUE, scale=TRUE)
 fish_stats_zscores$fish_biomass_bym3_mean.unscaled <-fish_stats_zscores$fish_biomass_bym3_mean * attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:scale') + attr(fish_stats_zscores$fish_biomass_bym3_mean, 'scaled:center')
 fish_stats_zscores$fish_biomass_bym3_mean<-as.numeric(fish_stats_zscores$fish_biomass_bym3_mean)
+fish_stats_zscores$d15n<-as.numeric(fish_stats_zscores$d15n)
 
 
 fish_stats_zscores$fish_abundance_bym3_log<-scale(fish_stats$fish_abundance_bym3_log, center=TRUE, scale=TRUE)
@@ -91,7 +90,8 @@ fish_stats_zscores_cat$log_Area<-as.numeric(fish_stats_zscores_cat$log_Area)
 
 
 # Shrub cover (total) vs. fish biomass ----------
-ggplot(fish_stats_zscores, aes(y=shrub_cover, x=fish_biomass_bym3_mean))+geom_point()+geom_smooth(method="lm")
+ggplot(fish_stats_zscores, aes(y=shrub_cover, x=fish_biomass_bym3_mean))+geom_point()+
+  geom_smooth(method="lm")
 
 
 # 
@@ -334,7 +334,7 @@ ggsave("C:Biodiversity idea//Plots//Model-fitted//LME_total_cover_fish_biomass.p
 
 
 #NDVI mean fish biomass ----
-# lme.NDVI_mean.fishbiomass<-lme(NDVI_mean ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
+lme.NDVI_mean.fishbiomass<-lme(NDVI_mean ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)
 lm.NDVI_mean.fishbiomass<-lm(NDVI_mean ~ fish_biomass_bym3_mean, data=fish_stats_zscores)
 
 # lme.NDVI_mean.fishbiomass_log<-lme(log(NDVI_mean+1) ~ fish_biomass_bym3_mean, random= ~1|unq_isl, data=fish_stats_zscores, na.action=na.omit)

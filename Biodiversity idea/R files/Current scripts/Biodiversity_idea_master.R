@@ -468,35 +468,52 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 
 
 
-#This is working with a 1km radius around the transects instead
+#This is working with a 2km radius around the transects instead
 hakai_sites_distance_tran<-read.csv("C:Biodiversity idea//Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
-#head(hakai_sites_distance_tran)
+View(hakai_sites_distance_tran)
+length(unique(hakai_sites_distance_tran$unq_tran))
+#61 unique transects
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
-#head(fish_bycatch_richness_merged_tran)
+View(fish_bycatch_richness_merged_tran)
+length(unique(fish_bycatch_richness_merged_tran$unq_tran))
+#down to 50 unq trans bc some of the sites not part of 7&8....
 
 ### averaging across sites
 fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 
+xs4<-quantile(fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean,c(0,0.25,0.75,1))
+labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
+fish_bycatch_richness_merged_tran<- fish_bycatch_richness_merged_tran %>% mutate(fish_biomass_bym3_cat_tran = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
+fish_bycatch_richness_merged_tran$fish_biomass_bym3_cat_tran[fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean<2]<-"low fish biomass"
+
+fish_bycatch_richness_merged_tran$unq_isl<-gsub('.{1}$', '', fish_bycatch_richness_merged_tran$unq_tran)
+
+write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv")
+length(unique(fish_bycatch_richness_merged_tran$unq_isl))
+#33 islands
+#50 transects
 
 # Loading and merging terrestrial data (at 0m) by transect ------------------------------------
 
 #transect data
 by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
-#head(by_tran_master_0m)
+View(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
+#### need to change the by_ran master file b/c it has repeat transects! 
  
 xs3=quantile(na.omit(by_tran_master_0m$d15n),c(0,1/2, 1))
 labels3 <- c("low d15N", "high d15N")
 by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
-
+by_tran_master_0m$d15n.cat[by_tran_master_0m$d15n<0]<-"low d15N"
+by_tran_master_0m$d15n.cat[by_tran_master_0m$d15n>19]<-"high d15N"
 
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-#head(by_tran_master)
+head(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 paste(
 which( colnames(by_tran_master)=="tree_richness" ),
@@ -521,8 +538,54 @@ sep=","
 by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108,81,99)]
 #head(by_tran_master_subset)
 
+by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
+by_isl_master<-by_isl_master[,-1]
+#head(by_isl_master)
+paste(
+  which( colnames(by_isl_master)=="unq_isl" ),
+  which( colnames(by_isl_master)=="total_richness" ),
+  which( colnames(by_isl_master)=="log_Area" ),
+  which( colnames(by_isl_master)=="Neighb_250" ),
+  which( colnames(by_isl_master)=="NDVI_mean" ),
+  which( colnames(by_isl_master)=="Perimeter" ),
+  which( colnames(by_isl_master)=="PA_norml" ),
+  which( colnames(by_isl_master)=="DistW_ML" ),
+  which( colnames(by_isl_master)=="Dist_Near" ),
+  which( colnames(by_isl_master)=="Area" ),
+  which( colnames(by_isl_master)=="size.cat2" ),
+  which( colnames(by_isl_master)=="node" ),
+  sep=","
+)
+
+by_isl_master_subset2<-by_isl_master[,c(1,103,98,19,20,14,15,17,18,13,105,107)]
+#head(by_isl_master_subset)
+
+by_tran_master_0m_with_tran<-merge(by_tran_master_0m, by_tran_master_subset, by="unq_tran", all=TRUE)
+by_tran_master_0m_with_tran<-merge(by_tran_master_0m_with_tran,by_isl_master_subset2, by="unq_isl")
+
+#merging terrestrial with marine and adding in marine site information, saving file
+fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_tran, by="unq_tran", all.y=TRUE)
+head(fish_richness_merged_tran)
 
 
+fish_richness_merged_tran$combined_richness_corrected<-fish_richness_merged_tran$wrack_richness+fish_richness_merged_tran$marine_richness_corrected
+fish_richness_merged_tran$eelgrass_cover_1km<-(fish_richness_merged_tran$MEAN_egarea1k)/(fish_richness_merged_tran$Radius_m_1000)
+fish_richness_merged_tran$habitat_cover_1km<-(fish_richness_merged_tran$sum_1km)/(fish_richness_merged_tran$Radius_m_1000)
+
+
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="VP"]<-1
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="P"]<-2
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="SP"]<-3
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="SE"]<-4
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="E"]<-5
+levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="VE"]<-6
+
+write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv")
+View(fish_richness_merged_tran)
+
+
+
+##### this is going to be separate now
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 by_isl_master<-by_isl_master[,-1]
@@ -548,43 +611,22 @@ paste(
   which( colnames(by_isl_master)=="node" ),
   which( colnames(by_isl_master)=="SLOPE" ),
   which( colnames(by_isl_master)=="slope_mean" ),
-   sep=","
+  sep=","
 )
 
 by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,13,105,66,65,107,53,30)]
 #head(by_isl_master_subset)
 
-by_tran_master_0m_with_isl<-merge(by_tran_master_0m, by_isl_master_subset, by="unq_isl", all=TRUE)
-by_tran_master_0m_with_isl<-merge(by_tran_master_0m_with_isl, by_tran_master_subset, by="unq_tran", all=TRUE)
+
+fish_richness_merged_isl<-merge(fish_bycatch_richness_merged_tran, by_isl_master, by="unq_isl", all.y=TRUE)
+head(fish_richness_merged_isl)
 
 
-#head(by_tran_master_0m_with_isl)
-
-
-#head(fish_bycatch_richness_merged_tran)
-
-#merging terrestrial with marine and adding in marine site information, saving file
-fish_richness_merged_tran_isl<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_isl, by="unq_tran", all.y=TRUE)
-#head(fish_richness_merged_tran_isl)
-
-xs4=quantile(na.omit(fish_richness_merged_tran_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
+xs4<- quantile(na.omit(fish_richness_merged_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
 labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
-fish_richness_merged_tran_isl<- fish_richness_merged_tran_isl %>% mutate(fish_biomass_bym3_cat = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
-
-length(xs4)
-length(labels4)
-
-fish_richness_merged_tran_isl$combined_richness_corrected<-fish_richness_merged_tran_isl$wrack_richness+fish_richness_merged_tran_isl$marine_richness_corrected
-fish_richness_merged_tran_isl$eelgrass_cover_1km<-(fish_richness_merged_tran_isl$MEAN_egarea1k)/(fish_richness_merged_tran_isl$Radius_m_1000)
-fish_richness_merged_tran_isl$habitat_cover_1km<-(fish_richness_merged_tran_isl$sum_1km)/(fish_richness_merged_tran_isl$Radius_m_1000)
+fish_richness_merged_isl<- fish_richness_merged_isl %>% 
+  mutate(fish_biomass_bym3_cat_isl = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
 
 
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="VP"]<-1
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="P"]<-2
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="SP"]<-3
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="SE"]<-4
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="E"]<-5
-levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)[levels(fish_richness_merged_tran_isl$WAVE_EXPOSURE)=="CE"]<-6
-
-write.csv(fish_richness_merged_tran_isl, "C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
-head(fish_richness_merged_tran_isl)
+write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
+head(fish_richness_merged_isl)

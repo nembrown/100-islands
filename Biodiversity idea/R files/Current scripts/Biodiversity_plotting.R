@@ -1,13 +1,34 @@
+library(here)
 
-#I think I added more after I fixed the issues with Owen's plots! 
+fish_richness_merged_tran_isl<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
+head(fish_richness_merged_tran_isl)
 
-#head(fish_richness_merged_tran_isl)
 
-ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=tree_richness, col=fish_biomass_bym3_cat))+
+ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=bird.de, col=fish_biomass_bym3_cat))+
   geom_point()+geom_smooth(method="lm")
 
-ggplot(fish_richness_merged_tran_isl, aes(x=fish_biomass_bym3_mean, y=tree_richness))+
+
+ggplot(fish_richness_merged_tran %>% filter(fish_biomass_bym3_cat_tran!="med fish biomass"), aes(col=fish_biomass_bym3_cat_tran, y=tree_richness, x=log(Area)))+
   geom_point()+geom_smooth(method="lm")
+
+
+
+ggplot(fish_richness_merged_tran, aes(col=fish_biomass_bym3_cat_tran, y=tree_richness, x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=habitat_cover_1km, y=bird.density))+
+  geom_point()+geom_smooth()
+
+
+ggplot(fish_richness_merged_tran_isl, aes(x=HAB2000, y=bird.density))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=d15n, y=bird.density))+
+  geom_point(aes(col=size.cat2))+geom_smooth()
+
+ggplot(fish_richness_merged_tran_isl, aes(x=d34s, y=bird.density))+
+  geom_point(aes(col=WAVE_EXPOSURE))+geom_smooth()
 
 
 
