@@ -477,7 +477,7 @@ length(unique(hakai_sites_distance_tran$unq_tran))
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
-View(fish_bycatch_richness_merged_tran)
+head(fish_bycatch_richness_merged_tran)
 length(unique(fish_bycatch_richness_merged_tran$unq_tran))
 #down to 50 unq trans bc some of the sites not part of 7&8....
 
@@ -500,20 +500,20 @@ length(unique(fish_bycatch_richness_merged_tran$unq_isl))
 
 #transect data
 by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
-View(by_tran_master_0m)
 by_tran_master_0m<-by_tran_master_0m[,-1]
 
 #### need to change the by_ran master file b/c it has repeat transects! 
- 
-xs3=quantile(na.omit(by_tran_master_0m$d15n),c(0,1/2, 1))
+by_tran_master_0m_2<-by_tran_master_0m 
+
+xs3=quantile(na.omit(by_tran_master_0m_2$d15n),c(0,1/2, 1))
 labels3 <- c("low d15N", "high d15N")
-by_tran_master_0m<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
-by_tran_master_0m$d15n.cat[by_tran_master_0m$d15n<0]<-"low d15N"
-by_tran_master_0m$d15n.cat[by_tran_master_0m$d15n>19]<-"high d15N"
+by_tran_master_0m_2<- by_tran_master_0m %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
+by_tran_master_0m_2$d15n.cat[by_tran_master_0m_2$d15n<0]<-"low d15N"
+by_tran_master_0m_2$d15n.cat[by_tran_master_0m_2$d15n>19]<-"high d15N"
 
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-head(by_tran_master)
+View(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 paste(
 which( colnames(by_tran_master)=="tree_richness" ),
@@ -536,7 +536,7 @@ sep=","
 # which( colnames(by_tran_master)=="herb_cover")
 
 by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108,81,99)]
-#head(by_tran_master_subset)
+by_tran_master_subset <- by_tran_master_subset %>% group_by(unq_tran)
 
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 by_isl_master<-by_isl_master[,-1]
@@ -560,8 +560,8 @@ paste(
 by_isl_master_subset2<-by_isl_master[,c(1,103,98,19,20,14,15,17,18,13,105,107)]
 #head(by_isl_master_subset)
 
-by_tran_master_0m_with_tran<-merge(by_tran_master_0m, by_tran_master_subset, by="unq_tran", all=TRUE)
-by_tran_master_0m_with_tran<-merge(by_tran_master_0m_with_tran,by_isl_master_subset2, by="unq_isl")
+by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all.x=TRUE)
+by_tran_master_0m_with_tran<-merge(by_tran_master_0m_with_tran,by_isl_master_subset2, by="unq_isl", all.x=TRUE)
 
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_tran, by="unq_tran", all.y=TRUE)
@@ -581,9 +581,12 @@ levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran
 levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="VE"]<-6
 
 write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv")
+#View(fish_richness_merged_tran)
+
+length(unique(fish_richness_merged_tran$unq_tran))
+#392 tran ... b/c this is all in the 0m file... 
+
 View(fish_richness_merged_tran)
-
-
 
 ##### this is going to be separate now
 #adding in a few interesting island-level components

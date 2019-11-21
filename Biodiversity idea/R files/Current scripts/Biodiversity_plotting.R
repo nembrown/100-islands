@@ -8,8 +8,12 @@ ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=bird.de, col=fish_bioma
   geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_tran %>% filter(fish_biomass_bym3_cat_tran!="med fish biomass"), aes(col=fish_biomass_bym3_cat_tran, y=tree_richness, x=log(Area)))+
+ggplot(fish_richness_merged_isl, aes(col=fish_biomass_bym3_cat_tran, y=tree_richness, x=log(Area)))+
   geom_point()+geom_smooth(method="lm")
+
+### the problem with this is that the Area is by island not transect ..... 
+#Could jitter points
+# I think we need to do island-level stats for the Area. 
 
 
 

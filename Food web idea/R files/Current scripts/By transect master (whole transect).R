@@ -107,7 +107,7 @@ becky_trees_tran<-as.data.frame(becky_trees_tran)
 becky_trees_tran$tran<-strtrim(becky_trees_tran$tran, 1)
 becky_trees_tran$unq_tran<- paste(becky_trees_tran$unq_isl,becky_trees_tran$tran)
 becky_trees_tran$unq_tran<-gsub(" ", "", becky_trees_tran$unq_tran, fixed = TRUE)
-head(becky_trees_tran)
+View(becky_trees_tran)
 
 becky_trees_tran_wide <-becky_trees_tran %>% group_by(unq_tran, species) %>% 
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
