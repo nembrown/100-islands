@@ -116,49 +116,21 @@ length(unique(soil_merge_isl$unq_isl))
 
 
 # Combining Owen and Deb's soil data --------------------------------------
+col_names_selected<-c("unq_plot" ,
+                      "unq_isl" ,
+                      "shore_dist" ,
+                      "d13c" ,
+                      "d15n" ,
+                      "c" ,
+                      "n" ,
+                      "s" ,
+                      "cn" , 
+                     "node" ,
+                     "easting" ,
+                     "northing" )
 
-paste(
-which( colnames(soil_merge_isl)=="unq_plot" ),
-which( colnames(soil_merge_isl)=="unq_isl" ),
-which( colnames(soil_merge_isl)=="shore_dist" ),
-which( colnames(soil_merge_isl)=="d13c" ),
-which( colnames(soil_merge_isl)=="d15n" ),
-which( colnames(soil_merge_isl)=="c" ),
-which( colnames(soil_merge_isl)=="n" ),
-which( colnames(soil_merge_isl)=="s" ),
-which( colnames(soil_merge_isl)=="cn" ),
-# which( colnames(soil_merge_isl)=="pc1" )
-# which( colnames(soil_merge_isl)=="plant.richness" )
-# which( colnames(soil_merge_isl)=="fs_pc1" )
-# which( colnames(soil_merge_isl)=="sm_av" )
-# which( colnames(soil_merge_isl)=="slope" )
- which( colnames(soil_merge_isl)=="node" ),
- which( colnames(soil_merge_isl)=="easting" ),
- which( colnames(soil_merge_isl)=="northing" ), sep=","
-)
-
-paste(
-which( colnames(soil.deb)=="unq_plot" ),
-which( colnames(soil.deb)=="unq_isl" ),
-which( colnames(soil.deb)=="shore_dist"),
-which( colnames(soil.deb)=="d13c" ),
-which( colnames(soil.deb)=="d15n" ),
-which( colnames(soil.deb)=="c" ),
-which( colnames(soil.deb)=="n" ),
-which( colnames(soil.deb)=="s" ),
-which( colnames(soil.deb)=="cn" ),
-# which( colnames(soil.deb)=="pc1" )
-# which( colnames(soil.deb)=="plant.richness" )
-# which( colnames(soil.deb)=="fs_pc1" )
-# which( colnames(soil.deb)=="sm_av" )
-# which( colnames(soil.deb)=="slope" )
- which( colnames(soil.deb)=="node" ),
- which( colnames(soil.deb)=="easting" ),
- which( colnames(soil.deb)=="northing" ), sep=","
-)
-
-soil_owen_deb<-rbind(soil_merge_isl[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
-#head(soil_owen_deb)
+soil_owen_deb<-rbind(soil_merge_isl[,colnames(soil_merge_isl) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
+head(soil_owen_deb)
 
 length(soil.deb$unq_plot)
 length(soil_merge_isl$unq_plot)
@@ -166,11 +138,17 @@ length(soil_owen_deb$unq_plot)
 length(unique(soil_owen_deb$unq_isl))
 #this just adds the two together... 
 
+### add in d34s here
+soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
+head(soil_s)
+
+soil_owen_deb<-merge(soil_owen_deb, soil_s, by="unq_plot", all.x=TRUE)
+
 
 #now we want one value per island: 
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-#head(soil_owen_deb_by_isl)
+head(soil_owen_deb_by_isl)
 length(soil_owen_deb_by_isl$unq_isl)
 
 #we could change this to weight different points differently but here just a mean of all samples on the island...
@@ -376,34 +354,47 @@ seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
 sara_habitat<-read.csv("C:Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 #head(sara_habitat)
 sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
-#head(sara_habitat_merged)
+head(sara_habitat_merged)
 
-which( colnames(sara_habitat_merged)=="unq_isl" )
-which( colnames(sara_habitat_merged)=="unq_tran" )
-which( colnames(sara_habitat_merged)=="MEAN_egarea2k" )
-which( colnames(sara_habitat_merged)=="MEAN_kparea2k" )
-which( colnames(sara_habitat_merged)=="MEAN_rockarea2000" )
-which( colnames(sara_habitat_merged)=="sum_2km" )
-which( colnames(sara_habitat_merged)=="SLOPE" )
-which( colnames(sara_habitat_merged)=="WIDTH" )
-which( colnames(sara_habitat_merged)=="HAB2000" )
-which( colnames(sara_habitat_merged)=="SITE_SUM" )
-which( colnames(sara_habitat_merged)=="sum_25m" )
-which( colnames(sara_habitat_merged)=="sum_50m" )
-which( colnames(sara_habitat_merged)=="sum_100m" )
-which( colnames(sara_habitat_merged)=="sum_250m" )
-which( colnames(sara_habitat_merged)=="sum_100m" )
-which( colnames(sara_habitat_merged)=="MEAN_egarea100" )
+sara_habitat_merged_selected<-c("unq_tran","unq_isl", "MEAN_egarea2k",
+       "MEAN_kparea2k",
+       "MEAN_rockarea2",
+       "sum_2km" ,
+       "SLOPE" ,
+       "WIDTH" ,
+       "HAB2000" ,
+       "SITE_SUM" ,
+       "MEAN_egarea100",
+       "WAVE_EXPOSURE")
 
-
-
-
-sara_habitat_merged_simple<-sara_habitat_merged[,c(1,62,8,19,30,41,56,57,60,61, 35, 36, 37, 38, 4)]
+sara_habitat_merged_simple<-sara_habitat_merged[, colnames(sara_habitat_merged) %in% sara_habitat_merged_selected]
 #head(sara_habitat_merged_simple)
+
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="VP"]<-1
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="P"]<-2
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="SP"]<-3
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="SE"]<-4
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="E"]<-5
+levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="VE"]<-6
+sara_habitat_merged_simple$WAVE_EXPOSURE<-as.numeric(sara_habitat_merged_simple$WAVE_EXPOSURE)
+
+
+### add in water area (calculated by Will)
+water_area<-read.csv("C:Food web idea//Data by person//Norah.data//WaterArea.csv", header=TRUE, sep=",")
+head(water_area)
+water_area<-water_area[,-1]
+water_area<-water_area %>% group_by(unq_tran)%>% spread(Radius_m, WaterArea_m2, sep="_")
+water_area<-water_area[,c(6,11:17)]
+sara_habitat_merged_simple<-merge(sara_habitat_merged_simple, water_area, by="unq_tran")
+
+
 sara_habitat_merged_by_isl <- sara_habitat_merged_simple %>% group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-#head(sara_habitat_merged_by_isl )
+# #head(sara_habitat_merged_by_isl )
 length(sara_habitat_merged_by_isl$unq_isl)
-str(sara_habitat_merged_by_isl )
+# str(sara_habitat_merged_by_isl )
+
+
+
 
 
 #### Seaweed composition
@@ -847,9 +838,9 @@ by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_ri
 levels <- c(-Inf, 6000, Inf)
 xs2=quantile(na.omit(by_isl_master$Area),c(0,1/2,1))
 xs2
-xs=quantile(na.omit(by_isl_master$Area),c(0,1/3,2/3,1))
+xs=quantile(na.omit(by_isl_master$Area),c(0,0.25,0.75,1))
 xs
-xs3=quantile(na.omit(by_isl_master$d15n),c(0,1/3, 2/3,1))
+xs3=quantile(na.omit(by_isl_master$d15n),c(0,0.25, 0.75,1))
 
 labels <- c("small", "medium", "large")
 labels2 <- c("small", "large")
@@ -859,7 +850,7 @@ by_isl_master<- by_isl_master %>% mutate(size.cat2 = cut(Area, xs2, labels = lab
 by_isl_master<- by_isl_master %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
 
 #head(soil_owen_deb)
-node.adding<-soil_owen_deb[,c(2,10)]
+node.adding<-soil_owen_deb[,c(8,9)]
 #head(node.adding)
 node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)

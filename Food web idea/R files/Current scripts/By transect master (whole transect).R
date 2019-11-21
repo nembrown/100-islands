@@ -107,7 +107,7 @@ becky_trees_tran<-as.data.frame(becky_trees_tran)
 becky_trees_tran$tran<-strtrim(becky_trees_tran$tran, 1)
 becky_trees_tran$unq_tran<- paste(becky_trees_tran$unq_isl,becky_trees_tran$tran)
 becky_trees_tran$unq_tran<-gsub(" ", "", becky_trees_tran$unq_tran, fixed = TRUE)
-View(becky_trees_tran)
+#View(becky_trees_tran)
 
 becky_trees_tran_wide <-becky_trees_tran %>% group_by(unq_tran, species) %>% 
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
@@ -271,6 +271,15 @@ water_area<-water_area[,c(6,11:17)]
 
 sara_habitat_merged<-merge(sara_habitat_merged, water_area, by="unq_tran")
 
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="VP"]<-1
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="P"]<-2
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="SP"]<-3
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="SE"]<-4
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="E"]<-5
+levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="VE"]<-6
+sara_habitat_merged$WAVE_EXPOSURE<-as.numeric(sara_habitat_merged$WAVE_EXPOSURE)
+
+
 
 #### Seaweed composition
 sara_composition<-read.csv("C:Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
@@ -342,7 +351,7 @@ chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, T
 
 chris_insects_master_by_trap_tran<-merge(chris_insects_master_by_trap_tran, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-View(chris_insects_master_by_trap_tran)
+#View(chris_insects_master_by_trap_tran)
 
 chris_insects_master_by_trap_tran$insect_beat_abundance<-chris_insects_master_by_trap_tran$sum_abundance/chris_insects_master_by_trap_tran$BeatTime
 
