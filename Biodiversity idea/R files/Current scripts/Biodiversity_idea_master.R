@@ -471,7 +471,7 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 #This is working with a 2km radius around the transects instead
 hakai_sites_distance_tran<-read.csv("C:Biodiversity idea//Output files//paired_sites_by_radius.csv")
 hakai_sites_distance_tran<-hakai_sites_distance_tran[,-1]
-View(hakai_sites_distance_tran)
+#View(hakai_sites_distance_tran)
 length(unique(hakai_sites_distance_tran$unq_tran))
 #61 unique transects
 
@@ -513,7 +513,7 @@ by_tran_master_0m_2$d15n.cat[by_tran_master_0m_2$d15n>19]<-"high d15N"
 
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-View(by_tran_master)
+#View(by_tran_master)
 by_tran_master<-by_tran_master[,-1]
 paste(
 which( colnames(by_tran_master)=="tree_richness" ),
@@ -538,30 +538,8 @@ sep=","
 by_tran_master_subset<-by_tran_master[,c(1,16,19,20,112,111,101,48,59,15,108,81,99)]
 by_tran_master_subset <- by_tran_master_subset %>% group_by(unq_tran)
 
-by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-by_isl_master<-by_isl_master[,-1]
-#head(by_isl_master)
-paste(
-  which( colnames(by_isl_master)=="unq_isl" ),
-  which( colnames(by_isl_master)=="total_richness" ),
-  which( colnames(by_isl_master)=="log_Area" ),
-  which( colnames(by_isl_master)=="Neighb_250" ),
-  which( colnames(by_isl_master)=="NDVI_mean" ),
-  which( colnames(by_isl_master)=="Perimeter" ),
-  which( colnames(by_isl_master)=="PA_norml" ),
-  which( colnames(by_isl_master)=="DistW_ML" ),
-  which( colnames(by_isl_master)=="Dist_Near" ),
-  which( colnames(by_isl_master)=="Area" ),
-  which( colnames(by_isl_master)=="size.cat2" ),
-  which( colnames(by_isl_master)=="node" ),
-  sep=","
-)
-
-by_isl_master_subset2<-by_isl_master[,c(1,103,98,19,20,14,15,17,18,13,105,107)]
-#head(by_isl_master_subset)
 
 by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all.x=TRUE)
-by_tran_master_0m_with_tran<-merge(by_tran_master_0m_with_tran,by_isl_master_subset2, by="unq_isl", all.x=TRUE)
 
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_tran, by="unq_tran", all.y=TRUE)
@@ -579,14 +557,15 @@ levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran
 levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="SE"]<-4
 levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="E"]<-5
 levels(fish_richness_merged_tran$WAVE_EXPOSURE)[levels(fish_richness_merged_tran$WAVE_EXPOSURE)=="VE"]<-6
+fish_richness_merged_tran$WAVE_EXPOSURE<-as.numeric(fish_richness_merged_tran$WAVE_EXPOSURE)
 
 write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv")
-#View(fish_richness_merged_tran)
+##View(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
 #392 tran ... b/c this is all in the 0m file... 
 
-View(fish_richness_merged_tran)
+#View(fish_richness_merged_tran)
 
 ##### this is going to be separate now
 #adding in a few interesting island-level components
@@ -621,14 +600,36 @@ by_isl_master_subset<-by_isl_master[,c(1,97,103,47,46,102,98,19,20,14,15,17,18,1
 #head(by_isl_master_subset)
 
 
-fish_richness_merged_isl<-merge(fish_bycatch_richness_merged_tran, by_isl_master, by="unq_isl", all.y=TRUE)
-head(fish_richness_merged_isl)
+head(fish_bycatch_richness_merged_tran)
+fish_bycatch_richness_merged_isl <-fish_bycatch_richness_merged_tran %>% group_by(unq_isl) %>%
+  summarise_if(is.numeric, mean, na.rm=TRUE)
 
+
+fish_richness_merged_isl<-merge(fish_bycatch_richness_merged_isl, by_isl_master, by="unq_isl", all.y=TRUE)
+head(fish_richness_merged_isl)
+length(unique(fish_richness_merged_isl$unq_isl))
+#103 islands
 
 xs4<- quantile(na.omit(fish_richness_merged_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
 labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
 fish_richness_merged_isl<- fish_richness_merged_isl %>% 
   mutate(fish_biomass_bym3_cat_isl = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
+
+xs_N<- quantile(na.omit(fish_richness_merged_isl$d15n),c(0,0.25,0.75, 1))
+labels_N <- c("low N15", "med N15", "high N15")
+fish_richness_merged_isl<- fish_richness_merged_isl %>% 
+  mutate(d15n_cat_isl = cut(d15n, xs_N, labels = labels_N))
+
+#d34S isn't included at the island level.... 
+xs_S<- quantile(na.omit(fish_richness_merged_isl$d34s),c(0,0.25,0.75, 1))
+labels_S <- c("low S34", "med S34", "high S34")
+fish_richness_merged_isl<- fish_richness_merged_isl %>% 
+  mutate(d34s_cat_isl = cut(d34s, xs_S, labels = labels_S))
+
+xs_N<- quantile(na.omit(fish_richness_merged_isl$),c(0,0.25,0.75, 1))
+labels_N <- c("low N15", "med N15", "high N15")
+fish_richness_merged_isl<- fish_richness_merged_isl %>% 
+  mutate(d15n_cat_isl = cut(d15n, xs_N, labels = labels_N))
 
 
 write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
