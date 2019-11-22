@@ -8,13 +8,35 @@ ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=bird.de, col=fish_bioma
   geom_point()+geom_smooth(method="lm")
 
 
-ggplot(fish_richness_merged_isl %>% filter(fish_biomass_bym3_cat_isl!="NA"), aes(col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl, y=tree_richness, x=log(Area)))+
+ggplot(fish_richness_merged_isl %>% filter(fish_biomass_bym3_cat_isl!="med fish biomass"), aes(col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_isl %>% filter(habcover_cat_isl!="med habitat cover"), aes(col=habcover_cat_isl, fill=habcover_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_isl %>% filter(d15n_cat_isl!="med N15"), aes(col=d15n_cat_isl, fill=d15n_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_isl %>% filter(d34s_cat_isl!="med S34"), aes(col=d34s_cat_isl, fill=d34s_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+
+ggplot(fish_richness_merged_isl %>% filter(fish.richness_cat_isl!="med fish.richness"), aes(col=fish.richness_cat_isl, fill=fish.richness_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_isl  %>% filter(wrack.richness_cat_isl!="NA"), aes(col=wrack.richness_cat_isl, fill=wrack.richness_cat_isl, y=log(bird.richness), x=log(Area)))+
+  geom_point()+geom_smooth(method="lm")
+
+ggplot(fish_richness_merged_isl  %>% filter(SITE_SUM_cat_isl!="NA"), aes(col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl, y=log(bird.richness), x=log(Area)))+
   geom_point()+geom_smooth(method="lm")
 
 
 
-ggplot(fish_richness_merged_isl %>% filter(d15n_cat_isl!="NA"), aes(col=d15n_cat_isl, fill=d15n_cat_isl, y=tree_richness, x=log(Area)))+
-  geom_point()+geom_smooth(method="lm")
+
+
+
+
+
 
 ### the problem with this is that the Area is by island not transect ..... 
 #Could jitter points
