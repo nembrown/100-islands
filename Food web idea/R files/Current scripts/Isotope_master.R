@@ -21,8 +21,6 @@ library(bipartite)
 library(viridis)
 
 library(naniar)
-
-#devtools::install_github("dill/beyonce")
 library(beyonce)
 
 
@@ -117,48 +115,29 @@ length(unique(soil_merge$unq_isl))
 #there are a bunch of extras but will wait first to see how to deal with them ... 
 
 
-paste(
-  which( colnames(soil_merge)=="unq_plot" ),
-  which( colnames(soil_merge)=="unq_isl" ),
-  which( colnames(soil_merge)=="shore_dist" ),
-  which( colnames(soil_merge)=="d13c" ),
-  which( colnames(soil_merge)=="d15n" ),
-  which( colnames(soil_merge)=="c" ),
-  which( colnames(soil_merge)=="n" ),
-  which( colnames(soil_merge)=="s" ),
-  which( colnames(soil_merge)=="cn" ),
-  # which( colnames(soil_merge)=="pc1" )
-  # which( colnames(soil_merge)=="plant.richness" )
-  # which( colnames(soil_merge)=="fs_pc1" )
-  # which( colnames(soil_merge)=="sm_av" )
-  # which( colnames(soil_merge)=="slope" )
-  which( colnames(soil_merge)=="node" ),
-  which( colnames(soil_merge)=="easting" ),
-  which( colnames(soil_merge)=="northing" ), sep=","
-)
+col_names_selected<-c("unq_plot" ,
+                      "unq_isl" ,
+                      "shore_dist" ,
+                      "d13c" ,
+                      "d15n" ,
+                      "c" ,
+                      "n" ,
+                      "s" ,
+                      "cn" , 
+                      "node" ,
+                      "easting" ,
+                      "northing" )
 
-paste(
-  which( colnames(soil.deb)=="unq_plot" ),
-  which( colnames(soil.deb)=="unq_isl" ),
-  which( colnames(soil.deb)=="shore_dist"),
-  which( colnames(soil.deb)=="d13c" ),
-  which( colnames(soil.deb)=="d15n" ),
-  which( colnames(soil.deb)=="c" ),
-  which( colnames(soil.deb)=="n" ),
-  which( colnames(soil.deb)=="s" ),
-  which( colnames(soil.deb)=="cn" ),
-  # which( colnames(soil.deb)=="pc1" )
-  # which( colnames(soil.deb)=="plant.richness" )
-  # which( colnames(soil.deb)=="fs_pc1" )
-  # which( colnames(soil.deb)=="sm_av" )
-  # which( colnames(soil.deb)=="slope" )
-  which( colnames(soil.deb)=="node" ),
-  which( colnames(soil.deb)=="easting" ),
-  which( colnames(soil.deb)=="northing" ), sep=","
-)
-
-soil_owen_deb<-rbind(soil_merge[,c(1,12,15,6,7,3,2,5,4,11,21,22)], soil.deb[,c(1,11,16,2,3,4,5,6,7,15,17,18)])
+soil_owen_deb<-rbind(soil_merge_isl[,colnames(soil_merge_isl) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
 head(soil_owen_deb)
+
+
+### add in d34s here
+soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
+head(soil_s)
+soil_s$d34s<-as.numeric(soil_s$d34s)
+
+soil_owen_deb<-merge(soil_owen_deb, soil_s, by="unq_plot", all.x=TRUE)
 
 write.csv(soil_owen_deb, "C:Food web idea//Data by person//Norah.data/soil_owen_deb.csv")
 
@@ -183,7 +162,7 @@ soil_owen_deb_by_isl_0m$group<-"soil_0m"
 
 head(soil_owen_deb_by_isl_0m)
 
-soil_owen_deb_by_isl<-rbind(soil_owen_deb_by_isl[,c(1,3,4,5,6,7,8,11)], soil_owen_deb_by_isl_0m[,c(1,3,4,5,6,7,8,11)])
+soil_owen_deb_by_isl<-rbind(soil_owen_deb_by_isl[,c(1:7,11,12)], soil_owen_deb_by_isl_0m[,c(1:7,11,12)])
 
 head(soil_owen_deb_by_isl)
 
@@ -226,36 +205,19 @@ deb.veg$group<-gsub(" ", "", deb.veg$group, fixed = TRUE)
 deb.veg$group[deb.veg$group=="SAL"] <- "gash"
 deb.veg$group[deb.veg$group=="FLV"] <- "midi"
 
+veg.names<-c("unq_plot" ,
+                      "unq_isl" ,
+                      "shore_dist" ,
+                      "d13c" ,
+                      "d15n" ,
+                      "c" ,
+                      "n" ,
+                      "s" ,
+                      "cn" , 
+                      "group" ,
+                      "shore_dist" )
 
-
-paste(
-  which( colnames(deb.veg)=="unq_plot" ),
-  which( colnames(deb.veg)=="unq_isl" ),
-  which( colnames(deb.veg)=="d13c" ),
-  which( colnames(deb.veg)=="d15n" ),
-  which( colnames(deb.veg)=="c" ),
-  which( colnames(deb.veg)=="n" ),
-  which( colnames(deb.veg)=="s" ),
-  which( colnames(deb.veg)=="cn" ),
-  which( colnames(deb.veg)=="group" ),
-  which( colnames(deb.veg)=="shore_dist" ),
-  sep=","
-)
-
-paste(
-  which( colnames(owen.veg)=="unq_plot" ),
-  which( colnames(owen.veg)=="unq_isl" ),
-  which( colnames(owen.veg)=="d13c" ),
-  which( colnames(owen.veg)=="d15n" ),
-  which( colnames(owen.veg)=="c" ),
-  which( colnames(owen.veg)=="n" ),
-  which( colnames(owen.veg)=="s" ),
-  which( colnames(owen.veg)=="cn" ),
-  which( colnames(owen.veg)=="group" ),
-  which( colnames(owen.veg)=="shore_dist" ),sep=","
-)
-
-veg_owen_deb<-rbind(deb.veg[,c(17,12,1,2,3,4,16,5,6,18)], owen.veg[,c(1,11,7,8,4,3,6,5,2,14)])
+veg_owen_deb<-rbind(deb.veg[,colnames(deb.veg) %in% veg.names], owen.veg[,colnames(owen.veg) %in% veg.names])
 head(veg_owen_deb)
 
 veg_owen_deb %>%replace_with_na(replace = list(s = "NA"))
@@ -264,12 +226,22 @@ veg_owen_deb$s<-as.numeric(veg_owen_deb$s)
 head(veg_owen_deb)
 
 veg_owen_deb_by_isl<- veg_owen_deb %>% group_by(unq_isl, group)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-
+veg_owen_deb_by_isl$d34s<-"NA"
+veg_owen_deb_by_isl$d34s<-as.numeric(veg_owen_deb_by_isl$d34s)
 head(veg_owen_deb_by_isl)
 head(soil_owen_deb_by_isl)
 
-veg_soil_owen_deb_by_isl<-dplyr::bind_rows(veg_owen_deb_by_isl[,c(1,2,3,4,5,6,7,8)], soil_owen_deb_by_isl[,c(1,8,2,3,4,5,6,7)])
+isotope.names<-c("unq_isl" ,
+             "d13c" ,
+             "d15n" ,
+             "c" ,
+             "n" ,
+             "s" ,
+             "cn" , 
+             "group" ,
+             "d34s" )
 
+veg_soil_owen_deb_by_isl<-dplyr::bind_rows(veg_owen_deb_by_isl[,colnames(veg_owen_deb_by_isl) %in% isotope.names], soil_owen_deb_by_isl[,colnames(soil_owen_deb_by_isl) %in% isotope.names])
 head(veg_soil_owen_deb_by_isl)
 length(unique(soil_owen_deb_by_isl$unq_isl))
 
@@ -297,6 +269,8 @@ names(feathers.merge)[46]<-"n"
 names(feathers.merge)[47]<-"cn"
 feathers.merge$s<-"NA"
 feathers.merge$s<-as.numeric(feathers.merge$s)
+feathers.merge$d34s<-"NA"
+feathers.merge$d34s<-as.numeric(feathers.merge$d34s)
 
 
 feathers.merge<- feathers.merge %>%   group_by(unq_isl, group)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
@@ -315,32 +289,14 @@ names(bird.feces.merge)[46]<-"n"
 names(bird.feces.merge)[47]<-"cn"
 bird.feces.merge$s<-"NA"
 bird.feces.merge$s<-as.numeric(bird.feces.merge$s)
+bird.feces.merge$d34s<-"NA"
+bird.feces.merge$d34s<-as.numeric(bird.feces.merge$d34s)
+
 
 bird.feces.merge<- bird.feces.merge %>%   group_by(unq_isl, group)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
 
-paste(
-  which( colnames(bird.feces.merge)=="unq_isl" ),
-  which( colnames(bird.feces.merge)=="d13c" ),
-  which( colnames(bird.feces.merge)=="d15n" ),
-  which( colnames(bird.feces.merge)=="c" ),
-  which( colnames(bird.feces.merge)=="n" ),
-  which( colnames(bird.feces.merge)=="s" ),
-  which( colnames(bird.feces.merge)=="cn" ),
-  which( colnames(bird.feces.merge)=="group" ),sep=","
-)
+bird_isotopes<-rbind(bird.feces.merge[,colnames(bird.feces.merge) %in% isotope.names], feathers.merge[,colnames(feathers.merge) %in% isotope.names])
 
-paste(
-  which( colnames(feathers.merge)=="unq_isl" ),
-  which( colnames(feathers.merge)=="d13c" ),
-  which( colnames(feathers.merge)=="d15n" ),
-  which( colnames(feathers.merge)=="c" ),
-  which( colnames(feathers.merge)=="n" ),
-  which( colnames(feathers.merge)=="s" ),
-  which( colnames(feathers.merge)=="cn" ),
-  which( colnames(feathers.merge)=="group" ),sep=","
-)
-
-bird_isotopes<-rbind(bird.feces.merge[,c(1,25,26,27,28,31,29,2)], feathers.merge[,c(1,25,26,27,28,31,29,2)])
 head(bird_isotopes)
 
 head(isotope_by_isl_gathered)
@@ -375,50 +331,37 @@ head(katie.mammal)
 katie.inverts<- dplyr::select(filter(katie.mammal, group == "Invertebrate tissue - whole body"),c(unq_isl,cn,s,d13c, d15n, c,n,species, broad_group, Loc_Caught))
 katie.inverts$group<-paste("katie_inverts", katie.inverts$Loc_Caught)
 head(katie.inverts)
+katie.inverts$d34s<-"NA"
+katie.inverts$d34s<-as.numeric(katie.inverts$d34s)
+
 
 katie.berries<- dplyr::select(filter(katie.mammal, group == "Vegetation - berry/fruit"),c(unq_isl,cn,s,d13c, d15n,c,n, species, group))
 head(katie.berries)
 katie.berries$group<-"katie_berries"
+katie.berries$d34s<-"NA"
+katie.berries$d34s<-as.numeric(katie.berries$d34s)
+
 
 katie.mouse.hair<- dplyr::select(filter(katie.mammal, group == "Mouse hair"),c(unq_isl,cn,s,d13c, d15n, species,c,n,group))
 katie.mouse.hair$group<-"Mouse hair"
 head(katie.mouse.hair)
+katie.mouse.hair$d34s<-"NA"
+katie.mouse.hair$d34s<-as.numeric(katie.mouse.hair$d34s)
+
 
 katie.mouse.feces<- dplyr::select(filter(katie.mammal, group == "Small mammal faecal"),c(unq_isl,cn,s,d13c, d15n,c,n, species,group))
 katie.mouse.feces$group<-"Mouse feces"
 head(katie.mouse.feces)
+katie.mouse.feces$d34s<-"NA"
+katie.mouse.feces$d34s<-as.numeric(katie.mouse.feces$d34s)
 
 
-paste(
-  which( colnames(katie.inverts)=="unq_isl" ),
-  which( colnames(katie.inverts)=="d13c" ),
-  which( colnames(katie.inverts)=="d15n" ),
-  which( colnames(katie.inverts)=="c" ),
-  which( colnames(katie.inverts)=="n" ),
-  which( colnames(katie.inverts)=="s" ),
-  which( colnames(katie.inverts)=="cn" ),
-  which( colnames(katie.inverts)=="group" ),sep=","
-)
-
-paste(
-  which( colnames(katie.mouse.feces)=="unq_isl" ),
-  which( colnames(katie.mouse.feces)=="d13c" ),
-  which( colnames(katie.mouse.feces)=="d15n" ),
-  which( colnames(katie.mouse.feces)=="c" ),
-  which( colnames(katie.mouse.feces)=="n" ),
-  which( colnames(katie.mouse.feces)=="s" ),
-  which( colnames(katie.mouse.feces)=="cn" ),
-  which( colnames(katie.mouse.feces)=="group" ),sep=","
-)
+katie.isotopes<-rbind(katie.inverts[,colnames(katie.inverts) %in% isotope.names], 
+                      katie.berries[,colnames(katie.berries) %in% isotope.names], 
+                      katie.mouse.hair[,colnames(katie.mouse.hair) %in% isotope.names], 
+                      katie.mouse.feces[,colnames(katie.mouse.feces) %in% isotope.names])
 
 
-
-head(isotope_by_isl_gathered2)
-
-katie.isotopes<-rbind( katie.inverts[,c(1,4,5,6,7,3,2,11)],
-                                katie.berries[,c(1,4,5,6,7,3,2,9)],
-                                katie.mouse.hair[,c(1,4,5,7,8,3,2,9)], 
-                                katie.mouse.feces[,c(1,4,5,6,7,3,2,9)])
 
 head(katie.isotopes)
 
@@ -443,13 +386,15 @@ chris.isotopes$s<-as.numeric(chris.isotopes$s)
 
 chris.isotopes.isl<-chris.isotopes %>% group_by(unq_isl, group) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(chris.isotopes.isl)
+chris.isotopes.isl$d34s<-"NA"
+chris.isotopes.isl$d34s<-as.numeric(chris.isotopes.isl$d34s)
 
 length(chris.isotopes.isl$unq_isl[chris.isotopes$group=="insects_ISO"])
 
-isotope_by_isl_gathered4<-rbind(isotope_by_isl_gathered3,chris.isotopes.isl[,c(1,3,4,5,6,8,7,2)] )
+isotope_by_isl_gathered4<-rbind(isotope_by_isl_gathered3,chris.isotopes.isl[,colnames(chris.isotopes.isl) %in% isotope.names])
 
 head(isotope_by_isl_gathered4)
-write.csv(isotope_by_isl_gathered4, "C:Food web idea//Norah.data/isotope_by_isl_gathered4.csv")
+write.csv(isotope_by_isl_gathered4, "C:Food web idea//Data by person//Norah.data//isotope_by_isl_gathered4.csv")
 
 ####
 
@@ -472,15 +417,8 @@ head(by_isl_master)
 head(isotope_by_isl_gathered4)
 which( colnames(by_isl_master)=="d15n" )
 
-isotope_master<-merge(isotope_by_isl_gathered4, by_isl_master[,-c(3:9)], by="unq_isl", all=TRUE)
+isotope_master<-merge(isotope_by_isl_gathered4, by_isl_master[,-c(2:8,11)], by="unq_isl", all=TRUE)
 head(isotope_master)
-
-head(soil_owen_deb)
-node.adding<-soil_owen_deb[,c(2,10)]
-head(node.adding)
-node.adding<-unique(node.adding)
-isotope_master<-merge(isotope_master, node.adding, by="unq_isl", all=TRUE)
-
 
 write.csv(isotope_master, "C:Food web idea//Data by person//Owen's data/isotope_master.csv")
 

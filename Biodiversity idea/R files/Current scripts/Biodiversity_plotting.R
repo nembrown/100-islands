@@ -1,14 +1,52 @@
 library(here)
+library(rlang)
+library(tidyr)
+library(vegan)
+library(ggplot2)
+library(ggcorrplot)
+library(doBy)
+library(plyr)
+library(dplyr)
+library(doBy)
+library(cowplot)
+library(viridis)
+library(matrixStats)
+library(tidyverse)
 
-fish_richness_merged_tran_isl<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_isl.csv")
-head(fish_richness_merged_tran_isl)
+
+fish_richness_merged_isl<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
+head(fish_richness_merged_isl)
+
+isotope_master<-read.csv("C:Food web idea//Data by person//Owen's data/isotope_master.csv")
+head(isotope_master)
+
+ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=bird.density, x=d13c))+
+  geom_point()
 
 
-ggplot(fish_richness_merged_tran_isl, aes(x=log(Area), y=bird.de, col=fish_biomass_bym3_cat))+
-  geom_point()+geom_smooth(method="lm")
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_biomass_bym3_mean))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_richness_corrected))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=d15n))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=d34s))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=habitat_cover_2km))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=log(SITE_SUM+1)))+
+  geom_point()+geom_smooth()
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=wrack_richness))+
+  geom_point()+geom_smooth()
 
 
-ggplot(fish_richness_merged_isl %>% filter(fish_biomass_bym3_cat_isl!="med fish biomass"), aes(col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl, y=log(bird.richness), x=log(Area)))+
+ggplot(fish_richness_merged_isl, aes(col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl, y=log(bird.richness), x=log(Area)))+
   geom_point()+geom_smooth(method="lm")
 
 ggplot(fish_richness_merged_isl %>% filter(habcover_cat_isl!="med habitat cover"), aes(col=habcover_cat_isl, fill=habcover_cat_isl, y=log(bird.richness), x=log(Area)))+
