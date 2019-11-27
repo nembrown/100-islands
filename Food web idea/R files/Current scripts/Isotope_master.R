@@ -101,10 +101,12 @@ head(owen_coords)
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
 
-owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
+owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all.x =TRUE)
 head(owen_key_expanded)
 
-
+owen_key_expanded$unq_isl<-substr(owen_key_expanded$unq_tran, 1, 4)
+  
+  
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by.x="unq_plot")
 head(soil_merge)
@@ -128,7 +130,7 @@ col_names_selected<-c("unq_plot" ,
                       "easting" ,
                       "northing" )
 
-soil_owen_deb<-rbind(soil_merge_isl[,colnames(soil_merge_isl) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
+soil_owen_deb<-rbind.data.frame(soil_merge[,colnames(soil_merge) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
 head(soil_owen_deb)
 
 
@@ -143,13 +145,6 @@ write.csv(soil_owen_deb, "C:Food web idea//Data by person//Norah.data/soil_owen_
 
 
 
-length(soil.deb$unq_plot)
-length(soil_merge$unq_plot)
-length(soil_owen_deb$unq_plot)
-length(unique(soil_owen_deb$unq_isl))
-#this just adds the two together... 
-
-
 #now we want one value per island: 
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
@@ -162,10 +157,12 @@ soil_owen_deb_by_isl_0m$group<-"soil_0m"
 
 head(soil_owen_deb_by_isl_0m)
 
-soil_owen_deb_by_isl<-rbind(soil_owen_deb_by_isl[,c(1:7,11,12)], soil_owen_deb_by_isl_0m[,c(1:7,11,12)])
 
-head(soil_owen_deb_by_isl)
+str(soil_owen_deb_by_isl)
+soil_owen_deb_by_isl_0m$d34s[soil_owen_deb_by_isl_0m$d34s=="NaN"]<-"NA"
+soil_owen_deb_by_isl_0m$d34s<-as.numeric(soil_owen_deb_by_isl_0m$d34s)
 
+soil_owen_deb_by_isl<-rbind.data.frame(soil_owen_deb_by_isl[,c(1:7,11,12)], soil_owen_deb_by_isl_0m[,c(1:7,11,12)])
 
 
 
@@ -217,7 +214,7 @@ veg.names<-c("unq_plot" ,
                       "group" ,
                       "shore_dist" )
 
-veg_owen_deb<-rbind(deb.veg[,colnames(deb.veg) %in% veg.names], owen.veg[,colnames(owen.veg) %in% veg.names])
+veg_owen_deb<-rbind.data.frame(deb.veg[,colnames(deb.veg) %in% veg.names], owen.veg[,colnames(owen.veg) %in% veg.names])
 head(veg_owen_deb)
 
 veg_owen_deb %>%replace_with_na(replace = list(s = "NA"))
@@ -241,8 +238,9 @@ isotope.names<-c("unq_isl" ,
              "group" ,
              "d34s" )
 
-veg_soil_owen_deb_by_isl<-dplyr::bind_rows(veg_owen_deb_by_isl[,colnames(veg_owen_deb_by_isl) %in% isotope.names], soil_owen_deb_by_isl[,colnames(soil_owen_deb_by_isl) %in% isotope.names])
-head(veg_soil_owen_deb_by_isl)
+
+veg_soil_owen_deb_by_isl<-rbind.data.frame(veg_owen_deb_by_isl, soil_owen_deb_by_isl)
+#View(veg_soil_owen_deb_by_isl)
 length(unique(soil_owen_deb_by_isl$unq_isl))
 
 isotope_by_isl_gathered<-veg_soil_owen_deb_by_isl
@@ -295,13 +293,13 @@ bird.feces.merge$d34s<-as.numeric(bird.feces.merge$d34s)
 
 bird.feces.merge<- bird.feces.merge %>%   group_by(unq_isl, group)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
 
-bird_isotopes<-rbind(bird.feces.merge[,colnames(bird.feces.merge) %in% isotope.names], feathers.merge[,colnames(feathers.merge) %in% isotope.names])
+bird_isotopes<-rbind.data.frame(bird.feces.merge[,colnames(bird.feces.merge) %in% isotope.names], feathers.merge[,colnames(feathers.merge) %in% isotope.names])
 
 head(bird_isotopes)
 
 head(isotope_by_isl_gathered)
 
-isotope_by_isl_gathered2<-rbind(bird_isotopes, isotope_by_isl_gathered)
+isotope_by_isl_gathered2<-rbind.data.frame(bird_isotopes, isotope_by_isl_gathered)
 head(isotope_by_isl_gathered2)
 
 
@@ -356,7 +354,7 @@ katie.mouse.feces$d34s<-"NA"
 katie.mouse.feces$d34s<-as.numeric(katie.mouse.feces$d34s)
 
 
-katie.isotopes<-rbind(katie.inverts[,colnames(katie.inverts) %in% isotope.names], 
+katie.isotopes<-rbind.data.frame(katie.inverts[,colnames(katie.inverts) %in% isotope.names], 
                       katie.berries[,colnames(katie.berries) %in% isotope.names], 
                       katie.mouse.hair[,colnames(katie.mouse.hair) %in% isotope.names], 
                       katie.mouse.feces[,colnames(katie.mouse.feces) %in% isotope.names])
@@ -373,7 +371,7 @@ head(katie.isotopes.isl)
 head(isotope_by_isl_gathered2)
 isotope_by_isl_gathered2<-isotope_by_isl_gathered2 %>% group_by(unq_isl, group)
 
-isotope_by_isl_gathered3<-rbind(isotope_by_isl_gathered2, katie.isotopes.isl[,c(1,3,4,5,6,7,8,2)])
+isotope_by_isl_gathered3<-rbind.data.frame(isotope_by_isl_gathered2, katie.isotopes.isl[,c(1,3,4,5,6,7,8,2)])
 head(isotope_by_isl_gathered3)
 
 
@@ -391,7 +389,7 @@ chris.isotopes.isl$d34s<-as.numeric(chris.isotopes.isl$d34s)
 
 length(chris.isotopes.isl$unq_isl[chris.isotopes$group=="insects_ISO"])
 
-isotope_by_isl_gathered4<-rbind(isotope_by_isl_gathered3,chris.isotopes.isl[,colnames(chris.isotopes.isl) %in% isotope.names])
+isotope_by_isl_gathered4<-rbind.data.frame(isotope_by_isl_gathered3,chris.isotopes.isl[,colnames(chris.isotopes.isl) %in% isotope.names])
 
 head(isotope_by_isl_gathered4)
 write.csv(isotope_by_isl_gathered4, "C:Food web idea//Data by person//Norah.data//isotope_by_isl_gathered4.csv")
@@ -414,25 +412,26 @@ write.csv(isotope_by_isl_gathered4, "C:Food web idea//Data by person//Norah.data
 #terrestrial diversity
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 head(by_isl_master)
+by_isl_master<-by_isl_master[,-1]
 head(isotope_by_isl_gathered4)
 which( colnames(by_isl_master)=="d15n" )
 
-isotope_master<-merge(isotope_by_isl_gathered4, by_isl_master[,-c(2:8,11)], by="unq_isl", all=TRUE)
+isotope_master<-merge(isotope_by_isl_gathered4, by_isl_master[,-c(2:7,10)], by="unq_isl", all=TRUE)
 head(isotope_master)
 
 write.csv(isotope_master, "C:Food web idea//Data by person//Owen's data/isotope_master.csv")
 
 
-#marine biodiversity
-which( colnames(fish_richness_merged_tran_isl)=="unq_isl" )
-fish_richness_merged_isl_simple<-fish_richness_merged_tran_isl[,c(1:45)]
-head(fish_richness_merged_isl_simple)
-isotope_master_2<-merge(isotope_master, fish_richness_merged_isl_simple, by.x="unq_isl", all=TRUE)
-
+# #marine biodiversity
+# which( colnames(fish_richness_merged_tran_isl)=="unq_isl" )
+# fish_richness_merged_isl_simple<-fish_richness_merged_tran_isl[,c(1:45)]
+# head(fish_richness_merged_isl_simple)
+# isotope_master_2<-merge(isotope_master, fish_richness_merged_isl_simple, by.x="unq_isl", all=TRUE)
+# 
 
 
 # Plotting ----------------------------------------------------------------
-
+library(ggplot2); theme_set(theme_bw())
 
 #marking colours to each type of isotope data
 colorset = c("soil_0m"="#482576FF" ,"gash"="#B5C5D5","soil_whole_island"= "#795998",
@@ -446,8 +445,8 @@ ggsave("C:Food web idea//Plots//Biplots//Isotope biplot.png", width=30, height=2
 #d15n vs. n
 d15n_n_10<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi","insects_COL","insects_CUR","insects_ISO","bird_feces","bird_feathers", "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)
 d15n_n_11<-ggplot(filter(isotope_master, group %in% c("insects_COL","insects_CUR","insects_ISO")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")  +  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+theme(legend.position="none")
-d15n_n_12<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
-d15n_n_13<-ggplot(filter(isotope_master, group %in% c("soil_0m","gash","soil_whole_island","midi")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+d15n_n_12<-ggplot(filter(isotope_master, group %in% c("soil_0m","soil_whole_island")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
+d15n_n_13<-ggplot(filter(isotope_master, group %in% c("gash","midi")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 d15n_n_14<-ggplot(filter(isotope_master, group %in% c("bird_feces","bird_feathers")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 d15n_n_15<-ggplot(filter(isotope_master, group %in% c( "Mouse feces", "Mouse hair")), aes(fill=group, col=group,x=n, y=d15n))+geom_point()+geom_smooth(aes(),method="lm")+  scale_fill_manual(values=colorset)+  scale_colour_manual(values=colorset)+ theme(legend.position="none")
 legend_10 <- get_legend(d15n_n_10+ theme(legend.position="bottom"))
