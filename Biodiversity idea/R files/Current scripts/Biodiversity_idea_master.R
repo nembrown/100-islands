@@ -44,8 +44,8 @@ library(viridis)
 library(matrixStats)
 library(tidyverse)
 
-#detach(package:plyr)
-#detach(package:dplyr)
+# detach(package:plyr)
+# detach(package:dplyr)
 
 # Net dimensions ----------------------------------------------------------
 # take net dimnesion data, make it long for each set to match the other files
