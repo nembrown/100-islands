@@ -1,4 +1,3 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 
 library(tidyr)
 library(plyr)
@@ -11,10 +10,10 @@ library(ggplot2)
 
 
 # Read in Owen's data
-longform_plant_percentcover<-read.csv("C:Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 
 #Read in Pat's data for area
-islands_data<-read.csv("C:Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+islands_data<-read.csv("Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 head(islands_data)
 
 names(islands_data)[1]<-"unq_isl"
@@ -75,13 +74,13 @@ islands_plant_filtered[duplicated(islands_plant_filtered),]
 
 
 #read in Deb's data
-veg1x1_Deb_mod<-read.csv("C:Data by person//Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
+veg1x1_Deb_mod<-read.csv("Food web idea//Data by person//Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(veg1x1_Deb_mod)
 length(unique(veg1x1_Deb_mod$unq_isl))
 #99 islands
 
 #adding shore dist to deb's veg
-Deb_interior<-read.csv("C:Data by person//Deb.data//shoredist.csv", header=TRUE, sep=",")
+Deb_interior<-read.csv("Food web idea//Data by person//Deb.data//shoredist.csv", header=TRUE, sep=",")
 veg1x1_Deb_mod_interior<-merge(veg1x1_Deb_mod, Deb_interior, by="pcid")
 head(veg1x1_Deb_mod_interior)
 names(veg1x1_Deb_mod_interior)[11]<-"shore_dist"
@@ -191,7 +190,7 @@ length(unique(Deb_Owen_veg_combined_complete_filled$unq_isl))
 #100
 
 ##adding in info about shurb herb or tree
-plant_category<-read.csv("C:Data by person//Owen's data//100Islands_Fitzpatrick_species.csv", header=TRUE, sep=",")
+plant_category<-read.csv("Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_species.csv", header=TRUE, sep=",")
 head(plant_category)
 
 
@@ -201,7 +200,7 @@ Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_fill
 
 
 
-write.csv(Deb_Owen_veg_combined_complete_filled, "C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
 
 
 
@@ -271,6 +270,6 @@ head(Deb_Owen_veg_large)
 Veg_means_by_island<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_small, Deb_Owen_veg_large)
 head(Veg_means_by_island)
 
-write.csv(Veg_means_by_island, "C:Data by person//Kalina.data/Veg_means_by_island.csv")
+write.csv(Veg_means_by_island, "Food web idea//Data by person//Kalina.data/Veg_means_by_island.csv")
 
 
