@@ -26,7 +26,7 @@ isotope_master_fish<-merge(isotope_by_isl_gathered4, fish_richness_merged_isl, b
 
 
 #bird prodcutivity
-
+View(fish_richness_merged_isl)
 fish_biomass_pelagic<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_pelagic_biomass_bym3_mean))+
   geom_errorbarh(aes(xmin=fish_pelagic_biomass_bym3_mean-fish_pelagic_biomass_bym3_sd, xmax=fish_pelagic_biomass_bym3_mean+fish_pelagic_biomass_bym3_sd)) +
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("pelagic_fish_biomass")
@@ -35,6 +35,16 @@ fish_biomass_pelagic<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fi
 fish_biomass_demersal<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_demersal_biomass_bym3_mean))+
   geom_errorbarh(aes(xmin=fish_demersal_biomass_bym3_mean-fish_demersal_biomass_bym3_sd, xmax=fish_demersal_biomass_bym3_mean+fish_demersal_biomass_bym3_sd)) +
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("demersal_fish_biomass")
+
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=individual_fish_biomass_bym3_mean))+
+  geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
 
 
 fish_biomass_demersal<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_demersal_biomass_bym3_mean))+
