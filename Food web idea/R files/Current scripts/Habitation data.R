@@ -210,6 +210,7 @@ owen_coords<-owen_coords[,c(3,4, 10)]
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
 
+
 pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv", header=TRUE, sep=",")
 pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
 pointcount.gps<-pointcount.gps[,c(3,16,17)]
@@ -223,6 +224,9 @@ Deb_Owen_veg_coords<-rbind(deb_coords,owen_coords)
 Deb_Owen_veg_coords<-merge(Deb_Owen_veg_combined_complete_filled,Deb_Owen_veg_coords,by="unq_tran", all.x = TRUE)
 
 write.csv(Deb_Owen_veg_coords, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords.csv")
+
+write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+
 
 
 
