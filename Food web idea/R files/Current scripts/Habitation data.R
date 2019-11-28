@@ -1,4 +1,3 @@
-setwd("C:/Users/norahbrown/Dropbox/Projects/100-islands/Food web idea")
 
 library(tidyr)
 library(plyr)
@@ -11,10 +10,10 @@ library(ggplot2)
 
 
 # Read in Owen's data
-longform_plant_percentcover<-read.csv("C:Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
+longform_plant_percentcover<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 
 #Read in Pat's data for area
-islands_data<-read.csv("C:Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
+islands_data<-read.csv("Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 head(islands_data)
 
 names(islands_data)[1]<-"unq_isl"
@@ -75,13 +74,13 @@ islands_plant_filtered[duplicated(islands_plant_filtered),]
 
 
 #read in Deb's data
-veg1x1_Deb_mod<-read.csv("C:Data by person//Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
+veg1x1_Deb_mod<-read.csv("Food web idea//Data by person//Owen's data//bird_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(veg1x1_Deb_mod)
 length(unique(veg1x1_Deb_mod$unq_isl))
 #99 islands
 
 #adding shore dist to deb's veg
-Deb_interior<-read.csv("C:Data by person//Deb.data//shoredist.csv", header=TRUE, sep=",")
+Deb_interior<-read.csv("Food web idea//Data by person//Deb.data//shoredist.csv", header=TRUE, sep=",")
 veg1x1_Deb_mod_interior<-merge(veg1x1_Deb_mod, Deb_interior, by="pcid")
 head(veg1x1_Deb_mod_interior)
 names(veg1x1_Deb_mod_interior)[11]<-"shore_dist"
@@ -191,17 +190,39 @@ length(unique(Deb_Owen_veg_combined_complete_filled$unq_isl))
 #100
 
 ##adding in info about shurb herb or tree
-plant_category<-read.csv("C:Data by person//Owen's data//100Islands_Fitzpatrick_species.csv", header=TRUE, sep=",")
+plant_category<-read.csv("Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_species.csv", header=TRUE, sep=",")
 head(plant_category)
 
 
 Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled, plant_category[,c(1,4,5)], by="species")
 
 
+head(Deb_Owen_veg_combined_complete_filled)
 
 
+write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+### add in coordinates
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-owen_coords[,c(1:9)]
+owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
+owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
+owen_coords<-owen_coords[,c(3,4, 10)]
+names(owen_coords)[1]<-"easting"
+names(owen_coords)[2]<-"northing"
 
-write.csv(Deb_Owen_veg_combined_complete_filled, "C:Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv", header=TRUE, sep=",")
+pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
+pointcount.gps<-pointcount.gps[,c(3,16,17)]
+pointcount.gps<-pointcount.gps[!duplicated(pointcount.gps$pcid),]
+#sometimes taken twice...  
+pointcount.gps$unq_tran<- paste("Deb",pointcount.gps$pcid, sep="_")
+deb_coords<-pointcount.gps[,-1]
+head(deb_coords)
+
+Deb_Owen_veg_coords<-rbind(deb_coords,owen_coords)
+Deb_Owen_veg_coords<-merge(Deb_Owen_veg_combined_complete_filled,Deb_Owen_veg_coords,by="unq_tran", all.x = TRUE)
+
+write.csv(Deb_Owen_veg_coords, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords.csv")
 
 
 
@@ -271,6 +292,6 @@ head(Deb_Owen_veg_large)
 Veg_means_by_island<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_small, Deb_Owen_veg_large)
 head(Veg_means_by_island)
 
-write.csv(Veg_means_by_island, "C:Data by person//Kalina.data/Veg_means_by_island.csv")
+write.csv(Veg_means_by_island, "Food web idea//Data by person//Kalina.data/Veg_means_by_island.csv")
 
 
