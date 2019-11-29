@@ -329,7 +329,7 @@ habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3
 # Adding in bird richness -------------------------------------------------
 
 birdrichness<-read.csv("C:Food web idea//Data by person//Deb.data//bird-summary.csv", header=TRUE, sep=",")
-#head(birdrichness)
+View(birdrichness)
 names(birdrichness)[1]<-"unq_isl"
 names(birdrichness)[6]<-"bird.richness"
 names(birdrichness)[4]<-"bird.density"

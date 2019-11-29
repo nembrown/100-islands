@@ -478,9 +478,35 @@ ggplot(fish_richness_merged_isl, aes(fish_abundance_bym3))+ geom_density(alpha=.
 
 
 
+
+###
+head(fish_richness_merged_isl)
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=d15n, col=log(insect_pitfall_av_abundance)))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n in soil")+scale_colour_viridis()
+
+
+#checked Area, Wave exposure, bird richness, % eelgrass, wrack on shore, 
+#maybe something with Neighb 250
+#maybe insect abundance
+
+ggplot(fish_richness_merged_isl, aes( y=bird.density, x=Neighb_250, col=d15n))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("Neighb_250")+scale_colour_viridis()
+
+
+
+
+
+
+
+
+
 ### the problem with this is that the Area is by island not transect ..... 
 #Could jitter points
 # I think we need to do island-level stats for the Area. 
+
+
+
+
 
 
 
