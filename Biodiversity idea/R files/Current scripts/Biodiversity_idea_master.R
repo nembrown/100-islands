@@ -84,15 +84,16 @@ ben_netdimensions_summer$sum_volume<-as.numeric(ben_netdimensions_summer$sum_vol
 # Fish abundance data cleaning ------------------------------------------------------
 #only summer months 
 
-
-ggplot(ben_fish_data, aes(abundance,fill=species))+xlim(0,30) + geom_density(alpha=.7)
-ggplot(ben_pelagic_demersal_data2, aes(abundance,fill=Depth.Behaviour))+scale_x_log10() + geom_density(alpha=.7)
-ggplot(ben_pelagic_demersal_data2, aes(abundance,fill=Depth.Behaviour))+xlim(0,10) + geom_density(alpha=.7)
-
+# 
+#  ggplot(ben_fish_data, aes(abundance,fill=species)) + geom_density(alpha=.7)+xlim(0,30)
+#  ggplot(ben_pelagic_demersal_data2, aes(abundance,fill=Depth.Behaviour))+scale_x_log10() + geom_density(alpha=.7)
+#  ggplot(ben_pelagic_demersal_data2, aes(abundance,fill=Depth.Behaviour))+xlim(0,10) + geom_density(alpha=.7)
+#  ggplot(ben_pelagic_demersal_data2, aes(abundance))+scale_x_log10() + geom_density(alpha=.7)
+#  
 
 ben_fish_data <- ben_fish_data %>% filter(between(month, 7,8))
-ben_fish_data_schooling <- ben_fish_data %>% filter(abundance>5)
-ben_fish_data_individual <- ben_fish_data %>% filter(abundance<5)
+ben_fish_data_schooling <- ben_fish_data %>% filter(abundance>12)
+ben_fish_data_individual <- ben_fish_data %>% filter(abundance<12)
 
 
 

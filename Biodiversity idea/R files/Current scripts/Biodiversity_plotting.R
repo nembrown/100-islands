@@ -14,6 +14,11 @@ library(matrixStats)
 library(tidyverse)
 library(cowplot)
 
+
+
+# dataframes --------------------------------------------------------------
+
+
 fish_richness_merged_isl<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
 View(fish_richness_merged_isl)
 
@@ -25,30 +30,21 @@ levels(isotope_master$group)
 isotope_master_fish<-merge(isotope_by_isl_gathered4, fish_richness_merged_isl, by="unq_isl")
 
 
+# Productivity vs. marine subsidies ---------------------------------------
+
+
 #bird prodcutivity
 View(fish_richness_merged_isl)
-fish_biomass_pelagic<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_pelagic_biomass_bym3_mean))+
-  geom_errorbarh(aes(xmin=fish_pelagic_biomass_bym3_mean-fish_pelagic_biomass_bym3_sd, xmax=fish_pelagic_biomass_bym3_mean+fish_pelagic_biomass_bym3_sd)) +
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("pelagic_fish_biomass")
 
-
-fish_biomass_demersal<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_demersal_biomass_bym3_mean))+
-  geom_errorbarh(aes(xmin=fish_demersal_biomass_bym3_mean-fish_demersal_biomass_bym3_sd, xmax=fish_demersal_biomass_bym3_mean+fish_demersal_biomass_bym3_sd)) +
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("demersal_fish_biomass")
-
-
-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=schooling_fish_biomass_bym3_mean))+
+fish_biomass_schooling<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=schooling_fish_biomass_bym3_mean))+
   #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
 
 
-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=individual_fish_biomass_bym3_mean))+
-  geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+fish_biomass_individual<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
 
-
-fish_biomass_demersal<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_demersal_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("demersal_fish_biomass")
 
 habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=habitat_cover_2km))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
@@ -56,8 +52,8 @@ habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=habitat_c
 wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass_pelagic, fish_biomass_demersal, habitat_cover, wrack_shore, ncol=2)
-ggsave("C:Biodiversity idea//Plots//bird.density.marine.biomass.predictors.png", width=40, height=10, unit="cm")
+plot_grid(fish_biomass_schooling, fish_biomass_individual, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird.density.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
 
@@ -72,7 +68,7 @@ bycatch_richness<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=bycatc
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("bycatch_richness")
   
 plot_grid(fish_richness, bycatch_richness, wrack_richness, ncol=3)
-ggsave("C:Biodiversity idea//Plots//bird.density.marine.richness.predictors.png", width=40, height=10, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird.density.marine.richness.predictors.png", width=40, height=10, unit="cm")
 
 
 
@@ -94,12 +90,12 @@ soil.C<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
 plot_grid(soil.N, soil.S, soil.C, feather.plot.C, feather.plot.N, col=3)
-ggsave("C:Biodiversity idea//Plots//bird.density.marine.chemistry.predictors.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird.density.marine.chemistry.predictors.png", width=40, height=20, unit="cm")
 
 
 
 
-#plant productivity
+#NDVI productivity
 herbivores.plot.N<- ggplot(isotope_master %>% filter(group=="insects_CUR"), aes( y=NDVI_mean, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in herbivores")
 
@@ -124,11 +120,17 @@ soil.C<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
 plot_grid(soil.N, soil.S, gash.plot.N, herbivores.plot.N, isopods.plot.N, isopods.plot.C, col=3)
-ggsave("C:Biodiversity idea//Plots//NDVI.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//NDVI.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
 
 
-fish_biomass<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=fish_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("fish_biomass")
+fish_biomass_schooling_NDVI<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_NDVI<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
 
 habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=habitat_cover_2km))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
@@ -136,8 +138,8 @@ habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=habitat_cove
 wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=NDVI_mean, x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass, habitat_cover, wrack_shore, ncol=3)
-ggsave("C:Biodiversity idea//Plots//NDVI.marine.biomass.predictors.png", width=30, height=10, unit="cm")
+plot_grid(fish_biomass_schooling_NDVI, fish_biomass_individual_NDVI, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//NDVI.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
 #plant cover
@@ -165,11 +167,18 @@ soil.C<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
 plot_grid(soil.N, soil.S, gash.plot.N, herbivores.plot.N, isopods.plot.N, isopods.plot.C, col=3)
-ggsave("C:Biodiversity idea//Plots//Plant_cover.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//Plant_cover.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
 
 
-fish_biomass<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=fish_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("fish_biomass")
+
+fish_biomass_schooling_plant<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_plant<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
 
 habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=habitat_cover_2km))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
@@ -177,12 +186,12 @@ habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=habitat_co
 wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=total_cover, x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass, habitat_cover, wrack_shore, ncol=3)
-ggsave("C:Biodiversity idea//Plots//Plant_cover.marine.biomass.predictors.png", width=30, height=10, unit="cm")
+plot_grid(fish_biomass_schooling_plant,fish_biomass_individual_plant, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//Plant_cover.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
 
-#plant cover
+#tree sum basal
 herbivores.plot.N<- ggplot(isotope_master %>% filter(group=="insects_CUR"), aes( y=sum_basal, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in herbivores")
 
@@ -196,22 +205,28 @@ isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=
 gash.plot.N<- ggplot(isotope_master %>% filter(group=="gash"), aes( y=sum_basal, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in salal")
 
-soil.N<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d15n))+
+soil.N_tree<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n in soil")
 
-soil.S<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d34s))+
+soil.S_tree<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d34s))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s in soil")
 
 
-soil.C<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d13c))+
+soil.C_tree<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
-plot_grid(soil.N, soil.S, gash.plot.N, herbivores.plot.N, isopods.plot.N, isopods.plot.C, col=3)
-ggsave("C:Biodiversity idea//Plots//sum_basal.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
+plot_grid(soil.N_tree, soil.S_tree, gash.plot.N, herbivores.plot.N, isopods.plot.N, isopods.plot.C, col=3)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//sum_basal.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
 
 
-fish_biomass<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=fish_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("fish_biomass")
+fish_biomass_schooling_tree<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_tree<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
 
 habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=habitat_cover_2km))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
@@ -219,100 +234,171 @@ habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=habitat_cove
 wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=sum_basal, x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass, habitat_cover, wrack_shore, ncol=3)
-ggsave("C:Biodiversity idea//Plots//sum_basal.marine.biomass.predictors.png", width=30, height=10, unit="cm")
+plot_grid(fish_biomass_schooling_tree, fish_biomass_individual_tree, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//sum_basal.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
 
 #herbivore abundance
 
-herbivores.plot.N<- ggplot(isotope_master %>% filter(group=="insects_CUR"), aes( y=insect_herbivore_beat_av_abundance, x=d15n))+
+herbivores.plot.N<- ggplot(isotope_master %>% filter(group=="insects_CUR"), aes( y=insect_herbivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in herbivores")
 
-isopods.plot.N<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_herbivore_beat_av_abundance, x=d15n))+
+isopods.plot.N<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_herbivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in isopods")
 
-isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_herbivore_beat_av_abundance, x=d13c))+
+isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_herbivore_pitfall_av_abundance, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
 
 
-gash.plot.N<- ggplot(isotope_master %>% filter(group=="gash"), aes( y=insect_herbivore_beat_av_abundance, x=d15n))+
+gash.plot.N<- ggplot(isotope_master %>% filter(group=="gash"), aes( y=insect_herbivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in salal")
 
-soil.N<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=d15n))+
+soil.N<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n in soil")
 
-soil.S<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=d34s))+
+soil.S<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=d34s))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s in soil")
 
 
-soil.C<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=d13c))+
+soil.C<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
 plot_grid(soil.N, soil.S, gash.plot.N, herbivores.plot.N, isopods.plot.N, isopods.plot.C, col=3)
-ggsave("C:Biodiversity idea//Plots//herbivore_abundance.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//herbivore_abundance.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
 
 
-fish_biomass<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=fish_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("fish_biomass")
 
-habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=habitat_cover_2km))+
+
+fish_biomass_schooling_herb<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_herb<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
+
+habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=habitat_cover_2km))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
 
-wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_beat_av_abundance, x=log(SITE_SUM+1)))+
+wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=insect_herbivore_pitfall_av_abundance, x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass, habitat_cover, wrack_shore, ncol=3)
-ggsave("C:Biodiversity idea//Plots//herbivore_abundance.marine.biomass.predictors.png", width=30, height=10, unit="cm")
+plot_grid(fish_biomass_schooling_herb, fish_biomass_individual_herb, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//herbivore_abundance.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
-#plant cover
-birdfoods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=insect_birdfood_beat_av_abundance, x=d13c))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivores")
+#carnivore
 
-isopods.plot.N<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_birdfood_beat_av_abundance, x=d15n))+
+carnivores.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=insect_carnivore_pitfall_av_abundance, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in carnivores")
+
+isopods.plot.N<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_carnivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in isopods")
 
-isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_birdfood_beat_av_abundance, x=d13c))+
+isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=insect_carnivore_pitfall_av_abundance, x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
 
-soil.N<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=d15n))+
+
+gash.plot.N<- ggplot(isotope_master %>% filter(group=="gash"), aes( y=insect_carnivore_pitfall_av_abundance, x=d15n))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in salal")
+
+soil.N<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n in soil")
 
-soil.S<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=d34s))+
+soil.S<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=d34s))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s in soil")
 
 
-soil.C<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=d13c))+
+soil.C<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
+
+plot_grid(soil.N, soil.S, gash.plot.N, carnivores.plot.C, isopods.plot.N, isopods.plot.C, col=3)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//carnivore_abundance.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
+
+
+
+
+fish_biomass_schooling_carn<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_carn<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
+
+habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=habitat_cover_2km))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat %")
+
+wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=insect_carnivore_pitfall_av_abundance, x=log(SITE_SUM+1)))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
+
+plot_grid(fish_biomass_schooling_carn, fish_biomass_individual_carn, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//carnivore_abundance.marine.biomass.predictors.png", width=20, height=20, unit="cm")
+
+
+#bird food cover
+birdfoods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivores")
+
+isopods.plot.N<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d15n))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15N in isopods")
+
+isopods.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+soil.N<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=d15n))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n in soil")
+
+soil.S<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=d34s))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s in soil")
+
+
+soil.C<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13c in soil")
 
 plot_grid(soil.N, soil.S, gash.plot.N, birdfoods.plot.C, isopods.plot.N, isopods.plot.C, col=3)
-ggsave("C:Biodiversity idea//Plots//birdfood_abundance.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
-
-
-fish_biomass_pelagic<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=fish_pelagic_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("fish_pelagic_biomass")
-
-fish_biomass_demersal<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=fish_demersal_biomass_bym3_mean))+
-  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("fish_demersal_biomass")
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//birdfood_abundance.marine.chemistry.predictors.png", width=30, height=20, unit="cm")
 
 
 
-habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=log(HAB2000)))+
+
+
+#birdfood
+fish_biomass_schooling_bf<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=schooling_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=schooling_fish_biomass_bym3_mean-schooling_fish_biomass_bym3_sd, xmax=schooling_fish_biomass_bym3_mean+schooling_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("schooling_fish_biomass")
+
+
+fish_biomass_individual_bf<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=individual_fish_biomass_bym3_mean))+
+  #geom_errorbarh(aes(xmin=individual_fish_biomass_bym3_mean-individual_fish_biomass_bym3_sd, xmax=individual_fish_biomass_bym3_mean+individual_fish_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("individual_fish_biomass")
+
+
+habitat_cover<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=log(HAB2000)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("nearby marine habitat")
 
-wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=insect_birdfood_beat_av_abundance, x=log(SITE_SUM+1)))+
+wrack_shore<-ggplot(fish_richness_merged_isl, aes( y=log(insect_birdfood_pitfall_av_abundance), x=log(SITE_SUM+1)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("wrack on shore")
 
-plot_grid(fish_biomass, habitat_cover, wrack_shore, ncol=3)
-ggsave("C:Biodiversity idea//Plots//birdfood_abundance.marine.biomass.predictors.png", width=30, height=10, unit="cm")
+plot_grid(fish_biomass_schooling_bf, fish_biomass_individual_bf, habitat_cover, wrack_shore, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//birdfood_abundance.marine.biomass.predictors.png", width=20, height=20, unit="cm")
 
 
+
+
+# Relating marine variables to each other ---------------------------------
 
 
 #### relating marine variables
 
-ggplot(fish_richness_merged_isl, aes(d34s, y=fish_biomass_bym3_mean))+
+ggplot(fish_richness_merged_isl, aes(d34s, y=d15n))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("d34s soil")
+
+
+ggplot(fish_richness_merged_isl, aes(d34s, y=schooling_fish_biomass_bym3_mean))+
   geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("d34s soil")
 
 
@@ -381,6 +467,14 @@ ggplot(fish_richness_merged_isl  %>% filter(SITE_SUM_cat_isl!="NA"), aes(col=SIT
 
 
 
+# Histograms --------------------------------------------------------------
+
+ggplot(fish_richness_merged_isl, aes(schooling_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
+ggplot(fish_richness_merged_isl, aes(individual_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
+
+
+
+ggplot(fish_richness_merged_isl, aes(fish_abundance_bym3))+ geom_density(alpha=.7)
 
 
 
@@ -1226,15 +1320,14 @@ ggsave("C:Biodiversity idea//Plots//Transect//Resources_terr_var//bycatch_abunda
 # Plotting Marine resources vs. biogeography ----------------------------
 
 #histogram of marine variab
-hist_marine1<-ggplot(fish_richness_merged_tran_isl_300, aes(x=bycatch_abundance_bym3))+geom_density()
-hist_marine2<-ggplot(fish_richness_merged_tran_isl_300, aes(x=bycatch_richness_corrected))+geom_density()
-hist_marine3<-ggplot(fish_richness_merged_tran_isl_300, aes(x=log(fish_abundance_bym3)))+geom_density()
-hist_marine4<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_richness_corrected))+geom_density()
-hist_marine5<-ggplot(fish_richness_merged_tran_isl_300, aes(x=log(fish_biomass_bym3)))+geom_density()
-hist_marine6<-ggplot(fish_richness_merged_tran_isl_300, aes(x=fish_length))+geom_density()
-hist_marine7<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_richness_corrected))+geom_density()
-hist_marine8<-ggplot(fish_richness_merged_tran_isl_300, aes(x=marine_abundance_bym3))+geom_density()
-
+hist_marine1<-ggplot(fish_richness_merged_tran_isl, aes(x=bycatch_abundance_bym3))+geom_density()
+hist_marine2<-ggplot(fish_richness_merged_tran_isl, aes(x=bycatch_richness_corrected))+geom_density()
+hist_marine3<-ggplot(fish_richness_merged_tran_isl, aes(x=log(fish_abundance_bym3)))+geom_density()
+hist_marine4<-ggplot(fish_richness_merged_tran_isl, aes(x=fish_richness_corrected))+geom_density()
+hist_marine5<-ggplot(fish_richness_merged_tran_isl, aes(x=log(fish_biomass_bym3)))+geom_density()
+hist_marine6<-ggplot(fish_richness_merged_tran_isl, aes(x=fish_length))+geom_density()
+hist_marine7<-ggplot(fish_richness_merged_tran_isl, aes(x=marine_richness_corrected))+geom_density()
+hist_marine8<-ggplot(fish_richness_merged_tran_isl, aes(x=marine_abundance_bym3))+geom_density()
 plot_grid(hist_marine4, hist_marine5, hist_marine6, hist_marine3, hist_marine2, hist_marine1, hist_marine7, ncol=4)
 ggsave("C:Biodiversity idea//Plots//Transect//Resources_biogeog//histogram_marine.png")
 
