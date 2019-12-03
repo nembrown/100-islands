@@ -246,22 +246,24 @@ ben_bycatch_data_wide_year_richness <- ben_bycatch_data_wide_year_richness[,-2] 
 
 
 ### bycatch biomass
-View(ben_weights_bycatch)
+#View(ben_weights_bycatch)
 
-ben_weights_bycatch<-ben_weights_bycatch%>% filter(! species %in% jellies)
+#ben_weights_bycatch<-ben_weights_bycatch%>% filter(! species %in% jellies)
 
 names(ben_weights_bycatch)[1]<-"site"
-ben_weights_bycatch<-ben_weights_bycatch[,1:11]
+ben_weights_bycatch<-ben_weights_bycatch[,1:12]
 # there are some replicated species - I'm going to sum them but ask Ben!! 
+head(ben_weights_bycatch)
+ben_weights_bycatch$biomass_abund<-as.numeric(ben_weights_bycatch$biomass_abund)
 
 
 ben_weights_bycatch_wide <-ben_weights_bycatch  %>% 
   group_by(site, year, month, day, replicate, species) %>% 
-  summarise(sum_biomass = sum(biomass..g., na.rm=TRUE)) %>% 
+  summarise(sum_biomass = sum(biomass_abund, na.rm=TRUE)) %>% 
   spread( species, sum_biomass) %>% 
   replace(is.na(.), 0)
 
-#head(ben_weights_bycatch_wide)
+head(ben_weights_bycatch_wide)
 ben_weights_bycatch_long<-ben_weights_bycatch_wide %>% select(site, year, month, day, replicate)
 ben_weights_bycatch_long$bycatch_biomass<-rowSums(ben_weights_bycatch_wide[,-c(1,2,3,4,5)],na.rm = TRUE)
 
@@ -275,8 +277,8 @@ ben_netdimensions_summer4$sum_volume<-as.numeric(ben_netdimensions_summer4$sum_v
 ben_weights_bycatch_long_nf<-merge(ben_weights_bycatch_long, ben_netdimensions_summer4)
 ben_weights_bycatch_long_nf$bycatch_biomass_bym3<-ben_weights_bycatch_long_nf$bycatch_biomass/(ben_weights_bycatch_long_nf$sum_volume)
 
-View(ben_weights_bycatch_long_nf)
-#ggplot(ben_weights_bycatch_long_nf, aes(bycatch_biomass_bym3)) + geom_density(alpha=.7)
+# View(ben_weights_bycatch_long_nf)
+# ggplot(ben_weights_bycatch_long_nf, aes(bycatch_biomass_bym3)) + geom_density(alpha=.7)
 # ggplot(ben_weights_bycatch_long_nf, aes(bycatch_biomass_bym3)) + geom_density(alpha=.7)+xlim(0,10)
 
 
@@ -660,6 +662,8 @@ fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_mast
 fish_richness_merged_tran$combined_richness_corrected<-fish_richness_merged_tran$wrack_richness+fish_richness_merged_tran$marine_richness_corrected
 fish_richness_merged_tran$eelgrass_cover_2km<-(fish_richness_merged_tran$MEAN_egarea2k)/(fish_richness_merged_tran$Radius_m_2000)
 fish_richness_merged_tran$habitat_cover_2km<-(fish_richness_merged_tran$sum_2km)/(fish_richness_merged_tran$Radius_m_2000)
+fish_richness_merged_tran$fish_biomass_bym3_mean<-fish_richness_merged_tran$schooling_fish_biomass_bym3_mean+fish_richness_merged_tran$individual_fish_biomass_bym3_mean
+fish_richness_merged_tran$fish_bycatch_biomass<-fish_richness_merged_tran$fish_biomass_bym3_mean+fish_richness_merged_tran$bycatch_biomass_bym3_mean
 
 
 
@@ -735,7 +739,11 @@ fish_richness_merged_isl<- fish_richness_merged_isl %>%
 fish_richness_merged_isl$combined_richness_corrected<-fish_richness_merged_isl$wrack_richness+fish_richness_merged_isl$marine_richness_corrected
 fish_richness_merged_isl$eelgrass_cover_2km<-(fish_richness_merged_isl$MEAN_egarea2k)/(fish_richness_merged_isl$Radius_m_2000)
 fish_richness_merged_isl$habitat_cover_2km<-(fish_richness_merged_isl$sum_2km)/(fish_richness_merged_isl$Radius_m_2000)
+fish_richness_merged_isl$fish_biomass_bym3_mean<-fish_richness_merged_isl$schooling_fish_biomass_bym3_mean+fish_richness_merged_isl$individual_fish_biomass_bym3_mean
+fish_richness_merged_isl$fish_bycatch_biomass<-fish_richness_merged_isl$fish_biomass_bym3_mean+fish_richness_merged_isl$bycatch_biomass_bym3_mean
 
+  
+  
 xs_habcover<- quantile(na.omit(fish_richness_merged_isl$habitat_cover_2km),c(0,0.25,0.75, 1))
 labels_habcover <- c("low habitat cover", "med habitat cover", "high habitat cover")
 fish_richness_merged_isl<- fish_richness_merged_isl %>% 
