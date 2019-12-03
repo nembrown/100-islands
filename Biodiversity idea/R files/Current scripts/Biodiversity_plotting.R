@@ -29,6 +29,20 @@ levels(isotope_master$group)
 
 isotope_master_fish<-merge(isotope_by_isl_gathered4, fish_richness_merged_isl, by="unq_isl")
 
+### bycatch
+ggplot(fish_richness_merged_isl, aes( x=d34s, y=log(bycatch_biomass_bym3_mean+1)))+
+  #geom_errorbar(aes(ymin=bycatch_biomass_bym3_mean-bycatch_biomass_bym3_sd, ymax=bycatch_biomass_bym3_mean+bycatch_biomass_bym3_sd)) +
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s")
+
+
+ggplot(fish_richness_merged_isl, aes(x=easting, y=bycatch_biomass_bym3_mean))+
+  geom_errorbar(aes(ymin=bycatch_biomass_bym3_mean-bycatch_biomass_bym3_sd, ymax=bycatch_biomass_bym3_mean+bycatch_biomass_bym3_sd)) +
+  geom_point(size=2)
+#+geom_smooth() +theme_classic()+xlab("d15n")
+
+
+
+
 
 # Productivity vs. marine subsidies ---------------------------------------
 
@@ -472,6 +486,7 @@ ggplot(fish_richness_merged_isl  %>% filter(SITE_SUM_cat_isl!="NA"), aes(col=SIT
 ggplot(fish_richness_merged_isl, aes(schooling_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
 ggplot(fish_richness_merged_isl, aes(individual_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
 
+ggplot(fish_richness_merged_isl, aes(bycatch_biomass_bym3_mean))+ geom_density(alpha=.7)
 
 
 ggplot(fish_richness_merged_isl, aes(fish_abundance_bym3))+ geom_density(alpha=.7)
