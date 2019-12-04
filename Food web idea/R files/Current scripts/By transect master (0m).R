@@ -97,10 +97,14 @@ soil_merge_s<-merge(soil_merge, soil_s, by="unq_plot")
 head(soil_merge_s)
 
 
+# ggplot(soil_merge_s, aes(x=d34s, y=d15n, col=shore_dist))+geom_point()
+
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
 
 head(soil_merge_0m)
+# ggplot(soil_merge_0m, aes(x=d34s, y=d15n))+geom_point()
+
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
 
