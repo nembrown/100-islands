@@ -55,6 +55,175 @@ plot_grid(fish_biomass_plant, fish_biomass_NDVI, fish_biomass_tree, fish_biomass
 ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_fish_biomass.png", width=40, height=20, unit="cm")
 
 
+plot_grid(plant_feather.plot.C, NDVI_feather.plot.C, tree_feather.plot.C, herb_feather.plot.C, det_feather.plot.C,carn_feather.plot.C, bf_feather.plot.C, bird_feather.plot.C,ncol=4)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_feather.C.png", width=40, height=20, unit="cm")
+
+plot_grid(plant_insects_ISO.plot.C, NDVI_insects_ISO.plot.C, tree_insects_ISO.plot.C, herb_insects_ISO.plot.C, det_insects_ISO.plot.C,carn_insects_ISO.plot.C, bf_insects_ISO.plot.C, bird_insects_ISO.plot.C,ncol=4)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_insects_ISO.C.png", width=40, height=20, unit="cm")
+
+plot_grid(plant_insects_COL.plot.C, NDVI_insects_COL.plot.C, tree_insects_COL.plot.C, herb_insects_COL.plot.C, det_insects_COL.plot.C,carn_insects_COL.plot.C, bf_insects_COL.plot.C, bird_insects_COL.plot.C,ncol=4)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_insects_COL.C.png", width=40, height=20, unit="cm")
+
+plot_grid(plant_Mouse_feces.plot.C, NDVI_Mouse_feces.plot.C, tree_Mouse_feces.plot.C, herb_Mouse_feces.plot.C, det_Mouse_feces.plot.C,carn_Mouse_feces.plot.C, bf_Mouse_feces.plot.C, bird_Mouse_feces.plot.C,ncol=4)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_Mouse_feces.C.png", width=40, height=20, unit="cm")
+
+plot_grid(plant_bird_feces.plot.C, NDVI_bird_feces.plot.C, tree_bird_feces.plot.C, herb_bird_feces.plot.C, det_bird_feces.plot.C,carn_bird_feces.plot.C, bf_bird_feces.plot.C, bird_bird_feces.plot.C,ncol=4)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_bird_feces.C.png", width=40, height=20, unit="cm")
+
+#####
+ggplot(fish_richness_merged_isl %>% filter(! schooling_fish_biomass_bym3_mean_cat_isl=="NA" & ! schooling_fish_biomass_bym3_mean_cat_isl=="med schooling fish biomass"), aes( y=log(bird.richness), x=log_Area, col=schooling_fish_biomass_bym3_mean_cat_isl, fill=schooling_fish_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+
+ggplot(fish_richness_merged_isl %>% filter(! schooling_fish_biomass_bym3_mean_cat_isl=="NA" & ! schooling_fish_biomass_bym3_mean_cat_isl=="med schooling fish biomass"), aes( y=log(plant_richness), x=log_Area, col=schooling_fish_biomass_bym3_mean_cat_isl, fill=schooling_fish_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(tree_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+ggplot(fish_richness_merged_isl %>% filter(! schooling_fish_biomass_bym3_mean_cat_isl=="NA" & ! schooling_fish_biomass_bym3_mean_cat_isl=="med schooling fish biomass"), aes( y=log(insect_richness), x=log_Area, col=schooling_fish_biomass_bym3_mean_cat_isl, fill=schooling_fish_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+
+ggplot(fish_richness_merged_isl %>% filter(! individual_fish_biomass_bym3_mean_cat_isl=="NA" & ! individual_fish_biomass_bym3_mean_cat_isl=="med individual fish biomass"), aes( y=log(insect_richness), x=log_Area, col=individual_fish_biomass_bym3_mean_cat_isl, fill=individual_fish_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+
+
+# Aggregating plots by d13C -----------------------------------------------
+
+
+#feather plots
+
+bird_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=bird.density, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+NDVI_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=NDVI_mean, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+plant_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=total_cover, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+tree_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=sum_basal, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+det_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=log(insect_detritivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+herb_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=log(insect_herbivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+carn_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=log(insect_carnivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+bf_feather.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feathers"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird feathers")
+
+
+######## detritivore plots
+bird_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=bird.density, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+NDVI_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=NDVI_mean, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+plant_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=total_cover, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+tree_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=sum_basal, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+det_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_detritivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+herb_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_herbivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+carn_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_carnivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+bf_insects_ISO.plot.C<- ggplot(isotope_master %>% filter(group=="insects_ISO"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in isopods")
+
+# carn plots
+bird_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=bird.density, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+NDVI_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=NDVI_mean, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+plant_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=total_cover, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+tree_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=sum_basal, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+det_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=log(insect_detritivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+herb_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=log(insect_herbivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+carn_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=log(insect_carnivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+bf_insects_COL.plot.C<- ggplot(isotope_master %>% filter(group=="insects_COL"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in carnivorous insects")
+
+
+## Mouse feces
+bird_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=bird.density, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+NDVI_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=NDVI_mean, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+plant_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=total_cover, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+tree_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=sum_basal, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+det_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=log(insect_detritivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+herb_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=log(insect_herbivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+carn_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=log(insect_carnivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+bf_Mouse_feces.plot.C<- ggplot(isotope_master %>% filter(group=="Mouse feces"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in Mouse feces")
+
+### bird feces
+bird_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=bird.density, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+NDVI_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=NDVI_mean, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+plant_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=total_cover, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+tree_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=sum_basal, x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+det_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=log(insect_detritivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+herb_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=log(insect_herbivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+carn_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=log(insect_carnivore_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+bf_bird_feces.plot.C<- ggplot(isotope_master %>% filter(group=="bird_feces"), aes( y=log(insect_birdfood_pitfall_av_abundance), x=d13c))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d13C in bird_feces")
+
+
 # Bird productivity -------------------------------------------------------
 
 
@@ -62,7 +231,11 @@ ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_fish_biomass.png",
 #View(fish_richness_merged_isl)
 
 bird_fish_biomass<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=fish_biomass_bym3_mean))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("fish_biomass")
+
+ggplot(fish_richness_merged_isl, aes( y=bird.richness, x=fish_biomass_bym3_mean))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("fish_biomass")
+
 
 bird_bycatch_biomass<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=bycatch_biomass_bym3_mean))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("bycatch_biomass")
@@ -121,9 +294,15 @@ soil.N_bird<-ggplot(fish_richness_merged_isl, aes( y=bird.density, x=d15n))+
 plot_grid(soil.N_bird, soil.S_bird, feather.plot.C, feather.plot.N, ncol=4)
 ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird.density.marine.chemistry.predictors.png", width=40, height=10, unit="cm")
 
+ggplot(fish_richness_merged_isl %>% filter(! bird.density_cat_isl =="NA" & ! bird.density_cat_isl =="med bird density"), aes( y=d15n, x=n, col=bird.density_cat_isl, fill=bird.density_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
 
 
+ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(bird.richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
 
+
+View(fish_richness_merged_isl)
 # NDVI Prod ---------------------------------------------------------------
 
 
@@ -496,15 +675,15 @@ ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//birdfood_abundance.mar
 
 #### relating marine variables
 
-ggplot(fish_richness_merged_isl, aes(d34s, y=d15n, col=size.cat2))+
+ggplot(fish_richness_merged_isl, aes(d34s, y=d15n))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
 
-ggplot(fish_richness_merged_tran, aes(y=d34s, x=slope))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("slope")
+ggplot(fish_richness_merged_isl, aes(y=d34s, x=log(Area)))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("Area")
 
 
-ggplot(fish_richness_merged_isl, aes(d34s, y=fish_bycatch_biomass))+
-  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
+ggplot(fish_richness_merged_isl, aes(d15n, y=fish_biomass_bym3_mean))+
+         geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n soil")
 
 ggplot(fish_richness_merged_isl, aes(d34s, y=log(HAB2000)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
@@ -537,7 +716,7 @@ ggplot(isotope_master_fish %>% filter(group=="insects_COL"), aes( x=d13c.x, y=fi
   geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("d13c carnivores")
 
 
-ggplot(isotope_master_fish %>% filter(group=="Mouse feces"), aes( x=d13c.x, y=fish_biomass_bym3_mean))+
+ggplot(isotope_master_fish %>% filter(group=="Mouse hair"), aes( x=d13c.x, y=fish_biomass_bym3_mean))+
   geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+xlab("d13c Mouse feces")
 
 
