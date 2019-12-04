@@ -88,7 +88,16 @@ head(soil_merge)
 write.csv(soil_merge, "C:Food web idea\\Data by person\\Norah.data\\soil_merge.csv")
 
 
-soil_merge_0m <- soil_merge %>% filter(shore_dist == 0)
+#
+### add in d34s here
+soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
+head(soil_s)
+
+soil_merge_s<-merge(soil_merge, soil_s, by="unq_plot")
+head(soil_merge_s)
+
+
+soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
 
 head(soil_merge_0m)
@@ -203,6 +212,7 @@ head(owen.veg_tran_0m_midi)
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_midi[,c(1:7)], by="unq_tran", all=TRUE)
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_gash[,c(1:7)], by="unq_tran", all=TRUE)
 head(habitat_veg_soil_by_tran_0m)
+
 
 
 
