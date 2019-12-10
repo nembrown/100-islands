@@ -780,6 +780,11 @@ labels_individual_fish_biomass_bym3_mean <- c("low individual fish biomass", "me
 fish_richness_merged_isl<- fish_richness_merged_isl %>% 
   mutate(individual_fish_biomass_bym3_mean_cat_isl = cut(individual_fish_biomass_bym3_mean, xs_individual_fish_biomass_bym3_mean, labels = labels_individual_fish_biomass_bym3_mean))
 
+xs_bycatch_biomass_bym3_mean<- quantile(na.omit(fish_richness_merged_isl$bycatch_biomass_bym3_mean),c(0,0.25,0.75, 1))
+labels_bycatch_biomass_bym3_mean <- c("low invert biomass", "med invert biomass", "high invert biomass")
+fish_richness_merged_isl<- fish_richness_merged_isl %>% 
+  mutate(bycatch_biomass_bym3_mean_cat_isl = cut(bycatch_biomass_bym3_mean, xs_bycatch_biomass_bym3_mean, labels = labels_bycatch_biomass_bym3_mean))
+
 
 write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
 

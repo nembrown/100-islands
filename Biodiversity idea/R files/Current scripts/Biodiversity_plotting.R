@@ -29,6 +29,19 @@ levels(isotope_master$group)
 
 isotope_master_fish<-merge(isotope_by_isl_gathered4, fish_richness_merged_isl, by="unq_isl")
 
+head(isotope_master_fish)
+isotope_master_fish_feathers<-isotope_master_fish %>% filter(group =="bird_feathers")
+xs_C_feathers<- quantile(na.omit(isotope_master_fish_feathers$d13c.x),c(0,0.25,0.75, 1))
+labels_C_feathers <- c("low d13c feathers", "med d13c feathers", "high d13c feathers")
+isotope_master_fish_feathers<- isotope_master_fish_feathers%>% 
+  mutate(d13c_feathers_cat_isl = cut(d13c.x, xs_C_feathers, labels = labels_C_feathers))
+
+isotope_master_fish_feces<-isotope_master_fish %>% filter(group =="bird_feces")
+xs_C_feces<- quantile(na.omit(isotope_master_fish_feces$d13c.x),c(0,0.25,0.75, 1))
+labels_C_feces <- c("low d13c feces", "med d13c feces", "high d13c feces")
+isotope_master_fish_feces<- isotope_master_fish_feces%>% 
+  mutate(d13c_feces_cat_isl = cut(d13c.x, xs_C_feces, labels = labels_C_feces))
+
 
 
 # Productivity vs. marine subsidies ---------------------------------------
@@ -70,16 +83,312 @@ ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_Mouse_feces.C.png"
 plot_grid(plant_bird_feces.plot.C, NDVI_bird_feces.plot.C, tree_bird_feces.plot.C, herb_bird_feces.plot.C, det_bird_feces.plot.C,carn_bird_feces.plot.C, bf_bird_feces.plot.C, bird_bird_feces.plot.C,ncol=4)
 ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//all_bird_feces.C.png", width=40, height=20, unit="cm")
 
+plot_grid(bird_fish_area, bird_bycatch_area, bird_habcover_area, bird_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird_area_marine.png", width=20, height=10, unit="cm")
+
+plot_grid(tree_fish_area, tree_bycatch_area, tree_habcover_area, tree_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//tree_area_marine.png", width=20, height=10, unit="cm")
+
+plot_grid(insect_herbivore_fish_area, insect_herbivore_bycatch_area, insect_herbivore_habcover_area, insect_herbivore_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_herbivore_area_marine.png", width=20, height=10, unit="cm")
+
+plot_grid(insect_birdfood_fish_area, insect_birdfood_bycatch_area, insect_birdfood_habcover_area, insect_birdfood_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_birdfood_area_marine.png", width=20, height=10, unit="cm")
+
+
+plot_grid(insect_detritivore_fish_area, insect_detritivore_bycatch_area, insect_detritivore_habcover_area, insect_detritivore_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_detritivore_area_marine.png", width=20, height=10, unit="cm")
+
+
+plot_grid(insect_carnivore_fish_area, insect_carnivore_bycatch_area, insect_carnivore_habcover_area, insect_carnivore_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_carnivore_area_marine.png", width=20, height=10, unit="cm")
+
+
+plot_grid(plant_fish_area, plant_bycatch_area, plant_habcover_area, plant_sitesum_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//plant_area_marine.png", width=20, height=10, unit="cm")
+
+
+plot_grid(bird_d15n_area, bird_d34s_area,bird_d13c_feathers_area,bird_d13c_feces_area, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//bird_area_chemistry.png", width=20, height=10, unit="cm")
+
+plot_grid(tree_d15n_area, tree_d34s_area,tree_d13c_feathers_area,tree_d13c_feces_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//tree_area_chemistry.png", width=20, height=10, unit="cm")
+
+plot_grid(insect_herbivore_d15n_area, insect_herbivore_d34s_area,insect_herbivore_d13c_feathers_area,insect_herbivore_d13c_feces_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_herbivore_area_chemistry.png", width=20, height=10, unit="cm")
+
+plot_grid(plant_d15n_area, plant_d34s_area,plant_d13c_feathers_area,plant_d13c_feces_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//plant_area_chemistry.png", width=20, height=10, unit="cm")
+
+
+plot_grid(insect_carnivore_d15n_area, insect_carnivore_d34s_area,insect_carnivore_d13c_feathers_area,insect_carnivore_d13c_feces_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_carnivore_area_chemistry.png", width=20, height=10, unit="cm")
+
+plot_grid(insect_detritivore_d15n_area, insect_detritivore_d34s_area,insect_detritivore_d13c_feathers_area,insect_detritivore_d13c_feces_area,ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_detritivore_area_chemistry.png", width=20, height=10, unit="cm")
+
+plot_grid(insect_birdfood_d15n_area, insect_birdfood_d34s_area, insect_birdfood_d13c_feathers_area,insect_birdfood_d13c_feces_area, ncol=2)
+ggsave("C:Biodiversity idea//Plots//Subsidy Productivity//insect_birdfood_area_chemistry.png", width=20, height=10, unit="cm")
+
+
+
 #####
-ggplot(fish_richness_merged_isl %>% filter(! schooling_fish_biomass_bym3_mean_cat_isl=="NA" & ! schooling_fish_biomass_bym3_mean_cat_isl=="med schooling fish biomass"), aes( y=log(bird.richness), x=log_Area, col=schooling_fish_biomass_bym3_mean_cat_isl, fill=schooling_fish_biomass_bym3_mean_cat_isl))+
-  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+colorset_richness_habcover = c("low habitat cover"="black" , "high habitat cover" ="#1baff5" )
+colorset_richness_SITE_SUM = c("low beach wrack"="black" , "high beach wrack" ="#1baff5" )
+colorset_richness_fish_biomass_bym3 = c("low fish biomass"="black" , "high fish biomass" ="#1baff5" )
+colorset_richness_bycatch_biomass_bym3_mean = c("low invert biomass"="black" , "high invert biomass" ="#1baff5" )
+colorset_richness_d15n = c("low N15"="black" , "high N15" ="#1baff5" )
+colorset_richness_d34s = c("low S34"="black" , "high S34" ="#1baff5" )
+colorset_richness_d13c_feathers = c("low d13c feathers"="black" , "high d13c feathers" ="#1baff5" )
+colorset_richness_d13c_feces = c("low d13c feces"="black" , "high d13c feces" ="#1baff5" )
 
 
-ggplot(fish_richness_merged_isl %>% filter(! schooling_fish_biomass_bym3_mean_cat_isl=="NA" & ! schooling_fish_biomass_bym3_mean_cat_isl=="med schooling fish biomass"), aes( y=log(plant_richness), x=log_Area, col=schooling_fish_biomass_bym3_mean_cat_isl, fill=schooling_fish_biomass_bym3_mean_cat_isl))+
-  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+##### Bird richness vs area
 
-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(tree_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
-  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
+# Richness vs.  area ------------------------------------------------------
+
+bird_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(bird.richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+bird_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(bird.richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+bird_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(bird.richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+bird_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(bird.richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+bird_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(bird.richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+bird_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(bird.richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+bird_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(bird.richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+bird_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(bird.richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+
+
+#### Tree
+tree_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(tree_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+tree_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(tree_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+tree_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(tree_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+tree_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(tree_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+tree_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(tree_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+tree_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(tree_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+tree_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(tree_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+tree_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(tree_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+
+
+#######
+#Herbivore
+insect_herbivore_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(insect_herbivore_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+insect_herbivore_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(insect_herbivore_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+insect_herbivore_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_herbivore_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+insect_herbivore_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(insect_herbivore_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+insect_herbivore_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(insect_herbivore_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+insect_herbivore_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(insect_herbivore_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+insect_herbivore_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(insect_herbivore_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+insect_herbivore_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(insect_herbivore_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+
+
+#birdfood
+insect_birdfood_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(insect_birdfood_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+insect_birdfood_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(insect_birdfood_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+insect_birdfood_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_birdfood_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+insect_birdfood_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(insect_birdfood_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+insect_birdfood_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(insect_birdfood_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+insect_birdfood_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(insect_birdfood_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+insect_birdfood_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(insect_birdfood_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+insect_birdfood_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(insect_birdfood_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+
+
+#detritivore
+insect_detritivore_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(insect_detritivore_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+insect_detritivore_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(insect_detritivore_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+insect_detritivore_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_detritivore_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+insect_detritivore_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(insect_detritivore_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+insect_detritivore_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(insect_detritivore_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+insect_detritivore_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(insect_detritivore_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+insect_detritivore_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(insect_detritivore_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+insect_detritivore_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(insect_detritivore_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+
+
+
+#### carnivore
+insect_carnivore_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(insect_carnivore_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+insect_carnivore_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(insect_carnivore_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+insect_carnivore_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_carnivore_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+insect_carnivore_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(insect_carnivore_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+insect_carnivore_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(insect_carnivore_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+insect_carnivore_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(insect_carnivore_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+insect_carnivore_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(insect_carnivore_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+insect_carnivore_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(insect_carnivore_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
+#### plant
+plant_habcover_area<-ggplot(fish_richness_merged_isl %>% filter(! habcover_cat_isl=="NA" & ! habcover_cat_isl=="med habitat cover"), aes( y=log(plant_richness), x=log_Area, col=habcover_cat_isl, fill=habcover_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_habcover)+ scale_fill_manual(values=colorset_richness_habcover)
+
+plant_sitesum_area<-ggplot(fish_richness_merged_isl %>% filter(! SITE_SUM_cat_isl=="NA" & ! SITE_SUM_cat_isl=="no wrack"), aes( y=log(plant_richness), x=log_Area, col=SITE_SUM_cat_isl, fill=SITE_SUM_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_SITE_SUM)+ scale_fill_manual(values=colorset_richness_SITE_SUM)
+
+plant_fish_area<-ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(plant_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_fish_biomass_bym3)+ scale_fill_manual(values=colorset_richness_fish_biomass_bym3)
+
+plant_bycatch_area<-ggplot(fish_richness_merged_isl %>% filter(! bycatch_biomass_bym3_mean_cat_isl=="NA" & ! bycatch_biomass_bym3_mean_cat_isl=="med invert biomass"), aes( y=log(plant_richness), x=log_Area, col=bycatch_biomass_bym3_mean_cat_isl, fill=bycatch_biomass_bym3_mean_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_bycatch_biomass_bym3_mean)+ scale_fill_manual(values=colorset_richness_bycatch_biomass_bym3_mean)
+
+plant_d15n_area<-ggplot(fish_richness_merged_isl %>% filter(! d15n_cat_isl=="NA" & ! d15n_cat_isl=="med N15"), aes( y=log(plant_richness), x=log_Area, col=d15n_cat_isl, fill=d15n_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d15n)+ scale_fill_manual(values=colorset_richness_d15n)
+
+plant_d34s_area<-ggplot(fish_richness_merged_isl %>% filter(! d34s_cat_isl=="NA" & ! d34s_cat_isl=="med S34"), aes( y=log(plant_richness), x=log_Area, col=d34s_cat_isl, fill=d34s_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d34s)+ scale_fill_manual(values=colorset_richness_d34s)
+
+plant_d13c_feathers_area<-ggplot(isotope_master_fish_feathers %>% filter(! d13c_feathers_cat_isl=="NA" & ! d13c_feathers_cat_isl=="med d13c feathers"), aes( y=log(plant_richness), x=log_Area, col=d13c_feathers_cat_isl, fill=d13c_feathers_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feathers)+ scale_fill_manual(values=colorset_richness_d13c_feathers)
+
+plant_d13c_feces_area<-ggplot(isotope_master_fish_feces %>% filter(! d13c_feces_cat_isl=="NA" & ! d13c_feces_cat_isl=="med d13c feces"), aes( y=log(plant_richness), x=log_Area, col=d13c_feces_cat_isl, fill=d13c_feces_cat_isl))+
+  geom_point(size=2)+geom_smooth(method="lm") +theme_classic()+ theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
+  scale_colour_manual(values=colorset_richness_d13c_feces)+ scale_fill_manual(values=colorset_richness_d13c_feces)
+
 
 ggplot(fish_richness_merged_isl %>% filter(! fish_biomass_bym3_cat_isl=="NA" & ! fish_biomass_bym3_cat_isl=="med fish biomass"), aes( y=log(insect_richness), x=log_Area, col=fish_biomass_bym3_cat_isl, fill=fish_biomass_bym3_cat_isl))+
   geom_point(size=2)+geom_smooth(method="lm") +theme_classic()
@@ -684,6 +993,10 @@ ggplot(fish_richness_merged_isl, aes(y=d34s, x=log(Area)))+
 
 ggplot(fish_richness_merged_isl, aes(d15n, y=fish_biomass_bym3_mean))+
          geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n soil")
+
+ggplot(fish_richness_merged_isl, aes(d34s, y=fish_biomass_bym3_mean))+
+  geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
+
 
 ggplot(fish_richness_merged_isl, aes(d34s, y=log(HAB2000)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
