@@ -202,13 +202,17 @@ head(Deb_Owen_veg_combined_complete_filled)
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
 ### add in coordinates
-owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_2.csv", header=TRUE, sep=",")
 owen_coords<-owen_coords[,c(1:9)]
 owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
 owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
 owen_coords<-owen_coords[,c(3,4, 10)]
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
+View(owen_coords)
+
+
+
 
 
 pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv", header=TRUE, sep=",")
@@ -228,7 +232,7 @@ write.csv(Deb_Owen_veg_coords, "Food web idea//Data by person//Kalina.data/Deb_O
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
 
 
-
+head(Deb_Owen_veg_coords)
 
 # Mean for each island ----------------------------------------------------
 
