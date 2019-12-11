@@ -211,6 +211,10 @@ names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
 View(owen_coords)
 
+# kacey_coords<-read.csv("C:Food web idea//Data by person//Kacey.data//coords_final.csv", header=TRUE, sep=",")
+# head(kacey_coords)
+# kacey_coords<-kacey_coords[,-1]
+# 
 
 
 
