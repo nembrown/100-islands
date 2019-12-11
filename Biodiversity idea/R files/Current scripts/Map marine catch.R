@@ -192,10 +192,11 @@ arch_data_simple_st$site_type<-"arch_site"
 head(arch_data_simple_st)
 
 arch_data_simple_SP<-arch_data_simple_st[,c(1,10)]
+
 names(arch_data_simple_SP)[1]<-"site"
 arch_data_simple_SP$site<-as.factor(arch_data_simple_SP$site)
 
-df.SF_transects_marine_arch<-rbind(df.SF_transects_marine,arch_data_simple_SP)
+df.SF_transects_marine_arch<-rbind(df.SF_transects_marine[,1:2],arch_data_simple_SP)
 head(df.SF_transects_marine_arch)
 df.SF_transects_marine_arch$long<-st_coordinates(df.SF_transects_marine_arch)[,1] # get coordinates
 df.SF_transects_marine_arch$lat<-st_coordinates(df.SF_transects_marine_arch)[,2]
