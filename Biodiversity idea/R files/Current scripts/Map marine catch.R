@@ -154,17 +154,17 @@ df.SF_transects_simple$site_type<-"100_islands"
 
 df.SF_transects_marine<-rbind(df.SF_transects_simple, ben_habitat_data_simple.SP)
 head(df.SF_transects_marine)
-df.SF_transects_marine$long<-st_coordinates(df.SF_transects_marine)[,1] # get coordinates
-df.SF_transects_marine$lat<-st_coordinates(df.SF_transects_marine)[,2]
+ df.SF_transects_marine$long<-st_coordinates(df.SF_transects_marine)[,1] # get coordinates
+ df.SF_transects_marine$lat<-st_coordinates(df.SF_transects_marine)[,2]
 
 
-bbox_marine_trans <- make_bbox(df.SF_transects_marine$long, df.SF_transects_marine$lat, f = 0.1)
-map_toner_lite_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "toner-lite", crop=FALSE)
-map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "terrain", crop=TRUE)
+# bbox_marine_trans <- make_bbox(df.SF_transects_marine$long, df.SF_transects_marine$lat, f = 0.1)
+# map_toner_lite_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "toner-lite", crop=FALSE)
+# map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "terrain", crop=TRUE)
 
 
-# ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
-# ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
+ ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
 library(beyonce)
 
@@ -172,6 +172,54 @@ colorset_map = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA" )
 
 ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map)
 ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
+
+
+#### adding in Arc data
+arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
+head(arch_data)
+arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature", "feature","easting", "northing")]
+head(arch_data_simple)
+  
+data_arch_subset2 <- arch_data_simple[ , c("easting", "northing")]
+arch_data_simple<- arch_data_simple[complete.cases(data_arch_subset2), ] 
+
+
+arch_data_simple_sf <- st_as_sf(arch_data_simple, coords = c("easting", "northing"), crs = 26909)
+arch_data_simple_st<-st_transform(x = arch_data_simple_sf, crs = 4326)
+arch_data_simple_st$long<-st_coordinates(arch_data_simple_st)[,1] # get coordinates
+arch_data_simple_st$lat<-st_coordinates(arch_data_simple_st)[,2] # get coordinates
+arch_data_simple_st$site_type<-"arch_site"
+head(arch_data_simple_st)
+
+arch_data_simple_SP<-arch_data_simple_st[,c(1,10)]
+names(arch_data_simple_SP)[1]<-"site"
+arch_data_simple_SP$site<-as.factor(arch_data_simple_SP$site)
+
+df.SF_transects_marine_arch<-rbind(df.SF_transects_marine,arch_data_simple_SP)
+head(df.SF_transects_marine_arch)
+df.SF_transects_marine_arch$long<-st_coordinates(df.SF_transects_marine_arch)[,1] # get coordinates
+df.SF_transects_marine_arch$lat<-st_coordinates(df.SF_transects_marine_arch)[,2]
+
+
+bbox_marine_trans_arch <- make_bbox(df.SF_transects_marine_arch$long, df.SF_transects_marine_arch$lat, f = 0.1)
+map_toner_lite_marine_trans_arch <- get_stamenmap(bbox_marine_trans_arch, source="stamen", maptype= "toner-lite", crop=FALSE)
+map_marine_trans_arch <- get_stamenmap(bbox_marine_trans_arch, source="stamen", maptype= "terrain", crop=TRUE)
+
+ggmap(map_marine_trans_arch) + geom_point(data=df.SF_transects_marine_arch, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Plots//map_transects_beachseine_arch.png", width=40, height=20, unit="cm")
+
+
+colorset_map_3 = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA", "arch_site" = "yellow")
+
+ggmap(map_marine_trans_arch) + geom_point(data=df.SF_transects_marine_arch, aes(x = long, y = lat, col=site_type))+  scale_colour_manual(values=colorset_map_3)
+ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine_arch.png", width=40, height=20, unit="cm")
+
+
+
+
+
+
+
 
 
 # Map at 1km radius only -------------------------------------------------------

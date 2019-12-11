@@ -788,4 +788,4 @@ fish_richness_merged_isl<- fish_richness_merged_isl %>%
 
 write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
 
-
+View(fish_richness_merged_isl)
