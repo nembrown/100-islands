@@ -231,7 +231,17 @@ head(deb_coords)
 Deb_Owen_veg_coords<-rbind(deb_coords,owen_coords)
 Deb_Owen_veg_coords<-merge(Deb_Owen_veg_combined_complete_filled,Deb_Owen_veg_coords,by="unq_tran", all.x = TRUE)
 
-write.csv(Deb_Owen_veg_coords, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords.csv")
+head(Deb_Owen_veg_coords)
+
+Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords %>%  group_by(unq_isl, unq_tran, species) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords_transect[,-4]
+Deb_Owen_veg_coords_transect_presabs<-Deb_Owen_veg_coords_transect
+Deb_Owen_veg_coords_transect_presabs$pres_abs<-  ifelse(Deb_Owen_veg_coords_transect$cover>0, 1, 0)
+
+View(Deb_Owen_veg_coords_transect_presabs)
+
+
+write.csv(Deb_Owen_veg_coords_transect_presabs, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords_transect_presabs.csv")
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
 
