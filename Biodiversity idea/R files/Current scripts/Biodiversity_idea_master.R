@@ -573,7 +573,7 @@ fish_bycatch_richness_merged_tran_year$fish_biomass_bym3_mean<-fish_bycatch_rich
 fish_bycatch_richness_merged_tran_year$fish_bycatch_biomass<-fish_bycatch_richness_merged_tran_year$fish_biomass_bym3_mean+fish_bycatch_richness_merged_tran_year$bycatch_biomass_bym3_mean
 
 ##head(fish_bycatch_richness_merged_tran_year)
-write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
+write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv", row.names=FALSE)
 
 
 
@@ -599,7 +599,7 @@ fish_bycatch_richness_merged_tran_year_arch$fish_feature<-as.factor(fish_bycatch
 fish_bycatch_richness_merged_tran_year_arch$feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$feature)
 
 
-write.csv(fish_bycatch_richness_merged_tran_year_arch, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv")
+write.csv(fish_bycatch_richness_merged_tran_year_arch, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv", row.names=FALSE)
 
 
 
@@ -639,7 +639,7 @@ fish_bycatch_richness_merged_tran$fish_biomass_bym3_cat_tran[fish_bycatch_richne
 
 fish_bycatch_richness_merged_tran$unq_isl<-gsub('.{1}$', '', fish_bycatch_richness_merged_tran$unq_tran)
 
-write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv")
+write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv", row.names=FALSE)
 length(unique(fish_bycatch_richness_merged_tran$unq_isl))
 #22 islands with 1km, 36 with 1.5km, 40 with 2 km 
 
@@ -696,7 +696,7 @@ fish_richness_merged_tran$eelgrass_cover_2km<-(fish_richness_merged_tran$MEAN_eg
 fish_richness_merged_tran$habitat_cover_2km<-(fish_richness_merged_tran$sum_2km)/(fish_richness_merged_tran$Radius_m_2000)
 
 
-write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv")
+write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv", row.names=FALSE)
 ###View(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
@@ -845,7 +845,7 @@ fish_richness_merged_isl<- fish_richness_merged_isl %>%
   mutate(bycatch_biomass_bym3_mean_cat_isl = cut(bycatch_biomass_bym3_mean, xs_bycatch_biomass_bym3_mean, labels = labels_bycatch_biomass_bym3_mean))
 
 
-write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv")
+write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv", row.names=FALSE)
 
 
 head(fish_richness_merged_isl)
