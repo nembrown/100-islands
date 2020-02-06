@@ -93,7 +93,7 @@ ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=clam_garden, y=bycatch
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=schooling_fish_biomass_bym3_mean, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
-# Productivity vs. marine subsidies ---------------------------------------
+# Productivity vs. marin e subsidies ---------------------------------------
 
 ###All plants
 plot_grid(fish_biomass_schooling_plant, fish_biomass_schooling_NDVI, fish_biomass_schooling_tree , ncol=3)
