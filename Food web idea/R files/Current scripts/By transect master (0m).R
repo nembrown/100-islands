@@ -1,10 +1,4 @@
 library(here)
-
-# this is the by transect file, but only the 0 m plots
-
-
-#read in necessary packages
-
 library(tidyr)
 library(plyr)
 library(dplyr)
@@ -85,6 +79,7 @@ head(soil_clean)
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
 head(soil_merge)
 
+
 write.csv(soil_merge, "C:Food web idea\\Data by person\\Norah.data\\soil_merge.csv")
 
 
@@ -93,7 +88,7 @@ write.csv(soil_merge, "C:Food web idea\\Data by person\\Norah.data\\soil_merge.c
 soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
-soil_merge_s<-merge(soil_merge, soil_s, by="unq_plot")
+soil_merge_s<-merge(soil_merge, soil_s, by="unq_plot", all=TRUE)
 head(soil_merge_s)
 
 
@@ -106,7 +101,7 @@ head(soil_merge_0m)
 # ggplot(soil_merge_0m, aes(x=d34s, y=d15n))+geom_point()
 
 
-write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
 
 
 # Adding plant cover and richnes sshoreline -----------------------------------------
@@ -582,5 +577,7 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 
 # Tidying up -------------------------------------------------------------
 
-View(by_tran_master_0m)
-write.csv(by_tran_master_0m, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv")
+
+write.csv(by_tran_master_0m, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv", row.names=FALSE)
+
+length(na.omit(by_tran_master_0m$d15n))    

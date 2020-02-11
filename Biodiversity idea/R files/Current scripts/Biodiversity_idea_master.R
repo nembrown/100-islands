@@ -575,6 +575,8 @@ fish_bycatch_richness_merged_tran_year$fish_bycatch_biomass<-fish_bycatch_richne
 ##head(fish_bycatch_richness_merged_tran_year)
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv", row.names=FALSE)
 
+#SITE AND FISH ONLY 
+head(fish_bycatch_richness_merged_tran_year)
 
 
 #### adding in arch sites to just fish before tran 
@@ -594,7 +596,8 @@ fish_bycatch_richness_merged_tran_year_arch<-merge(fish_bycatch_richness_merged_
 head(fish_bycatch_richness_merged_tran_year_arch)
 fish_bycatch_richness_merged_tran_year_arch$CMT<-as.factor(fish_bycatch_richness_merged_tran_year_arch$CMT)
 fish_bycatch_richness_merged_tran_year_arch$clam_garden<-as.factor(fish_bycatch_richness_merged_tran_year_arch$clam_garden)
-fish_bycatch_richness_merged_tran_year_arch$midden_feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$midden_feature)
+fish_bycatch_richness_merged_tran_year_arch$midden_feature<-factor(fish_bycatch_richness_merged_tran_year_arch$midden_feature, ordered=TRUE)
+
 fish_bycatch_richness_merged_tran_year_arch$fish_feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$fish_feature)
 fish_bycatch_richness_merged_tran_year_arch$feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$feature)
 
@@ -626,7 +629,7 @@ length(unique(hakai_sites_distance_tran$unq_tran))
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
-#head(fish_bycatch_richness_merged_tran)
+head(fish_bycatch_richness_merged_tran)
 length(unique(fish_bycatch_richness_merged_tran$unq_tran))
 
 ### averaging across sites
@@ -637,10 +640,13 @@ labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
 fish_bycatch_richness_merged_tran<- fish_bycatch_richness_merged_tran %>% mutate(fish_biomass_bym3_cat_tran = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
 fish_bycatch_richness_merged_tran$fish_biomass_bym3_cat_tran[fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean<2]<-"low fish biomass"
 
-fish_bycatch_richness_merged_tran$unq_isl<-gsub('.{1}$', '', fish_bycatch_richness_merged_tran$unq_tran)
+#fish_bycatch_richness_merged_tran$unq_isl<-gsub('.{1}$', '', fish_bycatch_richness_merged_tran$unq_tran)
 
+
+
+###FISH with unq_tran added but no transect data NO UNQ_ISL
 write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv", row.names=FALSE)
-length(unique(fish_bycatch_richness_merged_tran$unq_isl))
+head(fish_bycatch_richness_merged_tran)
 #22 islands with 1km, 36 with 1.5km, 40 with 2 km 
 
 
@@ -649,7 +655,7 @@ length(unique(fish_bycatch_richness_merged_tran$unq_isl))
 
 #transect data
 by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
-by_tran_master_0m<-by_tran_master_0m[,-1]
+#by_tran_master_0m<-by_tran_master_0m[,-1]
 
 #### need to change the by_ran master file b/c it has repeat transects! 
 by_tran_master_0m_2<-by_tran_master_0m 
@@ -662,10 +668,12 @@ by_tran_master_0m_2$d15n.cat[by_tran_master_0m_2$d15n>19]<-"high d15N"
 
 by_tran_master_0m_2$d15N_over_N<-by_tran_master_0m_2$d15n/by_tran_master_0m_2$n
 
+
+head(by_tran_master_0m_2)
+by_tran_master_0m_2<-by_tran_master_0m_2 %>% select(-unq_isl)
 ### adding in tree diversity (transect level)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-##View(by_tran_master)
-by_tran_master_col_names<-c("unq_tran", "tree_richness" ,
+by_tran_master_col_names<-c("unq_isl", "unq_tran", "tree_richness" ,
                             "tree_abundance",
                             "sum_basal",
                             "site_mean_by_tran" ,
@@ -677,7 +685,8 @@ by_tran_master_col_names<-c("unq_tran", "tree_richness" ,
                             "Radius_m_2000",
                             "sum_2km",
                             "WAVE_EXPOSURE",
-                            "SITE_SUM")
+                            "SITE_SUM",
+                            "SLOPE")
 
 
 by_tran_master_subset<-by_tran_master[,colnames(by_tran_master) %in% by_tran_master_col_names]
@@ -685,10 +694,13 @@ by_tran_master_subset <- by_tran_master_subset %>% group_by(unq_tran)
 
 
 by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all.x=TRUE)
+head(by_tran_master_0m_with_tran)
+
+
 
 #merging terrestrial with marine and adding in marine site information, saving file
 fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_tran, by="unq_tran", all.y=TRUE)
-#head(fish_richness_merged_tran)
+head(fish_richness_merged_tran)
 
 
 fish_richness_merged_tran$combined_richness_corrected<-fish_richness_merged_tran$wrack_richness+fish_richness_merged_tran$marine_richness_corrected
@@ -703,6 +715,7 @@ length(unique(fish_richness_merged_tran$unq_tran))
 #392 tran ... b/c this is all in the 0m file... 
 
 ##View(fish_richness_merged_tran)
+
 
 
 
@@ -728,9 +741,43 @@ fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, arch_data_
 head(fish_richness_merged_tran_arch)
 fish_richness_merged_tran_arch$CMT<-as.factor(fish_richness_merged_tran_arch$CMT)
 fish_richness_merged_tran_arch$clam_garden<-as.factor(fish_richness_merged_tran_arch$clam_garden)
-fish_richness_merged_tran_arch$midden_feature<-as.factor(fish_richness_merged_tran_arch$midden_feature)
+fish_richness_merged_tran_arch$midden_feature<-factor(fish_richness_merged_tran_arch$midden_feature, ordered=TRUE)
 fish_richness_merged_tran_arch$fish_feature<-as.factor(fish_richness_merged_tran_arch$fish_feature)
 fish_richness_merged_tran_arch$feature<-as.factor(fish_richness_merged_tran_arch$feature)
+
+fish_richness_merged_tran_arch$midden_feature<-fish_richness_merged_tran_arch$midden_feature[,c("")]
+
+recode(fish_richness_merged_tran_arch$midden_feature, yes = "1", no="0")
+fish_richness_merged_tran_arch$midden_feature<-as.numeric(fish_richness_merged_tran_arch$midden_feature)
+
+write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv", row.names=FALSE)
+
+##### adding in island-level characteristics to the transect file
+head(fish_richness_merged_tran_arch)
+
+by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
+head(by_isl_master)
+by_isl_master_col_names_tran<-c("unq_isl",
+                          "PA_norml",
+                           "eagles",
+                           "ravens",
+                           "node", 
+                          "site_sum_by_isl", 
+                          "Rock")
+
+#ravens eagles site_sum_by_isl SLOPE PA_norml Rock slope_mean
+
+by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names_tran]
+##head(by_isl_master_subset)
+
+head(fish_richness_merged_tran_arch)
+fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch, by_isl_master_subset_tran, by="unq_isl", all.y=TRUE)
+
+
+
+
+
+
 # unq_isl -----------------------------------------------------------------
 
 
@@ -848,4 +895,3 @@ fish_richness_merged_isl<- fish_richness_merged_isl %>%
 write.csv(fish_richness_merged_isl, "C:Biodiversity idea//Output files//fish_richness_merged_isl.csv", row.names=FALSE)
 
 
-head(fish_richness_merged_isl)
