@@ -45,7 +45,7 @@ library(cowplot)
 library(viridis)
 library(matrixStats)
 library(tidyverse)
-# 
+
 #  detach(package:plyr)
 #  detach(package:dplyr)
 
@@ -575,31 +575,29 @@ fish_bycatch_richness_merged_tran_year$fish_bycatch_biomass<-fish_bycatch_richne
 ##head(fish_bycatch_richness_merged_tran_year)
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv", row.names=FALSE)
 
-#SITE AND FISH ONLY 
+#Beachsein site SITE AND FISH ONLY 
 head(fish_bycatch_richness_merged_tran_year)
 
 
-#### adding in arch sites to just fish before tran 
+#### adding in arch sites to just fish
 arch_sites_distance_beach<-read.csv("Biodiversity idea//Output files//paired_beach_arch_by_radius_1000.csv")
-arch_sites_distance_beach<-arch_sites_distance_beach[,-1]
 head(arch_sites_distance_beach)
 
 fish_bycatch_richness_merged_tran_year_arch<-merge(fish_bycatch_richness_merged_tran_year, arch_sites_distance_beach, by="site", all.x=TRUE)
 
 ##adding in arch data
-arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
 head(arch_data)
-arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature", "feature")]
+arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature")]
 head(arch_data_simple)
+#i.e. no easting or northing
 
 fish_bycatch_richness_merged_tran_year_arch<-merge(fish_bycatch_richness_merged_tran_year_arch, arch_data_simple, by="site_id", all.x=TRUE)
 head(fish_bycatch_richness_merged_tran_year_arch)
 fish_bycatch_richness_merged_tran_year_arch$CMT<-as.factor(fish_bycatch_richness_merged_tran_year_arch$CMT)
 fish_bycatch_richness_merged_tran_year_arch$clam_garden<-as.factor(fish_bycatch_richness_merged_tran_year_arch$clam_garden)
 fish_bycatch_richness_merged_tran_year_arch$midden_feature<-factor(fish_bycatch_richness_merged_tran_year_arch$midden_feature, ordered=TRUE)
-
 fish_bycatch_richness_merged_tran_year_arch$fish_feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$fish_feature)
-fish_bycatch_richness_merged_tran_year_arch$feature<-as.factor(fish_bycatch_richness_merged_tran_year_arch$feature)
 
 
 write.csv(fish_bycatch_richness_merged_tran_year_arch, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv", row.names=FALSE)
@@ -724,7 +722,7 @@ arch_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_arch
 arch_sites_distance_tran<-arch_sites_distance_tran[,-1]
 head(arch_sites_distance_tran)
 length(unique(arch_sites_distance_tran$unq_tran))
-#30 unique transects if using 300m radius 
+#20 unique transects if using 300m radius 
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran, arch_sites_distance_tran, by="unq_tran", all.x=TRUE)
 
@@ -732,9 +730,9 @@ head(fish_richness_merged_tran_arch)
 length(unique(fish_richness_merged_tran_arch$unq_tran))
 
 ##adding in arch data
-arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
 head(arch_data)
-arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature", "feature")]
+arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature")]
 head(arch_data_simple)
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, arch_data_simple, by="site_id", all.x=TRUE)
@@ -743,12 +741,11 @@ fish_richness_merged_tran_arch$CMT<-as.factor(fish_richness_merged_tran_arch$CMT
 fish_richness_merged_tran_arch$clam_garden<-as.factor(fish_richness_merged_tran_arch$clam_garden)
 fish_richness_merged_tran_arch$midden_feature<-factor(fish_richness_merged_tran_arch$midden_feature, ordered=TRUE)
 fish_richness_merged_tran_arch$fish_feature<-as.factor(fish_richness_merged_tran_arch$fish_feature)
-fish_richness_merged_tran_arch$feature<-as.factor(fish_richness_merged_tran_arch$feature)
 
-fish_richness_merged_tran_arch$midden_feature<-fish_richness_merged_tran_arch$midden_feature[,c("")]
-
-recode(fish_richness_merged_tran_arch$midden_feature, yes = "1", no="0")
-fish_richness_merged_tran_arch$midden_feature<-as.numeric(fish_richness_merged_tran_arch$midden_feature)
+#for sem:
+fish_richness_merged_tran_arch$midden_feature_sem<-fish_richness_merged_tran_arch$midden_feature
+ recode(fish_richness_merged_tran_arch$midden_feature_sem, yes = "1", no="0")
+fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem)
 
 write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv", row.names=FALSE)
 

@@ -63,31 +63,40 @@ ggplot(fish_richness_merged_tran_arch, aes(x=CMT, y=d34s, col=CMT))+
 ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d15n, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
+
 ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d34s, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 
 
-ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d15n, col=feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d34s, col=feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
 
 
 ### arch and fish
 head(fish_bycatch_richness_merged_tran_year_arch)
+# write.csv(fish_bycatch_richness_merged_tran_year_arch, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv", row.names=FALSE)
+
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_pelagic_biomass_bym3_mean, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
+
+ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_demersal_biomass_bym3_mean, col=fish_feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
+
 
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=midden_feature, y=fish_pelagic_biomass_bym3_mean, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
-ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=midden_feature, y=fish_demersal_biomass_bym3_mean, col=midden_feature))+
+  ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=midden_feature, y=fish_bycatch_biomass, col=midden_feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
+
+ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_richness_corrected, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=clam_garden, y=bycatch_richness_corrected, col=clam_garden))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
+ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=midden_feature, y=bycatch_richness_corrected, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=schooling_fish_biomass_bym3_mean, col=fish_feature))+

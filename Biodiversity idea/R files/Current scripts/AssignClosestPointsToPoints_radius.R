@@ -48,15 +48,15 @@ head(transects_beach_joined)
 
 transects_beach_joined <-transects_beach_joined  %>% st_set_geometry(NULL)
 transects_beach_joined<-as.data.frame(transects_beach_joined)
-write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv")
+write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
 
 
 
 
 # Arch data ---------------------------------------------------------------
 
-arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
-head(arch_data)
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+
 arch_data_simple_new<-arch_data[ , c("site_id", "easting", "northing")]
 data_arch_subset2_new <- arch_data_simple_new[ , c("easting", "northing")]
 arch_data_simple_new<- arch_data_simple_new[complete.cases(data_arch_subset2_new), ] 
@@ -99,23 +99,15 @@ dat_circles_arch_big <- st_buffer(df.SF_transects_simple_new, dist = 1000)
 transects_arch_joined_big <- st_join(arch_data_simple_st_new, dat_circles_arch_big, left=FALSE)
 transects_arch_joined_big <-transects_arch_joined_big  %>% st_set_geometry(NULL)
 transects_arch_joined_big<-as.data.frame(transects_arch_joined_big)
-write.csv(transects_arch_joined_big, "C:Biodiversity idea//Output files//paired_arch_by_radius_1000.csv")
+write.csv(transects_arch_joined_big, "C:Biodiversity idea//Output files//paired_arch_by_radius_1000.csv", row.names = FALSE)
 
 
 
 
 
 ###### arch and beachsine
-arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
-head(arch_data)
-arch_data_simple_new<-arch_data[ , c("site_id", "easting", "northing")]
-data_arch_subset2_new <- arch_data_simple_new[ , c("easting", "northing")]
-arch_data_simple_new<- arch_data_simple_new[complete.cases(data_arch_subset2_new), ] 
-arch_data_simple_new$site_id<-as.factor(arch_data_simple_new$site_id)
-
-arch_data_simple_sf_new <- st_as_sf(arch_data_simple_new, coords = c("easting", "northing"), crs = 26909)
-arch_data_simple_st_new<-st_transform(x = arch_data_simple_sf_new, crs = 3035)
 head(arch_data_simple_st_new)
+#created from above
 
 
 
@@ -142,7 +134,7 @@ length(unique(beach_arch_joined$site))
 
 beach_arch_joined <-beach_arch_joined  %>% st_set_geometry(NULL)
 beach_arch_joined<-as.data.frame(beach_arch_joined)
-write.csv(beach_arch_joined, "C:Biodiversity idea//Output files//paired_beach_arch_by_radius_1000.csv")
+write.csv(beach_arch_joined, "C:Biodiversity idea//Output files//paired_beach_arch_by_radius_1000.csv", row.names = FALSE)
 
 
 

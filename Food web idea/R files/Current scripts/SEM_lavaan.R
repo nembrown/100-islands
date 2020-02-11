@@ -50,14 +50,14 @@ N15_model<-'#latent variables as responses
             
             #latent variables measurement models
             vector_pres =~ ravens + eagles
-            human_pres =~ midden_feature
+            human_pres =~ midden_feature_sem
             algae_biomass_shore =~ log_site_sum_by_isl
             human_pres =~ d15n
             algae_biomass_shore = ~d15n
             marine_animal_biomass_shore =~ d15n '
 
 
-fit <- sem(N15_model, data=fish_richness_merged_tran_arch_2,  missing = "ML", se = "bootstrap")
+fit <- sem(N15_model, data=fish_richness_merged_tran_arch_2,  missing = "ML")
 summary(fit, fit.measures=TRUE)
 
 
@@ -101,7 +101,7 @@ N15_model_novector<-'#latent variables as responses
 
             
             #latent variables measurement models
-            human_pres =~ midden_feature
+            human_pres =~ midden_feature_sem
             algae_biomass_shore =~ log_site_sum_by_isl
             human_pres =~ d15n
             algae_biomass_shore = ~d15n

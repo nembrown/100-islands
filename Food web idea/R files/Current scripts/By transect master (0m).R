@@ -29,7 +29,7 @@ library(cowplot)
 
 #####OWEN
 #owen's isotope data by plot
-soil_clean<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
+soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
 length((soil_clean$unq_plot))
 
@@ -43,7 +43,7 @@ names(soil_clean)[7]<-"d15n"
 head(soil_clean)
 
 #Owen's key data
-owen_key<-read.csv("C:Food web idea//Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_tran))
 
@@ -57,7 +57,7 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_tran))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Food web idea//Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
 head(owen_coords)
 owen_coords<-owen_coords[,c(1:9)]
 head(owen_coords)

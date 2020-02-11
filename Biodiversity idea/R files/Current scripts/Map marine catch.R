@@ -175,23 +175,21 @@ ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine.png", width=4
 
 
 #### adding in Arc data
-arch_data<-read.csv("Food web idea//Data by person//Norah.data//Arch_sites2_2018_nb.csv")
-head(arch_data)
-arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature", "feature","easting", "northing")]
-head(arch_data_simple)
-  
-data_arch_subset2 <- arch_data_simple[ , c("easting", "northing")]
-arch_data_simple<- arch_data_simple[complete.cases(data_arch_subset2), ] 
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
 
+arch_data_simple_new<-arch_data[ , c("site_id", "easting", "northing")]
+data_arch_subset2_new <- arch_data_simple_new[ , c("easting", "northing")]
+arch_data_simple_new<- arch_data_simple_new[complete.cases(data_arch_subset2_new), ] 
+arch_data_simple_new$site_id<-as.factor(arch_data_simple_new$site_id)
 
-arch_data_simple_sf <- st_as_sf(arch_data_simple, coords = c("easting", "northing"), crs = 26909)
-arch_data_simple_st<-st_transform(x = arch_data_simple_sf, crs = 4326)
+arch_data_simple_sf_new <- st_as_sf(arch_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+arch_data_simple_st<-st_transform(x = arch_data_simple_sf_new, crs = 4326)
 arch_data_simple_st$long<-st_coordinates(arch_data_simple_st)[,1] # get coordinates
 arch_data_simple_st$lat<-st_coordinates(arch_data_simple_st)[,2] # get coordinates
 arch_data_simple_st$site_type<-"arch_site"
 head(arch_data_simple_st)
 
-arch_data_simple_SP<-arch_data_simple_st[,c(1,10)]
+arch_data_simple_SP<-arch_data_simple_st[,c(1,5)]
 
 names(arch_data_simple_SP)[1]<-"site"
 arch_data_simple_SP$site<-as.factor(arch_data_simple_SP$site)
@@ -207,7 +205,7 @@ map_toner_lite_marine_trans_arch <- get_stamenmap(bbox_marine_trans_arch, source
 map_marine_trans_arch <- get_stamenmap(bbox_marine_trans_arch, source="stamen", maptype= "terrain", crop=TRUE)
 
 ggmap(map_marine_trans_arch) + geom_point(data=df.SF_transects_marine_arch, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
-ggsave("C:Plots//map_transects_beachseine_arch.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//map_transects_beachseine_arch.png", width=40, height=20, unit="cm")
 
 
 colorset_map_3 = c("100_islands"="#9FEF5C" , "beachseine" ="#6138EA", "arch_site" = "yellow")
