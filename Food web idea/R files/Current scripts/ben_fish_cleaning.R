@@ -1,5 +1,17 @@
 library(here)
-
+library(rlang)
+library(tidyr)
+library(vegan)
+library(ggplot2)
+library(ggcorrplot)
+library(doBy)
+library(plyr)
+library(dplyr)
+library(doBy)
+library(cowplot)
+library(viridis)
+library(matrixStats)
+library(tidyverse)
 #!diagnostics off
 #here() starts at C:/Users/norahbrown/Dropbox/Projects/100-islands
 
@@ -585,7 +597,7 @@ head(arch_sites_distance_beach)
 
 fish_bycatch_richness_merged_tran_year_arch<-merge(fish_bycatch_richness_merged_tran_year, arch_sites_distance_beach, by="site", all.x=TRUE)
 
-##adding in arch data
+
 arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
 head(arch_data)
 arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature")]
