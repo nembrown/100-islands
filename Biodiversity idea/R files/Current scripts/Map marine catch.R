@@ -217,7 +217,80 @@ ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine_arch.png", wi
 
 
 
+###### Arch sites midden
+#### adding in Arc data
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+arch_data_midden<- arch_data %>% filter(midden_feature == "yes")
+head(arch_data_midden)
+  
+arch_data_simple_new_midden<-arch_data_midden[ , c("site_id", "easting", "northing")]
+data_arch_subset2_new_midden <- arch_data_simple_new_midden[ , c("easting", "northing")]
+arch_data_simple_new_midden<- arch_data_simple_new_midden[complete.cases(data_arch_subset2_new_midden), ] 
+arch_data_simple_new_midden$site_id<-as.factor(arch_data_simple_new_midden$site_id)
 
+arch_data_simple_sf_new_midden <- st_as_sf(arch_data_simple_new_midden, coords = c("easting", "northing"), crs = 26909)
+arch_data_simple_st_midden<-st_transform(x = arch_data_simple_sf_new_midden, crs = 4326)
+arch_data_simple_st_midden$long<-st_coordinates(arch_data_simple_st_midden)[,1] # get coordinates
+arch_data_simple_st_midden$lat<-st_coordinates(arch_data_simple_st_midden)[,2] # get coordinates
+arch_data_simple_st_midden$site_type<-"midden_site"
+head(arch_data_simple_st_midden)
+
+arch_data_simple_SP_midden<-arch_data_simple_st_midden[,c(1,5)]
+
+names(arch_data_simple_SP_midden)[1]<-"site"
+arch_data_simple_SP_midden$site<-as.factor(arch_data_simple_SP_midden$site)
+
+df.SF_transects_marine_arch_midden<-rbind(df.SF_transects_marine[,1:2],arch_data_simple_SP_midden)
+head(df.SF_transects_marine_arch_midden)
+df.SF_transects_marine_arch_midden$long<-st_coordinates(df.SF_transects_marine_arch_midden)[,1] # get coordinates
+df.SF_transects_marine_arch_midden$lat<-st_coordinates(df.SF_transects_marine_arch_midden)[,2]
+
+
+bbox_marine_trans_arch_midden <- make_bbox(df.SF_transects_marine_arch_midden$long, df.SF_transects_marine_arch_midden$lat, f = 0.1)
+map_toner_lite_marine_trans_arch_midden <- get_stamenmap(bbox_marine_trans_arch_midden, source="stamen", maptype= "toner-lite", crop=FALSE)
+map_marine_trans_arch_midden <- get_stamenmap(bbox_marine_trans_arch_midden, source="stamen", maptype= "terrain", crop=TRUE)
+
+ggmap(map_marine_trans_arch_midden) + geom_point(data=df.SF_transects_marine_arch_midden, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Biodiversity idea//Plots//map_transects_beachseine_arch_midden.png", width=40, height=20, unit="cm")
+
+
+###### Arch sites fish
+#### adding in Arc data
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+arch_data_fish<- arch_data %>% filter(fish_feature == "yes")
+head(arch_data_fish)
+
+arch_data_simple_new_fish<-arch_data_fish[ , c("site_id", "easting", "northing")]
+data_arch_subset2_new_fish <- arch_data_simple_new_fish[ , c("easting", "northing")]
+arch_data_simple_new_fish<- arch_data_simple_new_fish[complete.cases(data_arch_subset2_new_fish), ] 
+arch_data_simple_new_fish$site_id<-as.factor(arch_data_simple_new_fish$site_id)
+
+arch_data_simple_sf_new_fish <- st_as_sf(arch_data_simple_new_fish, coords = c("easting", "northing"), crs = 26909)
+arch_data_simple_st_fish<-st_transform(x = arch_data_simple_sf_new_fish, crs = 4326)
+arch_data_simple_st_fish$long<-st_coordinates(arch_data_simple_st_fish)[,1] # get coordinates
+arch_data_simple_st_fish$lat<-st_coordinates(arch_data_simple_st_fish)[,2] # get coordinates
+arch_data_simple_st_fish$site_type<-"fish_site"
+head(arch_data_simple_st_fish)
+
+arch_data_simple_SP_fish<-arch_data_simple_st_fish[,c(1,5)]
+
+names(arch_data_simple_SP_fish)[1]<-"site"
+arch_data_simple_SP_fish$site<-as.factor(arch_data_simple_SP_fish$site)
+
+df.SF_transects_marine_arch_fish<-rbind(df.SF_transects_marine[,1:2],arch_data_simple_SP_fish)
+head(df.SF_transects_marine_arch_fish)
+df.SF_transects_marine_arch_fish$long<-st_coordinates(df.SF_transects_marine_arch_fish)[,1] # get coordinates
+df.SF_transects_marine_arch_fish$lat<-st_coordinates(df.SF_transects_marine_arch_fish)[,2]
+
+
+bbox_marine_trans_arch_fish <- make_bbox(df.SF_transects_marine_arch_fish$long, df.SF_transects_marine_arch_fish$lat, f = 0.1)
+map_toner_lite_marine_trans_arch_fish <- get_stamenmap(bbox_marine_trans_arch_fish, source="stamen", maptype= "toner-lite", crop=FALSE)
+map_marine_trans_arch_fish <- get_stamenmap(bbox_marine_trans_arch_fish, source="stamen", maptype= "terrain", crop=TRUE)
+
+ggmap(map_marine_trans_arch_fish) + geom_point(data=df.SF_transects_marine_arch_fish, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Biodiversity idea//Plots//map_transects_beachseine_arch_fish.png", width=40, height=20, unit="cm")
 
 
 
