@@ -293,6 +293,43 @@ ggmap(map_marine_trans_arch_fish) + geom_point(data=df.SF_transects_marine_arch_
 ggsave("C:Biodiversity idea//Plots//map_transects_beachseine_arch_fish.png", width=40, height=20, unit="cm")
 
 
+##### ARch data canoe
+#### adding in Arc data
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+arch_data_canoe<- arch_data %>% filter(canoe_skid == "yes")
+head(arch_data_canoe)
+
+arch_data_simple_new_canoe<-arch_data_canoe[ , c("site_id", "easting", "northing")]
+data_arch_subset2_new_canoe <- arch_data_simple_new_canoe[ , c("easting", "northing")]
+arch_data_simple_new_canoe<- arch_data_simple_new_canoe[complete.cases(data_arch_subset2_new_canoe), ] 
+arch_data_simple_new_canoe$site_id<-as.factor(arch_data_simple_new_canoe$site_id)
+
+arch_data_simple_sf_new_canoe <- st_as_sf(arch_data_simple_new_canoe, coords = c("easting", "northing"), crs = 26909)
+arch_data_simple_st_canoe<-st_transform(x = arch_data_simple_sf_new_canoe, crs = 4326)
+arch_data_simple_st_canoe$long<-st_coordinates(arch_data_simple_st_canoe)[,1] # get coordinates
+arch_data_simple_st_canoe$lat<-st_coordinates(arch_data_simple_st_canoe)[,2] # get coordinates
+arch_data_simple_st_canoe$site_type<-"canoe_site"
+head(arch_data_simple_st_canoe)
+
+arch_data_simple_SP_canoe<-arch_data_simple_st_canoe[,c(1,5)]
+
+names(arch_data_simple_SP_canoe)[1]<-"site"
+arch_data_simple_SP_canoe$site<-as.factor(arch_data_simple_SP_canoe$site)
+
+df.SF_transects_marine_arch_canoe<-rbind(df.SF_transects_marine[,1:2],arch_data_simple_SP_canoe)
+head(df.SF_transects_marine_arch_canoe)
+df.SF_transects_marine_arch_canoe$long<-st_coordinates(df.SF_transects_marine_arch_canoe)[,1] # get coordinates
+df.SF_transects_marine_arch_canoe$lat<-st_coordinates(df.SF_transects_marine_arch_canoe)[,2]
+
+
+bbox_marine_trans_arch_canoe <- make_bbox(df.SF_transects_marine_arch_canoe$long, df.SF_transects_marine_arch_canoe$lat, f = 0.1)
+map_toner_lite_marine_trans_arch_canoe <- get_stamenmap(bbox_marine_trans_arch_canoe, source="stamen", maptype= "toner-lite", crop=FALSE)
+map_marine_trans_arch_canoe <- get_stamenmap(bbox_marine_trans_arch_canoe, source="stamen", maptype= "terrain", crop=TRUE)
+
+ggmap(map_marine_trans_arch_canoe) + geom_point(data=df.SF_transects_marine_arch_canoe, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+ggsave("C:Biodiversity idea//Plots//map_transects_beachseine_arch_canoe.png", width=40, height=20, unit="cm")
+
 
 # Map at 1km radius only -------------------------------------------------------
 
