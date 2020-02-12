@@ -64,10 +64,19 @@ ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d15n, col=midden_
   geom_boxplot()+geom_jitter(width=0.2)
 
 
+
+
+
 ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d34s, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 
+
+ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d15n, col=feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
+ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d34s, col=feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
 
 
 
