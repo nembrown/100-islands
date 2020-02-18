@@ -74,6 +74,7 @@ by_tran_master_0m_2<-by_tran_master_0m_2 %>% dplyr::select(-unq_isl)
 
 ### adding in tree diversity (at the whole transect level, i.e. from 0 to 40m)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
+head(by_tran_master)
 by_tran_master_col_names<-c("unq_isl", "unq_tran", "tree_richness" ,
                             "tree_abundance",
                             "sum_basal",
@@ -87,11 +88,17 @@ by_tran_master_col_names<-c("unq_isl", "unq_tran", "tree_richness" ,
                             "sum_2km",
                             "WAVE_EXPOSURE",
                             "SITE_SUM",
-                            "SLOPE")
+                            "SLOPE",
+                            "SUBSTRATE")
 
 
 by_tran_master_subset<-by_tran_master[,colnames(by_tran_master) %in% by_tran_master_col_names]
 by_tran_master_subset <- by_tran_master_subset %>% group_by(unq_tran)
+
+by_tran_master_subset$beachy_substrate<- ifelse(grepl("ROCK", by_tran_master_subset$SUBSTRATE), "0", "1")
+by_tran_master_subset$beachy_substrate<-as.character(by_tran_master_subset$beachy_substrate)
+by_tran_master_subset$beachy_substrate<-as.numeric(by_tran_master_subset$beachy_substrate)
+
 
 
 by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all=TRUE)
@@ -144,12 +151,12 @@ head(fish_richness_merged_tran_arch)
 fish_richness_merged_tran_arch$midden_feature_sem<-as.character(fish_richness_merged_tran_arch$midden_feature)
 fish_richness_merged_tran_arch$midden_feature_sem<- dplyr::recode(fish_richness_merged_tran_arch$midden_feature_sem, yes = "1", no="0")
 fish_richness_merged_tran_arch$midden_feature_sem[is.na(fish_richness_merged_tran_arch$midden_feature_sem)] <- 0
-fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem)
+fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem, ordered=TRUE)
 
 fish_richness_merged_tran_arch$fish_feature_sem<-as.character(fish_richness_merged_tran_arch$fish_feature)
 fish_richness_merged_tran_arch$fish_feature_sem<-dplyr::recode(fish_richness_merged_tran_arch$fish_feature_sem, yes = "1", no="0")
 fish_richness_merged_tran_arch$fish_feature_sem[is.na(fish_richness_merged_tran_arch$fish_feature_sem)] <- 0
-fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem)
+fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem, ordered=TRUE)
 
 fish_richness_merged_tran_arch$canoe_skid_sem<-as.character(fish_richness_merged_tran_arch$canoe_skid)
 fish_richness_merged_tran_arch$canoe_skid_sem<-dplyr::recode(fish_richness_merged_tran_arch$canoe_skid_sem, yes = "1", no="0")
@@ -169,21 +176,22 @@ write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fi
 #head(fish_richness_merged_tran_arch)
 
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-#head(by_isl_master)
+head(by_isl_master)
 by_isl_master_col_names_tran<-c("unq_isl",
-                          "PA_norml",
-                           "eagles",
-                           "ravens",
-                           "node", 
-                          "site_sum_by_isl", 
-                          "Rock")
+                                "Area",
+                                "PA_norml",
+                                "eagles",
+                                "ravens",
+                                "node", 
+                                "site_sum_by_isl", 
+                                "Rock")
 
 #ravens eagles site_sum_by_isl SLOPE PA_norml Rock slope_mean
 
 by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names_tran]
 ###head(by_isl_master_subset)
 
-
+by_isl_master_subset_tran$log_Area<-log(by_isl_master_subset_tran$Area)
 
 #head(fish_richness_merged_tran_arch)
 fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch, by_isl_master_subset_tran, by="unq_isl", all.y=TRUE)
@@ -192,7 +200,6 @@ fish_richness_merged_tran_arch_2$log_site_sum_by_isl <- log(fish_richness_merged
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock+1)
-fish_richness_merged_tran_arch_2$midden_feature_sem[is.na(fish_richness_merged_tran_arch_2$midden_feature_sem)] <- 0
 
 ###culturally important plants
 
@@ -202,6 +209,9 @@ master_transect<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richnes
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
+head(master_transect)
+
+master_transect[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("midden_feature_sem","fish_feature_sem")], ordered)
 
 
 # unq_isl -----------------------------------------------------------------
