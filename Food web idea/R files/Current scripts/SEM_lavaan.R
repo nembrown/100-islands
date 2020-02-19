@@ -147,15 +147,24 @@ N15_model_novector2<-'#latent variables as responses
             marine_animal_biomass_shore =~ d15n
                                                 '
 
-fit3 <- sem(N15_model_novector2, data=master_transect,  missing = "ML")
-summary(fit3)
-varTable(fit3)
-lavTables(fit3)
+fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",
+            missing = "available.cases",  std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
+
+fit5 <- sem(N15_model_novector2, data=master_transect,missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE)
+
+
+#missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE
+
+summary(fit4)
+varTable(fit4)
+lavTables(fit4)
 print(modindices(fit3))
 
 lavInspect(fit3, "cov.lv")
 
 head(master_transect)
+
+
 
 
 ### piecewise fitting
@@ -208,14 +217,14 @@ summary(fit_animal, fit.measures=TRUE)
 ##### Human model
 N15_model_human<-'#latent variables as responses
 
-            fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area ~ human_pres
+            human_pres <~ fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area
             
             log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
             
             log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_bycatch_biomass
             
             #correlations
-             fish_biomass_bym3_mean ~~ fish_bycatch_biomass
+             #fish_biomass_bym3_mean ~~ fish_bycatch_biomass
 
             
             #latent variables measurement models
@@ -223,9 +232,26 @@ N15_model_human<-'#latent variables as responses
                                                 '
 
 fit_human <- sem(N15_model_human, data=master_transect,  std.lv=TRUE, std.ov=TRUE, missing="pairwise")
-summary(fit_human, standardize=T)
-coefs(fit_human, standardize=T )
+summary(fit_human, standardize=T, rsq=T)
+coef(fit_human, standardize=T )
 
 lavaanify(N15_model_human)
+standardizedsolution(fit_human)
 
 ?sem
+# 
+# #getting composite scores from fixing first loading to 1
+# 
+# comp_formula2 <- '
+# human_pres <~ 0.16*fish_biomass_bym3_mean + -19*fish_bycatch_biomass  + 0.40*WAVE_EXPOSURE + -0.40*log_Area
+# 
+# human_pres ~ d15n
+# '
+# 
+# comp_model2 <- sem(comp_formula2, data=master_transect, fixed.x=F)
+# 
+# 
+# 
+# cover_model <- lm(d15n ~ fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area ,master_transect)
+# 
+# summary(cover_model)
