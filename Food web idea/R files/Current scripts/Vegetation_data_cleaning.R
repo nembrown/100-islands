@@ -87,8 +87,9 @@ length(unique(Deb_Owen_veg_combined$unq_isl))
 
 Deb_Owen_veg_combined_wide <-Deb_Owen_veg_combined %>%  group_by(unq_plot) %>% spread(species, cover)
 
-head(Deb_Owen_veg_combined_wide)
+View(Deb_Owen_veg_combined_wide)
 longform_plant_percentcover2<-Deb_Owen_veg_combined_wide
+longform_plant_percentcover2[is.na(longform_plant_percentcover2)]<-0 
 
 #combining some species
 longform_plant_percentcover2$marine<-longform_plant_percentcover2$`o soil`+ longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
@@ -118,7 +119,9 @@ longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk 
                       "feather" ,
                       "grass 1" ,
                       "grass sp" ,
+                      "scat",
                       "sedge" ,
+                      "stump" ,
                       "sedge1" ,
                       "sedge 1" ,
                       "sedge sp" ,
@@ -133,7 +136,7 @@ longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk 
 longform_plant_percentcover_species<-longform_plant_percentcover2[, ! colnames(longform_plant_percentcover2) %in% not_species_names]
 head(longform_plant_percentcover_species)
 
-longform_plant_percentcover_species_long<-longform_plant_percentcover_species %>% group_by(unq_plot) %>% gather(species, cover, 6:154)
+longform_plant_percentcover_species_long<-longform_plant_percentcover_species %>% group_by(unq_plot) %>% gather(species, cover, 6:152)
 head(longform_plant_percentcover_species_long)
 #lots of Nas but we will deal with thme next
 
@@ -165,16 +168,13 @@ write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person/
 
 head(longform_plant_percentcover2)
 
-marine_by_plot_from_plants<-longform_plant_percentcover2 %>% dplyr::select(unq_plot, unq_isl, unq_tran, shore_dist, person, marine)
+marine_by_plot_from_plants<-longform_plant_percentcover2 %>% dplyr::select(unq_plot, unq_isl, unq_tran, shore_dist, person, marine, 'marine remains', 'abalone shell', shell, scat, bare, 'o soil',driftwood )
 head(marine_by_plot_from_plants)
-
 
 
 write.csv(marine_by_plot_from_plants, "Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv", row.names=FALSE)
 
-
-
-
+View(marine_by_plot_from_plants)
 
 ####################### below here I have left the same
 
