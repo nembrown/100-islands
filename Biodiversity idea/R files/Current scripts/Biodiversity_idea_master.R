@@ -205,13 +205,29 @@ fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2
 
 plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
 
-master_transect<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richness, all=TRUE)
+master_transect2<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richness, all=TRUE)
+
+
+head(master_transect2)
+
+master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_transect2[,c("midden_feature_sem","fish_feature_sem")], ordered)
+
+
+
+### adding marine remains from owens notes
+
+marine_by_transect_from_notes_selected<-read.csv("C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv")
+
+master_transect<-merge(master_transect2, marine_by_transect_from_notes_selected, by="unq_tran", all=TRUE)
+View(master_transect)
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
-head(master_transect)
 
-master_transect[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("midden_feature_sem","fish_feature_sem")], ordered)
+
+
+
+
 
 
 # unq_isl -----------------------------------------------------------------
