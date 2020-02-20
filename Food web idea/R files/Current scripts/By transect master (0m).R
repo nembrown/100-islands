@@ -109,7 +109,6 @@ write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merg
 #this loads data from "Habitation data" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 
 #longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
 
@@ -156,14 +155,10 @@ longform_plant_percentcover3_tran_0m$shrub_cover<-rowSums(longform_plant_percent
 longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)], na.rm=TRUE)
 
-longform_plant_percentcover3_tran_0m$unq_tran<-strtrim(longform_plant_percentcover3_tran_0m$unq_tran, 5)
-
-which( colnames(longform_plant_percentcover3_tran_0m)=="unq_tran" )
-
 
 head(soil_merge_0m)
 
-habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m[,-2], by="unq_plot", all=TRUE)
+habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
 head(habitat_veg_soil_by_tran_0m)
 
 
