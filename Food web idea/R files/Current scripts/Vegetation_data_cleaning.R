@@ -14,6 +14,26 @@ library(ggplot2)
 
 # Read in Owen's data
 islands_plant<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
+head(islands_plant)
+
+islands_plant<-islands_plant %>% dplyr::select(-unq_tran)
+
+
+
+islands_plant$unq_tran<-str_sub(islands_plant$unq_plot, end=-2)
+islands_plant$unq_tran[islands_plant$unq_plot=="CV04SN25"]<-"CV04SN"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM04WE25"]<-"MM04WE"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM08NS25"]<-"MM08NS"
+islands_plant$unq_tran[islands_plant$unq_plot=="PR05EW25"]<-"PR05EW"
+islands_plant$unq_tran[islands_plant$unq_plot=="PR06EW25"]<-"PR06EW"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ02NS25"]<-"TQ02NS"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ05EW25"]<-"TQ05EW"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM01WE15"]<-"MM01WE"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM03WE15"]<-"MM03WE"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM08EW15"]<-"MM08EW"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ06EW15"]<-"TQ06EW"
+
+
 
 
 #summing across layers Owen but no T, because T is summing across layers, so need to exclude
@@ -92,12 +112,12 @@ longform_plant_percentcover2<-Deb_Owen_veg_combined_wide
 longform_plant_percentcover2[is.na(longform_plant_percentcover2)]<-0 
 
 #combining some species
-longform_plant_percentcover2$marine<-longform_plant_percentcover2$`o soil`+ longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
+longform_plant_percentcover2$unknown_lily<-longform_plant_percentcover2$'unk lily'+ longform_plant_percentcover2$'unk lily sp'+longform_plant_percentcover2$'lily seedling'
+longform_plant_percentcover2$marine<-longform_plant_percentcover2$scat+ longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$shell
 longform_plant_percentcover2$free_space<-longform_plant_percentcover2$bare+longform_plant_percentcover2$`bare ground`+longform_plant_percentcover2$`sandy soil`+longform_plant_percentcover2$`o soil`+longform_plant_percentcover2$gravel+longform_plant_percentcover2$rock
 longform_plant_percentcover2$grass<-longform_plant_percentcover2$`grass 1`+longform_plant_percentcover2$`grass sp`
 longform_plant_percentcover2$sedge_final<-longform_plant_percentcover2$`sedge 1`+longform_plant_percentcover2$`sedge sp`+longform_plant_percentcover2$sedge+longform_plant_percentcover2$sedge1
 longform_plant_percentcover2$unknown_forb<-longform_plant_percentcover2$'unk forb'+ longform_plant_percentcover2$'unidentified forb'
-longform_plant_percentcover2$unknown_lily<-longform_plant_percentcover2$'unk lily'+ longform_plant_percentcover2$'unk lily sp'+longform_plant_percentcover2$'lily seedling'
 longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk mono'+ longform_plant_percentcover2$'unk monocot'
  
 

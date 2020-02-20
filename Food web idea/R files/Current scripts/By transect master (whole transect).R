@@ -48,6 +48,20 @@ head(soil_clean)
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
 head(owen_key)
 length(unique(owen_key$unq_tran))
+owen_key<-owen_key %>% dplyr::select(-unq_tran)
+owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
+owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04SN"
+owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04WE"
+owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08NS"
+owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05EW"
+owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06EW"
+owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02NS"
+owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05EW"
+owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01WE"
+owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03WE"
+owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08EW"
+owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06EW"
+
 
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
@@ -139,7 +153,7 @@ head(habitat_soil_by_tran)
 
 # Adding plant cover and richness -----------------------------------------
 
-#this loads data from "Habitation data" R script
+#this loads data cleaned from "Vegetation data cleaning" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
