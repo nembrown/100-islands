@@ -44,12 +44,12 @@ pointcount.gps<-pointcount.gps[,c(3,16,17)]
 pointcount.gps<-pointcount.gps[!duplicated(pointcount.gps$pcid),]
 #sometimes taken twice...  
   
-shoredist.deb<-merge(shoredist.deb, pointcount.gps, by.x="pcid", all=TRUE)
+shoredist.deb<-merge(shoredist.deb, pointcount.gps, by="pcid", all=TRUE)
 #head(shoredist.deb)
 length(i.soil.all$sample.id)
 
-soil.deb<-merge(i.soil.all, shoredist.deb, by.x="pcid", all=TRUE)
-#head(soil.deb)
+soil.deb<-merge(i.soil.all, shoredist.deb, by="pcid", all=TRUE)
+head(soil.deb)
 names(soil.deb)[16]<-"shore_dist"
 names(soil.deb)[11]<-"unq_isl"
 names(soil.deb)[4]<-"c"
@@ -59,13 +59,15 @@ names(soil.deb)[7]<-"cn"
 names(soil.deb)[1]<-"unq_plot"
 
 length(soil.deb$unq_plot)
-#head(soil.deb)
+head(soil.deb)
 
+
+#####OWEN
 
 #####OWEN
 #owen's isotope data by plot
 soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
-#head(soil_clean)
+head(soil_clean)
 length((soil_clean$unq_plot))
 
 #duplicated plots: 
@@ -75,34 +77,88 @@ soil_clean[duplicated(soil_clean$unq_plot),]
 names(soil_clean)[6]<-"d13c"
 names(soil_clean)[7]<-"d15n"
 
+head(soil_clean)
+
 #Owen's key data
-owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod.csv", header=TRUE, sep=",")
-#head(owen_key)
-length(unique(owen_key$unq_isl))
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+length(unique(owen_key$unq_tran))
+owen_key<-owen_key %>% dplyr::select(-unq_tran)
+owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
+
+owen_key<- owen_key %>% mutate(unq_tran= if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))) %>% 
+                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("NS", "N", owen_key$unq_tran, fixed = TRUE), gsub("NS", "S", owen_key$unq_tran, fixed = TRUE))) %>% 
+                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("EW", "E", owen_key$unq_tran, fixed = TRUE), gsub("EW", "W", owen_key$unq_tran, fixed = TRUE))) %>% 
+                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("WE", "W", owen_key$unq_tran, fixed = TRUE), gsub("WE", "E", owen_key$unq_tran, fixed = TRUE))) 
+                       
+
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
+owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
+owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
+owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
+owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
 
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
-#head(hakai_plot)
+head(hakai_plot)
 
-owen_key_expanded<-merge(owen_key, hakai_plot, by.x="unq_plot", all=TRUE)
-#head(owen_key_expanded)
-length(unique(owen_key_expanded$unq_isl))
+owen_key_expanded<-merge(owen_key, hakai_plot, by="unq_plot", all=TRUE)
+head(owen_key_expanded)
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords.csv", header=TRUE, sep=",")
-#head(owen_coords)
+owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 
-owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
-owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
+head(owen_coords)
+owen_coords<-owen_coords[,c(1:3)]
+head(owen_coords)
 
-owen_coords<-owen_coords[,c(3,4, 14)]
-#head(owen_coords)
-names(owen_coords)[1]<-"easting"
-names(owen_coords)[2]<-"northing"
+owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_plot", all=TRUE)
+head(owen_key_expanded)
 
-owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
-#head(owen_key_expanded)
+
+#put isotope data together with the key
+soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
+head(soil_merge)
+
+
+### add in d34s here
+soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
+head(soil_s)
+
+#just pick Owen's soils - for the transect file
+
+soil_s_owen<-soil_s %>% filter(person=="Owen")
+
+soil_merge<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
+View(soil_merge)
+
+###up to now is all plot level, so now we transition to transect level 
+soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(soil_merge_mean)
+
+soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #put isotope data together with the key

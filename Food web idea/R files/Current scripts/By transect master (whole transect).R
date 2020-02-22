@@ -46,21 +46,36 @@ head(soil_clean)
 
 #Owen's key data
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-head(owen_key)
 length(unique(owen_key$unq_tran))
 owen_key<-owen_key %>% dplyr::select(-unq_tran)
 owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
-owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04SN"
-owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08NS"
-owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05EW"
-owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06EW"
-owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02NS"
-owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05EW"
-owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08EW"
-owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06EW"
+
+
+
+###this didn't work!!!!! FUDGE
+owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
+
+
+
+#if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))
+  
+
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
+owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
+owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
+owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
+owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
 
 
 #Owen's plot-level soil info - moisture, slope etc
@@ -69,40 +84,38 @@ names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
 owen_key_expanded<-merge(owen_key, hakai_plot, by="unq_plot", all=TRUE)
-head(owen_key_expanded)
-length(unique(owen_key_expanded$unq_tran))
+View(owen_key_expanded)
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
+
 head(owen_coords)
-owen_coords<-owen_coords[,c(1:9)]
+owen_coords<-owen_coords[,c(1:3)]
 head(owen_coords)
 
-owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
-owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
-
-owen_coords<-owen_coords[,c(3,4, 10)]
-head(owen_coords)
-names(owen_coords)[1]<-"easting"
-names(owen_coords)[2]<-"northing"
-
-owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
+owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_plot", all=TRUE)
 head(owen_key_expanded)
 
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
-head(soil_merge)
+View(soil_merge)
 
 
 ### add in d34s here
 soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
-soil_merge<-merge(soil_merge, soil_s, by="unq_plot")
+#just pick Owen's soils - for the transect file
 
+soil_s_owen<-soil_s %>% filter(person=="Owen")
+
+soil_merge<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
+View(soil_merge)
+
+###up to now is all plot level, so now we transition to transect level 
 soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(soil_merge_mean)
+View(soil_merge_mean)
 
 soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
 
@@ -118,10 +131,8 @@ names(becky_trees_tran)[1]<-"unq_isl"
 names(becky_trees_tran)[3]<-"species"
 becky_trees_tran<-as.data.frame(becky_trees_tran)
 
-becky_trees_tran$tran<-strtrim(becky_trees_tran$tran, 1)
 becky_trees_tran$unq_tran<- paste(becky_trees_tran$unq_isl,becky_trees_tran$tran)
 becky_trees_tran$unq_tran<-gsub(" ", "", becky_trees_tran$unq_tran, fixed = TRUE)
-#View(becky_trees_tran)
 
 becky_trees_tran_wide <-becky_trees_tran %>% group_by(unq_tran, species) %>% 
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
@@ -145,10 +156,11 @@ becky_trees_tran_2<-becky_trees_tran %>% group_by(unq_tran) %>%
 
 
 head(becky_trees_tran_2)
+
 becky_trees_wide_richness_tran<-merge(becky_trees_wide_richness_tran, becky_trees_tran_2)
   
 habitat_soil_by_tran<-merge(soil_merge_mean,becky_trees_wide_richness_tran, by="unq_tran", all=TRUE)
-head(habitat_soil_by_tran)
+View(habitat_soil_by_tran)
 
 
 # Adding plant cover and richness -----------------------------------------
@@ -156,10 +168,11 @@ head(habitat_soil_by_tran)
 #this loads data cleaned from "Vegetation data cleaning" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
 head(longform_plant_percentcover)
 
-#longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
+#because we've trimmed down to transect already, we don't need to include Deb's veg.... 
+#but it is included in the by_island and by_plot frames
+
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 head(longform_plant_percentcover_owen)
@@ -203,15 +216,13 @@ longform_plant_percentcover3_tran$shrub_cover<-rowSums(longform_plant_percentcov
 longform_plant_percentcover3_tran$herb_richness<-specnumber(longform_plant_percentcover2_tran_herb[,-c(1)])
 longform_plant_percentcover3_tran$herb_cover<-rowSums(longform_plant_percentcover2_tran_herb[,-c(1)], na.rm=TRUE)
 
-longform_plant_percentcover3_tran$unq_tran<-strtrim(longform_plant_percentcover3_tran$unq_tran, 5)
-
 head(longform_plant_percentcover3_tran)
 
-
-head(soil_merge)
-
 habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcover3_tran, by="unq_tran", all=TRUE)
-head(habitat_veg_soil_by_tran)
+View(habitat_veg_soil_by_tran)
+
+length(habitat_veg_soil_by_tran$unq_tran)
+#330
 
 
 
@@ -221,6 +232,29 @@ head(habitat_veg_soil_by_tran)
 owen.veg_tran<-read.csv("C:Food web idea//Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
 head(owen.veg_tran)
 owen.veg_tran<-owen.veg_tran[,-1]
+
+length(unique(owen.veg_tran$unq_tran))
+owen.veg_tran$unq_tran<-str_sub(owen.veg_tran$unq_plot, end=-2)
+
+owen.veg_tran<- owen.veg_tran %>% mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("SN", "S", owen.veg_tran$unq_tran, fixed = TRUE), gsub("SN", "N", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("NS", "N", owen.veg_tran$unq_tran, fixed = TRUE), gsub("NS", "S", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("EW", "E", owen.veg_tran$unq_tran, fixed = TRUE), gsub("EW", "W", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("WE", "W", owen.veg_tran$unq_tran, fixed = TRUE), gsub("WE", "E", owen.veg_tran$unq_tran, fixed = TRUE))) 
+
+
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV04SN25"]<-"CV04S"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM04WE25"]<-"MM04W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM08NS25"]<-"MM08N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="PR05EW25"]<-"PR05E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="PR06EW25"]<-"PR06E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM01WE15"]<-"MM01W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM03WE15"]<-"MM03W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM08EW15"]<-"MM08E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ06EW15"]<-"TQ06E"
+
 
 owen.veg_tran_gash <- owen.veg_tran %>% filter(species == "gash")
 owen.veg_tran_midi <- owen.veg_tran %>% filter(species == "midi")
@@ -240,14 +274,6 @@ names(owen.veg_tran_midi)[6]<-"s_midi"
 names(owen.veg_tran_midi)[7]<-"d13c_midi"
 names(owen.veg_tran_midi)[8]<-"d15n_midi"
 
-owen.veg_tran_midi$transect<-strtrim(owen.veg_tran_midi$transect, 1)
-owen.veg_tran_midi$unq_tran<- paste(owen.veg_tran_midi$unq_isl,owen.veg_tran_midi$transect)
-owen.veg_tran_midi$unq_tran<-gsub(" ", "", owen.veg_tran_midi$unq_tran, fixed = TRUE)
-
-owen.veg_tran_gash$transect<-strtrim(owen.veg_tran_gash$transect, 1)
-owen.veg_tran_gash$unq_tran<- paste(owen.veg_tran_gash$unq_isl,owen.veg_tran_gash$transect)
-owen.veg_tran_gash$unq_tran<-gsub(" ", "", owen.veg_tran_gash$unq_tran, fixed = TRUE)
-
 owen.veg_tran_gash <-owen.veg_tran_gash %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(owen.veg_tran_gash)
 
@@ -263,18 +289,13 @@ head(habitat_veg_soil_by_tran)
 
 seawrack_key<-read.csv("C:Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
-seawrack_key$ISLAND<-sprintf("%02d",seawrack_key$ISLAND)
-seawrack_key$unq_isl <- paste(seawrack_key$NODE,seawrack_key$ISLAND)
-seawrack_key$unq_isl<-gsub(" ", "", seawrack_key$unq_isl, fixed = TRUE)
-head(seawrack_key)
+
 
 
 sara_habitat<-read.csv("C:Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
-sara_habitat_merged<-merge(sara_habitat, seawrack_key, by.y="unq_tran", all=TRUE)
+sara_habitat_merged<-merge(sara_habitat, seawrack_key, by="unq_tran", all=TRUE)
 head(sara_habitat_merged)
-which( colnames(sara_habitat_merged)=="unq_isl" )
-sara_habitat_merged<-sara_habitat_merged[,-62]
 
 ### add in water area (calculated by Will)
 water_area<-read.csv("C:Food web idea//Data by person//Norah.data//WaterArea.csv", header=TRUE, sep=",")
@@ -310,8 +331,6 @@ sara_composition_richness<-sara_composition[,c(1,3)]
 sara_composition_richness$wrack_richness<-specnumber(sara_composition[,-c(1,2,3,4,5,6, 52)])
 sara_composition_richness$site_mean_by_tran<-sara_composition$SITE_SUM
 
-sara_composition_richness$unq_tran<-strtrim(sara_composition_richness$unq_tran, 5)
-
 # add in diversity to full wrack story
 sara_habitat_merged_by_tran<-merge(sara_habitat_merged, sara_composition_richness, by="unq_tran", all=TRUE)
 head(sara_habitat_merged_by_tran)
@@ -319,7 +338,7 @@ head(sara_habitat_merged_by_tran)
 
 #add in wrack to veg, habitat
 habitat_veg_wrack_soil_by_tran<-merge(habitat_veg_soil_by_tran, sara_habitat_merged_by_tran, by="unq_tran", all=TRUE)
-head(habitat_veg_wrack_soil_by_tran)
+View(habitat_veg_wrack_soil_by_tran)
 
 
 
@@ -330,7 +349,7 @@ head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
 chris_insects_master$plot<-substr(chris_insects_master$Trapline, 5, 5)
-head(chris_insects_master)
+#View(chris_insects_master)
 
 # I still want to divde by groups BUT I will do all insects as a whole first then break into groups
 
@@ -355,9 +374,9 @@ head(chris_insects_master_wide_tran_richness)
 #now a more standardized abundance measure per beat or pitfall trap on the island
 chris_trapline_data<-read.csv("C:Food web idea//Data by person//Chris.data//trapline_data.csv", header=TRUE, sep=",")
 chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
-chris_trapline_data$unq_tran<-strtrim(chris_trapline_data$Trapline, 5)
+chris_trapline_data$unq_tran<-chris_trapline_data$Trapline
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
-head(chris_trapline_data)
+View(chris_trapline_data)
 
 #sum number of insects found on that trapline/traptype
 chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
@@ -678,9 +697,11 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 
 # Tidying up -------------------------------------------------------------
 
-head(by_tran_master)
+View(by_tran_master)
 write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv")
 
+length(unique(by_tran_master$unq_tran))
+#there's the interior plots too... that's why there's 625
 
 
 

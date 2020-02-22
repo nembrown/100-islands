@@ -127,7 +127,7 @@ write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merg
 #this loads data from "Habitation data" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-
+View(longform_plant_percentcover)
 #longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
@@ -207,7 +207,7 @@ names(owen.veg_tran_0m_midi)[6]<-"s_midi"
 names(owen.veg_tran_0m_midi)[7]<-"d13c_midi"
 names(owen.veg_tran_0m_midi)[8]<-"d15n_midi"
 
-owen.veg_tran_0m_midi$transect<-strtrim(owen.veg_tran_0m_midi$transect, 1)
+#owen.veg_tran_0m_midi$transect<-strtrim(owen.veg_tran_0m_midi$transect, 1)
 owen.veg_tran_0m_midi$unq_tran<- paste(owen.veg_tran_0m_midi$unq_isl,owen.veg_tran_0m_midi$transect)
 owen.veg_tran_0m_midi$unq_tran<-gsub(" ", "", owen.veg_tran_0m_midi$unq_tran, fixed = TRUE)
 

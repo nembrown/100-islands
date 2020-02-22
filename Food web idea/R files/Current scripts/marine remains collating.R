@@ -59,21 +59,38 @@ marine_by_plot_from_notes_selected$total_marine_evidence<-marine_by_plot_from_no
 
 marine_by_plot_from_notes_selected[duplicated(marine_by_plot_from_notes_selected$unq_plot),]
 
-### Add in transect identifier here
-marine_by_plot_from_notes_selected$unq_tran<-str_sub(marine_by_plot_from_notes_selected$unq_plot, end=-2)
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="CV04SN25"]<-"CV04SN"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="MM04WE25"]<-"MM04WE"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="MM08NS25"]<-"MM08NS"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="PR05EW25"]<-"PR05EW"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="PR06EW25"]<-"PR06EW"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="TQ02NS25"]<-"TQ02NS"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="TQ05EW25"]<-"TQ05EW"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="MM01WE15"]<-"MM01WE"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="MM03WE15"]<-"MM03WE"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="MM08EW15"]<-"MM08EW"
-marine_by_plot_from_notes_selected$unq_tran[marine_by_plot_from_notes_selected$unq_plot=="TQ06EW15"]<-"TQ06EW"
+
+head(marine_by_plot_from_notes_selected)
+
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+length(unique(owen_key$unq_tran))
+owen_key<-owen_key %>% dplyr::select(-unq_tran)
+owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
+
+owen_key<- owen_key %>% mutate(unq_tran= if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen_key$plot<4, gsub("NS", "N", owen_key$unq_tran, fixed = TRUE), gsub("NS", "S", owen_key$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen_key$plot<4, gsub("EW", "E", owen_key$unq_tran, fixed = TRUE), gsub("EW", "W", owen_key$unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(owen_key$plot<4, gsub("WE", "W", owen_key$unq_tran, fixed = TRUE), gsub("WE", "E", owen_key$unq_tran, fixed = TRUE))) 
 
 
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
+owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
+owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
+owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
+owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+head(owen_key)
+owen_key_subset<-owen_key %>% dplyr::select(unq_plot, unq_tran)
+
+
+marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, owen_key_subset, by="unq_plot")
 
 
 
@@ -185,7 +202,7 @@ ggplot(master_transect, aes(x=as.factor(total_marine_evidence), y=d15n))+geom_bo
 
 
 
--#### SUM
+#### SUM
 head(master_transect2)
 master_transect3<-merge(master_transect2, marine_by_transect_from_notes_selected_sum[,-c(2,3)])
 
