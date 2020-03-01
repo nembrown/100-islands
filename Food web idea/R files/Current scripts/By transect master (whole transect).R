@@ -84,7 +84,7 @@ names(hakai_plot)[3]<-"plant.richness"
 head(hakai_plot)
 
 owen_key_expanded<-merge(owen_key, hakai_plot, by="unq_plot", all=TRUE)
-View(owen_key_expanded)
+head(owen_key_expanded)
 
 #Add in the GPS coordinates
 owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
@@ -99,7 +99,7 @@ head(owen_key_expanded)
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
-View(soil_merge)
+head(soil_merge)
 
 
 ### add in d34s here
@@ -111,11 +111,11 @@ head(soil_s)
 soil_s_owen<-soil_s %>% filter(person=="Owen")
 
 soil_merge<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
-View(soil_merge)
+head(soil_merge)
 
 ###up to now is all plot level, so now we transition to transect level 
 soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-View(soil_merge_mean)
+head(soil_merge_mean)
 
 soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
 
@@ -160,7 +160,7 @@ head(becky_trees_tran_2)
 becky_trees_wide_richness_tran<-merge(becky_trees_wide_richness_tran, becky_trees_tran_2)
   
 habitat_soil_by_tran<-merge(soil_merge_mean,becky_trees_wide_richness_tran, by="unq_tran", all=TRUE)
-View(habitat_soil_by_tran)
+head(habitat_soil_by_tran)
 
 
 # Adding plant cover and richness -----------------------------------------
@@ -219,7 +219,7 @@ longform_plant_percentcover3_tran$herb_cover<-rowSums(longform_plant_percentcove
 head(longform_plant_percentcover3_tran)
 
 habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcover3_tran, by="unq_tran", all=TRUE)
-View(habitat_veg_soil_by_tran)
+head(habitat_veg_soil_by_tran)
 
 length(habitat_veg_soil_by_tran$unq_tran)
 #330
@@ -338,7 +338,7 @@ head(sara_habitat_merged_by_tran)
 
 #add in wrack to veg, habitat
 habitat_veg_wrack_soil_by_tran<-merge(habitat_veg_soil_by_tran, sara_habitat_merged_by_tran, by="unq_tran", all=TRUE)
-View(habitat_veg_wrack_soil_by_tran)
+head(habitat_veg_wrack_soil_by_tran)
 
 
 
@@ -349,7 +349,7 @@ head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
 chris_insects_master$plot<-substr(chris_insects_master$Trapline, 5, 5)
-#View(chris_insects_master)
+#head(chris_insects_master)
 
 # I still want to divde by groups BUT I will do all insects as a whole first then break into groups
 
@@ -376,7 +376,7 @@ chris_trapline_data<-read.csv("C:Food web idea//Data by person//Chris.data//trap
 chris_trapline_data$unq_isl<-strtrim(chris_trapline_data$Trapline, 4)
 chris_trapline_data$unq_tran<-chris_trapline_data$Trapline
 chris_trapline_data$plot<-substr(chris_trapline_data$Trapline, 5, 5)
-View(chris_trapline_data)
+head(chris_trapline_data)
 
 #sum number of insects found on that trapline/traptype
 chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, Trap) %>% 
@@ -384,7 +384,7 @@ chris_insects_master_by_trap_tran<-chris_insects_master %>% group_by(unq_tran, T
 
 chris_insects_master_by_trap_tran<-merge(chris_insects_master_by_trap_tran, chris_trapline_data[,-c(2:15)], by="unq_tran")
 
-#View(chris_insects_master_by_trap_tran)
+#head(chris_insects_master_by_trap_tran)
 
 chris_insects_master_by_trap_tran$insect_beat_abundance<-chris_insects_master_by_trap_tran$sum_abundance/chris_insects_master_by_trap_tran$BeatTime
 
@@ -697,13 +697,13 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 
 # Tidying up -------------------------------------------------------------
 
-View(by_tran_master)
+head(by_tran_master)
 write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv")
 
 length(unique(by_tran_master$unq_tran))
 #there's the interior plots too... that's why there's 625
 
-
+ggplot(by_tran_master, aes(y=insect_richness, x=unq_isl))+geom_boxplot()
 
 #### PLotting
 
