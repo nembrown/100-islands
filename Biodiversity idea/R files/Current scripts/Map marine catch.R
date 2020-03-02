@@ -40,11 +40,9 @@ fish_richness_merged_tran_isl<-fish_richness_merged_tran_isl[,-1]
 #Island level location information
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
 head(by_isl_master)
-by_isl_master<-by_isl_master[,-1]
 
 #Transect-level information
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-by_tran_master<-by_tran_master[,-1]
 
 
 #isotopes on the island-level
@@ -121,11 +119,13 @@ ggmap(map_marine) + geom_point(data=df.SF_marine, aes(x = long, y = lat, col=sit
 
 ggmap(map_marine_big) + stat_density2d(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
 ggmap(map_marine_big) + geom_blank(data=df.SF_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
-ggsave("C:Plots//map_big.png", width=40, height=20, unit="cm")
+ggsave("C:Biodiversity idea//Plots//Maps//map_big.png", width=40, height=20, unit="cm")
 
 
 # Transects --------------------------------------------------------------
-head(by_tran_master)
+#load transect 
+by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
+
 
 data_subset2 <- by_tran_master[ , c("easting", "northing")]
 by_tran_master_no_na<- by_tran_master[complete.cases(data_subset2), ] 
@@ -136,6 +136,7 @@ df.SF_transects<-st_transform(x = df.SF_transects, crs = 4326)
 df.SF_transects$long<-st_coordinates(df.SF_transects)[,1] # get coordinates
 df.SF_transects$lat<-st_coordinates(df.SF_transects)[,2] # get coordinates
 head(df.SF_transects)
+
 
 
 head(ben_habitat_data)
@@ -152,6 +153,15 @@ head(df.SF_transects_simple)
 names(df.SF_transects_simple)[1]<-"site"
 df.SF_transects_simple$site_type<-"100_islands"
 
+# ###different dataframe.... 
+# df.SF_transects_simple_ungeo<-df.SF_transects_simple
+# df.SF_transects_simple_ungeo$long<-st_coordinates(df.SF_transects_simple_ungeo)[,1] # get coordinates
+# df.SF_transects_simple_ungeo$lat<-st_coordinates(df.SF_transects_simple_ungeo)[,2]
+# df.SF_transects_simple_ungeo<-df.SF_transects_simple_ungeo %>% st_set_geometry(NULL)
+# head(df.SF_transects_simple_ungeo)
+# df.SF_transects_simple_ungeo<-df.SF_transects_simple_ungeo[,-2]
+
+
 df.SF_transects_marine<-rbind(df.SF_transects_simple, ben_habitat_data_simple.SP)
 head(df.SF_transects_marine)
  df.SF_transects_marine$long<-st_coordinates(df.SF_transects_marine)[,1] # get coordinates
@@ -163,8 +173,10 @@ head(df.SF_transects_marine)
 # map_marine_trans <- get_stamenmap(bbox_marine_trans, source="stamen", maptype= "terrain", crop=TRUE)
 
 
- ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
- ggsave("C:Plots//map_transects_beachseine.png", width=40, height=20, unit="cm")
+ggmap(map_marine_trans) + geom_point(data=df.SF_transects_marine, aes(x = long, y = lat, col=site_type))+  scale_colour_viridis_d()
+
+#outdated file path - update to the project directory. 
+ggsave("C:Biodiversity idea//Plots//Maps//map_transects_beachseine.png", width=40, height=20, unit="cm")
 
 library(beyonce)
 

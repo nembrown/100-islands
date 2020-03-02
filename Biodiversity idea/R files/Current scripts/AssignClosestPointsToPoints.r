@@ -31,6 +31,23 @@
 #######################################################################################
 
 
+library(here)
+library(sf)
+library(raster)
+library(spData)
+library(tmap)    # for static and interactive maps
+library(leaflet) # for interactive maps
+library(mapview) # for interactive maps
+library(ggplot2) # tidyverse vis package
+library(shiny)
+library(rgdal) # spatial/shp reading
+library(viridis) # nice color palette
+library(ggmap) # ggplot functionality for maps ---> dplyr, purr is dependency
+library(ggsn) # for scale bars/north arrows in ggplots
+library(maps)
+library(mapdata)
+
+
 # Islands -----------------------------------------------------------------
 
 
@@ -123,6 +140,22 @@ head(ben_habitat_data_simple)
 bens_sites<-ben_habitat_data_simple
 names(bens_sites)[1]<-"beachseine"
 head(bens_sites)
+
+by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
+data_subset2 <- by_tran_master[ , c("easting", "northing")]
+by_tran_master_no_na<- by_tran_master[complete.cases(data_subset2), ] 
+df.SF_transects <- st_as_sf(by_tran_master_no_na, coords = c("easting", "northing"), crs = 26909)
+df.SF_transects<-st_transform(x = df.SF_transects, crs = 4326)
+df.SF_transects$long<-st_coordinates(df.SF_transects)[,1] # get coordinates
+df.SF_transects$lat<-st_coordinates(df.SF_transects)[,2] # get coordinates
+head(df.SF_transects)
+
+head(df.SF_transects)
+df.SF_transects_simple<-df.SF_transects[,1]
+head(df.SF_transects_simple)
+names(df.SF_transects_simple)[1]<-"site"
+df.SF_transects_simple$site_type<-"100_islands"
+
 
 
 df.SF_transects_simple$long<-st_coordinates(df.SF_transects_simple)[,1] # get coordinates
