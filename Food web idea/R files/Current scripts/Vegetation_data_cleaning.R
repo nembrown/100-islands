@@ -42,9 +42,6 @@ islands_plant$unq_tran[islands_plant$unq_plot=="MM07NS3"]<-"MM07S"
 islands_plant$unq_tran[islands_plant$unq_plot=="ST09WE3"]<-"ST09E"
 
 
-
-
-
 #summing across layers Owen but no T, because T is summing across layers, so need to exclude
 islands_plant_noT <- islands_plant %>%  filter(layer!= "T")
 

@@ -77,8 +77,6 @@ owen_key$unq_tran[owen_key$unq_plot=="ST09WE3"]<-"ST09E"
 
 
 
-
-
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
 names(hakai_plot)[3]<-"plant.richness"
@@ -90,7 +88,7 @@ head(owen_key_expanded)
 #Add in the GPS coordinates
 owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 
-head(owen_coords)
+View(owen_coords)
 owen_coords<-owen_coords[,c(1:3)]
 head(owen_coords)
 
