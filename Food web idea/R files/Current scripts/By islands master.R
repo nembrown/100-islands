@@ -769,7 +769,7 @@ node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv", row.names = FALSE)
+write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
 head(by_isl_master)
 
 
