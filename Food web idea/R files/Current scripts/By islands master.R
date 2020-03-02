@@ -25,7 +25,8 @@ library(forcats)
 
 
 
-
+#This file should be summarizing by plot when possible and skipping the transect phase. 
+#Not possible for Becky's data. 
 
 # Loading soil data -------------------------------------------------------
 
@@ -58,17 +59,17 @@ names(soil.deb)[6]<-"s"
 names(soil.deb)[7]<-"cn"
 names(soil.deb)[1]<-"unq_plot"
 
-length(soil.deb$unq_plot)
+length(unique(soil.deb$unq_plot))
+#301 plots for deb
 head(soil.deb)
 
 
 #####OWEN
-
-#####OWEN
-#owen's isotope data by plot
+#owen's soil isotope data by plot
 soil_clean<-read.csv("C:Food web idea//Data by person//Owen's data//soil_clean.csv", header=TRUE, sep=",")
 head(soil_clean)
-length((soil_clean$unq_plot))
+length(unique(soil_clean$unq_plot))
+#682
 
 #duplicated plots: 
 soil_clean[duplicated(soil_clean$unq_plot),]
@@ -81,29 +82,6 @@ head(soil_clean)
 
 #Owen's key data
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-length(unique(owen_key$unq_tran))
-owen_key<-owen_key %>% dplyr::select(-unq_tran)
-owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
-
-owen_key<- owen_key %>% mutate(unq_tran= if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))) %>% 
-                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("NS", "N", owen_key$unq_tran, fixed = TRUE), gsub("NS", "S", owen_key$unq_tran, fixed = TRUE))) %>% 
-                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("EW", "E", owen_key$unq_tran, fixed = TRUE), gsub("EW", "W", owen_key$unq_tran, fixed = TRUE))) %>% 
-                        mutate(unq_tran= if_else(owen_key$plot<4, gsub("WE", "W", owen_key$unq_tran, fixed = TRUE), gsub("WE", "E", owen_key$unq_tran, fixed = TRUE))) 
-                       
-
-#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
-owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
-owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
-owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
-owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
-owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
-owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
-owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
-owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
-owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
-owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
-owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
-
 
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
@@ -129,48 +107,6 @@ soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
 head(soil_merge)
 
 
-### add in d34s here
-soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
-head(soil_s)
-
-#just pick Owen's soils - for the transect file
-
-soil_s_owen<-soil_s %>% filter(person=="Owen")
-
-soil_merge<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
-View(soil_merge)
-
-###up to now is all plot level, so now we transition to transect level 
-soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(soil_merge_mean)
-
-soil_merge_mean<-soil_merge_mean[,-c(8,9,10)]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#put isotope data together with the key
-soil_merge_isl<-merge(soil_clean, owen_key_expanded, by.x="unq_plot")
-#head(soil_merge_isl)
-
-
-soil_merge_isl[duplicated(soil_merge_isl$unq_plot),]
-length(unique(soil_merge_isl$unq_isl))
-#there are a bunch of extras but will wait first to see how to deal with them ... 
-
-
 # Combining Owen and Deb's soil data --------------------------------------
 col_names_selected<-c("unq_plot" ,
                       "unq_isl" ,
@@ -185,52 +121,45 @@ col_names_selected<-c("unq_plot" ,
                      "easting" ,
                      "northing" )
 
-soil_owen_deb<-rbind(soil_merge_isl[,colnames(soil_merge_isl) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
+soil_owen_deb<-rbind(soil_merge[,colnames(soil_merge) %in% col_names_selected], soil.deb[,colnames(soil.deb) %in% col_names_selected])
 head(soil_owen_deb)
 
-length(soil.deb$unq_plot)
-length(soil_merge_isl$unq_plot)
-length(soil_owen_deb$unq_plot)
-length(unique(soil_owen_deb$unq_isl))
-#this just adds the two together... 
+length(unique(soil_owen_deb$unq_plot))
+#983 = 301 + 682
 
 ### add in d34s here
 soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
-soil_owen_deb<-merge(soil_owen_deb, soil_s, by="unq_plot", all.x=TRUE)
+soil_owen_deb<-merge(soil_owen_deb, soil_s[,-3], by="unq_plot", all=TRUE)
 
-
-#now we want one value per island: 
+#NOW we want to cut down to one value per island: 
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(soil_owen_deb_by_isl)
-length(soil_owen_deb_by_isl$unq_isl)
+length(unique(soil_owen_deb_by_isl$unq_isl))
+#100 islands 
 
 #we could change this to weight different points differently but here just a mean of all samples on the island...
-#including both debv and owen's'
-
-
 
 
 # Adding habitat class and island characteristics -------------------------
 
 habitat_class<-read.csv("C:Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 
-#head(habitat_class)
+head(habitat_class)
 
 length(habitat_class$unq_isl)
 
 island_data_wiebe<-read.csv("C:Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
-#head(island_data_wiebe)
+head(island_data_wiebe)
 
 names(island_data_wiebe)[1]<-"unq_isl"
 
-habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,19)])
+habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,17,18,19)])
 
-habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by.x="unq_isl", all=TRUE)
-#head(habitat_soil_by_isl)
-str(habitat_soil_by_isl)
+habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by="unq_isl", all=TRUE)
+head(habitat_soil_by_isl)
 
 
 
@@ -260,7 +189,7 @@ becky_trees_wide_richness$tree_evenness<-becky_trees_wide_richness$tree_diversit
 
 
 becky_trees_wide_richness$tree_abundance<-rowSums(becky_trees_wide[,-1],na.rm = TRUE)
-#head(becky_trees_wide_richness)
+head(becky_trees_wide_richness)
 
 
 #summed total basal area of all species in that island= "cover" type thing 
@@ -276,7 +205,7 @@ becky_trees_wide_richness<-merge(becky_trees_wide_richness, becky_trees_2)
 
 habitat_soil_by_isl<-merge(habitat_soil_by_isl,becky_trees_wide_richness, by="unq_isl", all=TRUE)
 #head(habitat_soil_by_isl)
-length(habitat_soil_by_isl$unq_isl)
+length(unique(habitat_soil_by_isl$unq_isl))
 
 
 # Adding plant cover and richness -----------------------------------------
@@ -284,61 +213,13 @@ length(habitat_soil_by_isl$unq_isl)
 #this loads data from "Habitation data" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
-#head(longform_plant_percentcover)
+head(longform_plant_percentcover)
 
 longform_plant_percentcover$unq_isl<-fct_explicit_na(longform_plant_percentcover$unq_isl)
 
 longform_plant_percentcover2 <- longform_plant_percentcover[,c(1:7)]%>% 
   group_by(unq_isl,species) %>% summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
-
-#copmmented outt his section, I think the source file changed so there is no longer random "marine" etc remains. Need to check habitation file to see what happened
-# #head(longform_plant_percentcover2)
-# 
-# longform_plant_percentcover2$marine<-longform_plant_percentcover2$`marine remains`+longform_plant_percentcover2$`abalone shell`+longform_plant_percentcover2$driftwood+longform_plant_percentcover2$shell
-# longform_plant_percentcover2$free_space<-longform_plant_percentcover2$bare+longform_plant_percentcover2$`bare ground`+longform_plant_percentcover2$`sandy soil`+longform_plant_percentcover2$`o soil`+longform_plant_percentcover2$gravel+longform_plant_percentcover2$rock
-# longform_plant_percentcover2$grass<-longform_plant_percentcover2$`grass 1`+longform_plant_percentcover2$`grass sp`
-# longform_plant_percentcover2$sedge_final<-longform_plant_percentcover2$`sedge 1`+longform_plant_percentcover2$`sedge sp`+longform_plant_percentcover2$sedge+longform_plant_percentcover2$sedge1
-# longform_plant_percentcover2$unknown_forb<-longform_plant_percentcover2$'unk forb'+ longform_plant_percentcover2$'unidentified forb'
-# longform_plant_percentcover2$unknown_lily<-longform_plant_percentcover2$'unk lily'+ longform_plant_percentcover2$'unk lily sp'
-# longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk mono'+ longform_plant_percentcover2$'unk monocot'
-# 
-# 
-# 
-# paste(
-# which( colnames(longform_plant_percentcover2)=="marine" ),
-# which( colnames(longform_plant_percentcover2)=="free_space" ),
-# which( colnames(longform_plant_percentcover2)=="bare" ),
-# which( colnames(longform_plant_percentcover2)=="bare ground" ),
-# which( colnames(longform_plant_percentcover2)=="woody debris" ),
-# which( colnames(longform_plant_percentcover2)=="wood" ),
-# which( colnames(longform_plant_percentcover2)=="sandy soil" ),
-# which( colnames(longform_plant_percentcover2)=="o soil" ),
-# which( colnames(longform_plant_percentcover2)=="shell" ),
-# which( colnames(longform_plant_percentcover2)=="gravel" ),
-# which( colnames(longform_plant_percentcover2)=="rock" ),
-# which( colnames(longform_plant_percentcover2)=="marine remains" ),
-# which( colnames(longform_plant_percentcover2)=="abalone shell" ),
-# which( colnames(longform_plant_percentcover2)=="driftwood" ),
-# which( colnames(longform_plant_percentcover2)=="feather" ),
-# which( colnames(longform_plant_percentcover2)=="grass 1" ),
-# which( colnames(longform_plant_percentcover2)=="grass sp" ),
-# which( colnames(longform_plant_percentcover2)=="sedge" ),
-# which( colnames(longform_plant_percentcover2)=="sedge1" ),
-# which( colnames(longform_plant_percentcover2)=="sedge 1" ),
-# which( colnames(longform_plant_percentcover2)=="sedge sp" ),
-# which( colnames(longform_plant_percentcover2)=="unk forb" ),
-# which( colnames(longform_plant_percentcover2)=="unidentified forb" ),
-# which( colnames(longform_plant_percentcover2)=="unk lily" ),
-# which( colnames(longform_plant_percentcover2)=="unk lily sp" ),
-# which( colnames(longform_plant_percentcover2)=="unk mono" ),
-# which( colnames(longform_plant_percentcover2)=="unk monocot" ),sep=","
-# )
-# 
-# longform_plant_percentcover_species<-longform_plant_percentcover2[,-c(1,172,173,13,14,171,170,115,88,122,61,109,81,2,39, 48, 59, 60,118,121,119,120,137,134,151,153,154,157)]
-# #head(longform_plant_percentcover_species)
-
 
 longform_plant_percentcover_shrub<- longform_plant_percentcover%>% filter(herb_shrub=="shrub")
 longform_plant_percentcover_herb<- longform_plant_percentcover %>% filter(herb_shrub=="herb")
@@ -378,7 +259,7 @@ longform_plant_percentcover3_isl$herb_cover<-rowSums(longform_plant_percentcover
 #head(soil_merge)
 
 habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
-#head(habitat_veg_soil_by_isl)
+head(habitat_veg_soil_by_isl)
 
 
 
@@ -450,9 +331,6 @@ length(sara_habitat_merged_by_isl$unq_isl)
 # str(sara_habitat_merged_by_isl )
 
 
-
-
-
 #### Seaweed composition
 sara_composition<-read.csv("C:Food web idea//Data by person//Sara's data//sara_composition.csv", header=TRUE, sep=",")
 #head(sara_composition)
@@ -476,15 +354,15 @@ sara_composition_sums<-sara_composition %>%
 
 sara_composition_means_richness$site_sum_by_isl<-sara_composition_sums$SITE_SUM
 
-
+head(sara_habitat_merged_by_isl)
 # add in diversity to full wrack story
-sara_habitat_merged_by_isl<-merge(sara_habitat_merged_by_isl, sara_composition_means_richness, by.x="unq_isl", all=TRUE)
-#head(sara_habitat_merged_by_isl)
+sara_habitat_merged_by_isl<-merge(sara_habitat_merged_by_isl, sara_composition_means_richness, by="unq_isl", all=TRUE)
+head(sara_habitat_merged_by_isl)
 
 
 #add in wrack to birds, veg, habitat
-habitat_veg_bird_wrack_soil_by_isl<-merge(habitat_veg_bird_soil_by_isl, sara_habitat_merged_by_isl, by.x="unq_isl", all=TRUE)
-#head(habitat_veg_bird_wrack_soil_by_isl)
+habitat_veg_bird_wrack_soil_by_isl<-merge(habitat_veg_bird_soil_by_isl, sara_habitat_merged_by_isl, by="unq_isl", all=TRUE)
+head(habitat_veg_bird_wrack_soil_by_isl)
 
 
 
@@ -513,27 +391,6 @@ by_isl_master <- merge(by_isl_master, baea.isls, all.x = TRUE)
 by_isl_master$ravens[is.na(by_isl_master$ravens)] <- 0
 by_isl_master$eagles[is.na(by_isl_master$eagles)] <- 0
 #head(by_isl_master)
-
-
-
-#can do the same thing for SOSP if we want ... 
-# pc<- read.csv("C:Food web idea//Data by person//Deb.data/pointcounts.csv")
-# #head(pc)
-# sosp <- pc[pc$spp == "SOSP", ]
-# #head(sosp)
-# 
-# sosp.isls <- unique(sosp$island)
-# 
-# sosp.isls <- as.data.frame(sosp.isls)
-# sosp.isls$sosp <- 1
-# names(sosp.isls) <- c("unq_isl", "sosp")
-# #head(sosp.isls)
-# by_isl_master_2 <- merge(sosp.isls, by_isl_master, all.y = TRUE)
-# by_isl_master_2$sosp[is.na(by_isl_master_2$sosp)] <- 0
-# View(by_isl_master_2)
-
-
-
 
 
 # Chris insects -----------------------------------------------------------
@@ -889,21 +746,21 @@ by_isl_master$habitat_het<-diversity(by_isl_master_habitat)
 by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_richness+by_isl_master$insect_richness+by_isl_master$bird.richness+by_isl_master$mammal_richness
 #head(by_isl_master)
 
-
-#Label small islands as those with Area less than 6000m2
-levels <- c(-Inf, 6000, Inf)
-xs2=quantile(na.omit(by_isl_master$Area),c(0,1/2,1))
-xs2
-xs=quantile(na.omit(by_isl_master$Area),c(0,0.25,0.75,1))
-xs
-xs3=quantile(na.omit(by_isl_master$d15n),c(0,0.25, 0.75,1))
-
-labels <- c("small", "medium", "large")
-labels2 <- c("small", "large")
-labels3 <- c("low 15N", "med 15N", "high 15N")
-by_isl_master<- by_isl_master %>% mutate(size.cat = cut(Area, xs, labels = labels))
-by_isl_master<- by_isl_master %>% mutate(size.cat2 = cut(Area, xs2, labels = labels2))
-by_isl_master<- by_isl_master %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
+# 
+# #Label small islands as those with Area less than 6000m2
+# levels <- c(-Inf, 6000, Inf)
+# xs2=quantile(na.omit(by_isl_master$Area),c(0,1/2,1))
+# xs2
+# xs=quantile(na.omit(by_isl_master$Area),c(0,0.25,0.75,1))
+# xs
+# xs3=quantile(na.omit(by_isl_master$d15n),c(0,0.25, 0.75,1))
+# 
+# labels <- c("small", "medium", "large")
+# labels2 <- c("small", "large")
+# labels3 <- c("low 15N", "med 15N", "high 15N")
+# by_isl_master<- by_isl_master %>% mutate(size.cat = cut(Area, xs, labels = labels))
+# by_isl_master<- by_isl_master %>% mutate(size.cat2 = cut(Area, xs2, labels = labels2))
+# by_isl_master<- by_isl_master %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
 
 #head(soil_owen_deb)
 node.adding<-soil_owen_deb[,c(8,9)]
@@ -912,8 +769,16 @@ node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
-write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv")
+write.csv(by_isl_master, "C:Food web idea//Data by person//Owen's data/by_isl_master.csv", row.names = FALSE)
 head(by_isl_master)
+
+
+
+
+
+
+
+
 
 # Plotting correlations ---------------------------------------------------
 

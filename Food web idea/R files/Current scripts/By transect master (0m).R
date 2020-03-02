@@ -44,22 +44,33 @@ head(soil_clean)
 
 #Owen's key data
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-head(owen_key)
-length(unique(owen_key$unq_tran))
 owen_key<-owen_key %>% dplyr::select(-unq_tran)
 owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
-owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04SN"
-owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08NS"
-owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05EW"
-owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06EW"
-owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02NS"
-owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05EW"
-owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03WE"
-owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08EW"
-owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06EW"
 
+owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
+
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
+owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
+owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
+owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
+owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
+owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
+owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+#this transect was only 3 plots long, two exterior and one interior.... so plot #3 is East
+owen_key$unq_tran[owen_key$unq_plot=="AD03WE3"]<-"AD03E"
+owen_key$unq_tran[owen_key$unq_plot=="CV14SN3"]<-"CV14N"
+owen_key$unq_tran[owen_key$unq_plot=="CV14EW3"]<-"CV14W"
+owen_key$unq_tran[owen_key$unq_plot=="MM07NS3"]<-"MM07S"
+owen_key$unq_tran[owen_key$unq_plot=="ST09WE3"]<-"ST09E"
 
 ###This is the proper way to do transects
 length(unique(owen_key$unq_tran))
@@ -75,21 +86,15 @@ head(owen_key_expanded)
 length(unique(owen_key_expanded$unq_tran))
 
 #Add in the GPS coordinates
-owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_3.csv", header=TRUE, sep=",")
+owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
+
 head(owen_coords)
-owen_coords<-owen_coords[,c(1:9)]
+owen_coords<-owen_coords[,c(1:3)]
 head(owen_coords)
 
-owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
-owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
-
-owen_coords<-owen_coords[,c(3,4, 10)]
-head(owen_coords)
-names(owen_coords)[1]<-"easting"
-names(owen_coords)[2]<-"northing"
-
-owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_tran", all=TRUE)
+owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_plot", all=TRUE)
 head(owen_key_expanded)
+
 
 head(soil_clean)
 
@@ -106,18 +111,17 @@ write.csv(soil_merge, "C:Food web idea\\Data by person\\Norah.data\\soil_merge.c
 soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
-soil_merge_s<-merge(soil_merge, soil_s, by="unq_plot", all=TRUE)
+#just pick Owen's soils - for the transect file since Deb's stuff is not on the transect
+
+soil_s_owen<-soil_s %>% filter(person=="Owen")
+
+soil_merge_s<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
 head(soil_merge_s)
-
-
-# ggplot(soil_merge_s, aes(x=d34s, y=d15n, col=shore_dist))+geom_point()
 
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
 
 head(soil_merge_0m)
-# ggplot(soil_merge_0m, aes(x=d34s, y=d15n))+geom_point()
-
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
 
@@ -127,16 +131,12 @@ write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merg
 #this loads data from "Habitation data" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-View(longform_plant_percentcover)
+head(longform_plant_percentcover)
 #longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
 head(longform_plant_percentcover_owen_0m)
-
-length(unique(longform_plant_percentcover_owen_0m$unq_plot))
-length(unique(longform_plant_percentcover_owen_0m_shrub$unq_plot))
-
 
 longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
                                        group_by(unq_plot,species) %>% 
@@ -184,8 +184,36 @@ head(habitat_veg_soil_by_tran_0m)
 
 
 owen.veg_tran<-read.csv("C:Food web idea//Data by person\\Owen's data\\foliar_clean_sorted_merge_meta.csv")
-head(owen.veg_tran)
+owen.veg_tran$plot<-as.numeric(owen.veg_tran$plot)
 owen.veg_tran<-owen.veg_tran[,-1]
+head(owen.veg_tran)
+
+owen.veg_tran$unq_tran<-str_sub(owen.veg_tran$unq_plot, end=-2)
+owen.veg_tran<- owen.veg_tran %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
+
+
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV04SN25"]<-"CV04S"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM04WE25"]<-"MM04W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM08NS25"]<-"MM08N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="PR05EW25"]<-"PR05E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="PR06EW25"]<-"PR06E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ02NS25"]<-"TQ02N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ05EW25"]<-"TQ05E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM01WE15"]<-"MM01W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM03WE15"]<-"MM03W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM08EW15"]<-"MM08E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="AD03WE3"]<-"AD03E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14SN3"]<-"CV14N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14EW3"]<-"CV14W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM07NS3"]<-"MM07S"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="ST09WE3"]<-"ST09E"
+
 
 owen.veg_tran_0m<-owen.veg_tran %>% filter(shore_dist=="0")
 
@@ -206,14 +234,6 @@ names(owen.veg_tran_0m_midi)[5]<-"cn_midi"
 names(owen.veg_tran_0m_midi)[6]<-"s_midi"
 names(owen.veg_tran_0m_midi)[7]<-"d13c_midi"
 names(owen.veg_tran_0m_midi)[8]<-"d15n_midi"
-
-#owen.veg_tran_0m_midi$transect<-strtrim(owen.veg_tran_0m_midi$transect, 1)
-owen.veg_tran_0m_midi$unq_tran<- paste(owen.veg_tran_0m_midi$unq_isl,owen.veg_tran_0m_midi$transect)
-owen.veg_tran_0m_midi$unq_tran<-gsub(" ", "", owen.veg_tran_0m_midi$unq_tran, fixed = TRUE)
-
-owen.veg_tran_0m_gash$transect<-strtrim(owen.veg_tran_0m_gash$transect, 1)
-owen.veg_tran_0m_gash$unq_tran<- paste(owen.veg_tran_0m_gash$unq_isl,owen.veg_tran_0m_gash$transect)
-owen.veg_tran_0m_gash$unq_tran<-gsub(" ", "", owen.veg_tran_0m_gash$unq_tran, fixed = TRUE)
 
 owen.veg_tran_0m_gash <-owen.veg_tran_0m_gash %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(owen.veg_tran_0m_gash)
@@ -592,5 +612,3 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 
 
 write.csv(by_tran_master_0m, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv", row.names=FALSE)
-
-length(na.omit(by_tran_master_0m$d15n))    

@@ -107,7 +107,7 @@ head(soil_merge)
 soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
-#just pick Owen's soils - for the transect file
+#just pick Owen's soils - for the transect file since Deb's stuff is not on the transect
 
 soil_s_owen<-soil_s %>% filter(person=="Owen")
 
@@ -713,7 +713,7 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 # Tidying up -------------------------------------------------------------
 
 #View(by_tran_master)
-write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv")
+write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv", row.names = FALSE)
 
 length(unique(by_tran_master$unq_tran))
 #there's the interior veg plots and insect plots too... that's why there's 565
