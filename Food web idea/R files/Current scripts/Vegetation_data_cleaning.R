@@ -16,22 +16,31 @@ library(ggplot2)
 islands_plant<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(islands_plant)
 
-islands_plant<-islands_plant %>% dplyr::select(-unq_tran)
+islands_plant<- islands_plant %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
 
 
+#these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
+islands_plant$unq_tran[islands_plant$unq_plot=="CV04SN25"]<-"CV04S"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM04WE25"]<-"MM04W"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM08NS25"]<-"MM08N"
+islands_plant$unq_tran[islands_plant$unq_plot=="PR05EW25"]<-"PR05E"
+islands_plant$unq_tran[islands_plant$unq_plot=="PR06EW25"]<-"PR06E"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ02NS25"]<-"TQ02N"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ05EW25"]<-"TQ05E"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM01WE15"]<-"MM01W"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM03WE15"]<-"MM03W"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM08EW15"]<-"MM08E"
+islands_plant$unq_tran[islands_plant$unq_plot=="TQ06EW15"]<-"TQ06E"
 
-islands_plant$unq_tran<-str_sub(islands_plant$unq_plot, end=-2)
-islands_plant$unq_tran[islands_plant$unq_plot=="CV04SN25"]<-"CV04SN"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM04WE25"]<-"MM04WE"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM08NS25"]<-"MM08NS"
-islands_plant$unq_tran[islands_plant$unq_plot=="PR05EW25"]<-"PR05EW"
-islands_plant$unq_tran[islands_plant$unq_plot=="PR06EW25"]<-"PR06EW"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ02NS25"]<-"TQ02NS"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ05EW25"]<-"TQ05EW"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM01WE15"]<-"MM01WE"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM03WE15"]<-"MM03WE"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM08EW15"]<-"MM08EW"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ06EW15"]<-"TQ06EW"
+islands_plant$unq_tran[islands_plant$unq_plot=="AD03WE3"]<-"AD03E"
+islands_plant$unq_tran[islands_plant$unq_plot=="CV14SN3"]<-"CV14N"
+islands_plant$unq_tran[islands_plant$unq_plot=="CV14EW3"]<-"CV14W"
+islands_plant$unq_tran[islands_plant$unq_plot=="MM07NS3"]<-"MM07S"
+islands_plant$unq_tran[islands_plant$unq_plot=="ST09WE3"]<-"ST09E"
+
 
 
 
@@ -107,7 +116,7 @@ length(unique(Deb_Owen_veg_combined$unq_isl))
 
 Deb_Owen_veg_combined_wide <-Deb_Owen_veg_combined %>%  group_by(unq_plot) %>% spread(species, cover)
 
-View(Deb_Owen_veg_combined_wide)
+head(Deb_Owen_veg_combined_wide)
 longform_plant_percentcover2<-Deb_Owen_veg_combined_wide
 longform_plant_percentcover2[is.na(longform_plant_percentcover2)]<-0 
 
@@ -173,6 +182,7 @@ plant_category<-read.csv("Food web idea//Data by person//Owen's data//100Islands
 head(plant_category)
 
 
+
 Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled, plant_category[,c(1,4,5)], by="species")
 
 
@@ -194,7 +204,7 @@ head(marine_by_plot_from_plants)
 
 write.csv(marine_by_plot_from_plants, "Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv", row.names=FALSE)
 
-View(marine_by_plot_from_plants)
+head(marine_by_plot_from_plants)
 
 ####################### below here I have left the same
 
@@ -209,7 +219,7 @@ owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
 owen_coords<-owen_coords[,c(3,4, 10)]
 names(owen_coords)[1]<-"easting"
 names(owen_coords)[2]<-"northing"
-View(owen_coords)
+head(owen_coords)
 
 # kacey_coords<-read.csv("C:Food web idea//Data by person//Kacey.data//coords_final.csv", header=TRUE, sep=",")
 # head(kacey_coords)
@@ -238,12 +248,12 @@ Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords_transect[,-4]
 Deb_Owen_veg_coords_transect_presabs<-Deb_Owen_veg_coords_transect
 Deb_Owen_veg_coords_transect_presabs$pres_abs<-  ifelse(Deb_Owen_veg_coords_transect$cover>0, 1, 0)
 
-View(Deb_Owen_veg_coords_transect_presabs)
+head(Deb_Owen_veg_coords_transect_presabs)
 
 
-write.csv(Deb_Owen_veg_coords_transect_presabs, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords_transect_presabs.csv")
+write.csv(Deb_Owen_veg_coords_transect_presabs, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords_transect_presabs.csv", row.names = FALSE)
 
-write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv")
+write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names = FALSE)
 
 
 head(Deb_Owen_veg_coords)
@@ -278,14 +288,14 @@ Deb_Owen_veg_combined_complete_filled_large_Owen<-Deb_Owen_veg_combined_complete
 Deb_Owen_veg_combined_complete_filled_large_Deb<-Deb_Owen_veg_combined_complete_filled_large[Deb_Owen_veg_combined_complete_filled_large$person=="Deb",]
 
 Deb_Owen_veg_combined_complete_filled_large_Deb[duplicated(Deb_Owen_veg_combined_complete_filled_large_Deb),]
-View(Deb_Owen_veg_combined_complete_filled_large_Deb)
+head(Deb_Owen_veg_combined_complete_filled_large_Deb)
 #Deb's plots collapse into one interior transect
 Deb_Owen_veg_combined_complete_filled_large_Deb_mean<- Deb_Owen_veg_combined_complete_filled_large_Deb %>%  group_by(unq_isl, species)%>% summarise(cover.mean =mean(cover), cover.sd=sd(cover), N=length(cover))
 Deb_Owen_veg_combined_complete_filled_large_Deb_mean$cover.se<-Deb_Owen_veg_combined_complete_filled_large_Deb_mean$cover.sd/sqrt(Deb_Owen_veg_combined_complete_filled_large_Deb_mean$N)
 
 #give each island Deb combo a named transect
 Deb_Owen_veg_combined_complete_filled_large_Deb_mean <-Deb_Owen_veg_combined_complete_filled_large_Deb_mean  %>% mutate(unq_tran=paste(unq_isl, "Deb_interior", sep='_'))
-View(Deb_Owen_veg_combined_complete_filled_large_Deb_mean)
+head(Deb_Owen_veg_combined_complete_filled_large_Deb_mean)
 
 
 #Owen's data collapse plot into transect'
@@ -314,6 +324,6 @@ head(Deb_Owen_veg_large)
 Veg_means_by_island<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_small, Deb_Owen_veg_large)
 head(Veg_means_by_island)
 
-write.csv(Veg_means_by_island, "Food web idea//Data by person//Kalina.data/Veg_means_by_island.csv")
+write.csv(Veg_means_by_island, "Food web idea//Data by person//Kalina.data/Veg_means_by_island.csv", row.names = FALSE)
 
 

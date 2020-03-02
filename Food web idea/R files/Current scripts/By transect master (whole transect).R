@@ -50,18 +50,10 @@ length(unique(owen_key$unq_tran))
 owen_key<-owen_key %>% dplyr::select(-unq_tran)
 owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
 
-
-
-###this didn't work!!!!! FUDGE
 owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
-
-
-
-#if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))
-  
 
 #these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
 owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
@@ -75,6 +67,15 @@ owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
 owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
 owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
 owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+#this transect was only 3 plots long, two exterior and one interior.... so plot #3 is East
+owen_key$unq_tran[owen_key$unq_plot=="AD03WE3"]<-"AD03E"
+owen_key$unq_tran[owen_key$unq_plot=="CV14SN3"]<-"CV14N"
+owen_key$unq_tran[owen_key$unq_plot=="CV14EW3"]<-"CV14W"
+owen_key$unq_tran[owen_key$unq_plot=="MM07NS3"]<-"MM07S"
+owen_key$unq_tran[owen_key$unq_plot=="ST09WE3"]<-"ST09E"
+
+
 
 
 
@@ -133,6 +134,15 @@ becky_trees_tran<-as.data.frame(becky_trees_tran)
 
 becky_trees_tran$unq_tran<- paste(becky_trees_tran$unq_isl,becky_trees_tran$tran)
 becky_trees_tran$unq_tran<-gsub(" ", "", becky_trees_tran$unq_tran, fixed = TRUE)
+
+#Becky's data is ONLY at the transect level, so I have assigned it to the starting transect
+#So we'll have some blanks for the tree data in the S transect of the NS but it shouldn't matter too much for scaling up. 
+
+becky_trees_tran<- becky_trees_tran %>% mutate(unq_tran= gsub("SN", "S", unq_tran, fixed = TRUE)) %>% 
+  mutate(unq_tran= gsub("NS", "N", unq_tran, fixed = TRUE)) %>% 
+  mutate(unq_tran= gsub("EW", "E", unq_tran, fixed = TRUE)) %>% 
+  mutate(unq_tran= gsub("WE", "W", unq_tran, fixed = TRUE)) 
+
 
 becky_trees_tran_wide <-becky_trees_tran %>% group_by(unq_tran, species) %>% 
   summarise(sum_abundance = mean(abund.ab, na.rm=TRUE)) %>% 
@@ -222,7 +232,7 @@ habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcove
 head(habitat_veg_soil_by_tran)
 
 length(habitat_veg_soil_by_tran$unq_tran)
-#330
+#381
 
 
 
@@ -230,16 +240,15 @@ length(habitat_veg_soil_by_tran$unq_tran)
 
 
 owen.veg_tran<-read.csv("C:Food web idea//Data by person//Owen's data\\foliar_clean_sorted_merge_meta.csv")
-head(owen.veg_tran)
+owen.veg_tran$plot<-as.numeric(owen.veg_tran$plot)
 owen.veg_tran<-owen.veg_tran[,-1]
+head(owen.veg_tran)
 
-length(unique(owen.veg_tran$unq_tran))
 owen.veg_tran$unq_tran<-str_sub(owen.veg_tran$unq_plot, end=-2)
-
-owen.veg_tran<- owen.veg_tran %>% mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("SN", "S", owen.veg_tran$unq_tran, fixed = TRUE), gsub("SN", "N", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("NS", "N", owen.veg_tran$unq_tran, fixed = TRUE), gsub("NS", "S", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("EW", "E", owen.veg_tran$unq_tran, fixed = TRUE), gsub("EW", "W", owen.veg_tran$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen.veg_tran$plot<4, gsub("WE", "W", owen.veg_tran$unq_tran, fixed = TRUE), gsub("WE", "E", owen.veg_tran$unq_tran, fixed = TRUE))) 
+owen.veg_tran<- owen.veg_tran %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
 
 
 #these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
@@ -254,6 +263,12 @@ owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM01WE15"]<-"MM01W"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM03WE15"]<-"MM03W"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM08EW15"]<-"MM08E"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="AD03WE3"]<-"AD03E"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14SN3"]<-"CV14N"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14EW3"]<-"CV14W"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM07NS3"]<-"MM07S"
+owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="ST09WE3"]<-"ST09E"
 
 
 owen.veg_tran_gash <- owen.veg_tran %>% filter(species == "gash")
@@ -290,7 +305,7 @@ head(habitat_veg_soil_by_tran)
 seawrack_key<-read.csv("C:Food web idea//Data by person//Sara's data//seawrack_spatial_mod.csv", header=TRUE, sep=",")
 head(seawrack_key)
 
-
+head(seawrack_key)
 
 sara_habitat<-read.csv("C:Food web idea//Data by person//Sara's data//sara_habitat.csv", header=TRUE, sep=",")
 head(sara_habitat)
@@ -697,13 +712,26 @@ by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran
 
 # Tidying up -------------------------------------------------------------
 
-head(by_tran_master)
+#View(by_tran_master)
 write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_master.csv")
 
 length(unique(by_tran_master$unq_tran))
-#there's the interior plots too... that's why there's 625
+#there's the interior veg plots and insect plots too... that's why there's 565
 
-ggplot(by_tran_master, aes(y=insect_richness, x=unq_isl))+geom_boxplot()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### PLotting
 
