@@ -14,13 +14,13 @@ library(tidyverse)
 
 marine_by_plot_from_plants<- read.csv("C:Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv")
 head(marine_by_plot_from_plants)
-View(marine_by_plot_from_plants)
+head(marine_by_plot_from_plants)
 
 
 
 marine_by_plot_from_notes<- read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 head(marine_by_plot_from_notes)
-# View(marine_by_plot_from_notes)
+# head(marine_by_plot_from_notes)
 marine_by_plot_from_notes$otter_pres <- ifelse(grepl("otter|ottre|latrine|nearotter", marine_by_plot_from_notes$notes), 1, 0)
 marine_by_plot_from_notes$otter_pres[marine_by_plot_from_notes$unq_plot=="CV09WE5"]<-0
 marine_by_plot_from_notes$otter_pres[marine_by_plot_from_notes$unq_plot=="CV09WE6"]<-0
@@ -67,11 +67,10 @@ length(unique(owen_key$unq_tran))
 owen_key<-owen_key %>% dplyr::select(-unq_tran)
 owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
 
-owen_key<- owen_key %>% mutate(unq_tran= if_else(owen_key$plot<4, gsub("SN", "S", owen_key$unq_tran, fixed = TRUE), gsub("SN", "N", owen_key$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen_key$plot<4, gsub("NS", "N", owen_key$unq_tran, fixed = TRUE), gsub("NS", "S", owen_key$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen_key$plot<4, gsub("EW", "E", owen_key$unq_tran, fixed = TRUE), gsub("EW", "W", owen_key$unq_tran, fixed = TRUE))) %>% 
-  mutate(unq_tran= if_else(owen_key$plot<4, gsub("WE", "W", owen_key$unq_tran, fixed = TRUE), gsub("WE", "E", owen_key$unq_tran, fixed = TRUE))) 
-
+owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
+  mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
 
 #these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
 owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
@@ -85,6 +84,13 @@ owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
 owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
 owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
 owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+
+#this transect was only 3 plots long, two exterior and one interior.... so plot #3 is East
+owen_key$unq_tran[owen_key$unq_plot=="AD03WE3"]<-"AD03E"
+owen_key$unq_tran[owen_key$unq_plot=="CV14SN3"]<-"CV14N"
+owen_key$unq_tran[owen_key$unq_plot=="CV14EW3"]<-"CV14W"
+owen_key$unq_tran[owen_key$unq_plot=="MM07NS3"]<-"MM07S"
+owen_key$unq_tran[owen_key$unq_plot=="ST09WE3"]<-"ST09E"
 
 head(owen_key)
 owen_key_subset<-owen_key %>% dplyr::select(unq_plot, unq_tran)
@@ -100,7 +106,7 @@ library(raster)
 library(spData)
 library(tmap)    # for static and interactive maps
 library(leaflet) # for interactive maps
-library(mapview) # for interactive maps
+library(maphead) # for interactive maps
 library(ggplot2) # tidyverse vis package
 library(shiny)
 library(rgdal) # spatial/shp reading
@@ -143,7 +149,7 @@ marine_circles <- st_buffer(df.SF_plot_simple_marine_new, dist = 10)
 #which of the not-marine plots fall within 10m radius of the marine plots
 plots_marine_joined <- st_join(df.SF_plot_simple_not_marine_new, marine_circles, left=FALSE)
 
-View(plots_marine_joined)
+head(plots_marine_joined)
 ### Alright so this is a big list because there are plots every 10 m along the same trasnsect so I only really need to do this for when the transects dont 
 #match up
 #the transects will get captured when we collect by transect later.... 
@@ -154,23 +160,23 @@ library(stringdist)
 plots_marine_joined$stringdist<-stringdist(plots_marine_joined$unq_tran_not_marine, plots_marine_joined$unq_tran)
 
 
-View(plots_marine_joined)
+head(plots_marine_joined)
 
 plots_marine_joined_should_marine <- plots_marine_joined %>% filter(stringdist>0) 
-View(plots_marine_joined_should_marine)
+head(plots_marine_joined_should_marine)
 #There are 106 plots that should get a "marine" indicator since they are within 10m of another plot (but on another TRANSECT) that has a marine indicator
 
 plots_marine_joined_should_marine <-plots_marine_joined_should_marine %>% st_set_geometry(NULL)
 plots_marine_joined_should_marine<-as.data.frame(plots_marine_joined_should_marine)
 plots_should_marine<-plots_marine_joined_should_marine %>% dplyr::select(unq_plot_not_marine) %>% droplevels()
-View(plots_should_marine)
+head(plots_should_marine)
 
 levels(plots_should_marine$unq_plot_not_marine)
 
 head(marine_by_plot_from_notes_selected)
 marine_by_plot_from_notes_selected$total_marine_evidence[(levels(marine_by_plot_from_notes_selected$unq_plot) %in% levels(plots_should_marine$unq_plot_not_marine))==TRUE]<-1
 
-View(marine_by_plot_from_notes_selected)
+head(marine_by_plot_from_notes_selected)
 
 write.csv(marine_by_plot_from_notes_selected, "C:Biodiversity idea//Output files//marine_by_plot_from_notes_selected.csv", row.names=FALSE)
 
