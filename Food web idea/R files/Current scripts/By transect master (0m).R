@@ -102,6 +102,15 @@ head(soil_clean)
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
 head(soil_merge)
 
+soil_merge$easting[soil_merge$unq_plot=="MM09WE1"]<-539907
+soil_merge$northing[soil_merge$unq_plot=="MM09WE1"]<-5766077
+soil_merge$easting[soil_merge$unq_plot=="MM09N1"]<-539916
+soil_merge$northing[soil_merge$unq_plot=="MM09N1"]<-5766116
+soil_merge$easting[soil_merge$unq_plot=="MM11E1"]<-540664
+soil_merge$northing[soil_merge$unq_plot=="MM11E1"]<-5767468
+soil_merge$easting[soil_merge$unq_plot=="MM11S1"]<-540619
+soil_merge$northing[soil_merge$unq_plot=="MM11S1"]<-5767388
+
 
 write.csv(soil_merge, "C:Food web idea\\Data by person\\Norah.data\\soil_merge.csv")
 

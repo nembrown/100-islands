@@ -88,7 +88,7 @@ head(owen_key_expanded)
 #Add in the GPS coordinates
 owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 
-View(owen_coords)
+head(owen_coords)
 owen_coords<-owen_coords[,c(1:3)]
 head(owen_coords)
 
@@ -111,6 +111,16 @@ soil_s_owen<-soil_s %>% filter(person=="Owen")
 
 soil_merge<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
 head(soil_merge)
+
+soil_merge$easting[soil_merge$unq_plot=="MM09WE1"]<-539907
+soil_merge$northing[soil_merge$unq_plot=="MM09WE1"]<-5766077
+soil_merge$easting[soil_merge$unq_plot=="MM09N1"]<-539916
+soil_merge$northing[soil_merge$unq_plot=="MM09N1"]<-5766116
+soil_merge$easting[soil_merge$unq_plot=="MM11E1"]<-540664
+soil_merge$northing[soil_merge$unq_plot=="MM11E1"]<-5767468
+soil_merge$easting[soil_merge$unq_plot=="MM11S1"]<-540619
+soil_merge$northing[soil_merge$unq_plot=="MM11S1"]<-5767388
+
 
 ###up to now is all plot level, so now we transition to transect level 
 soil_merge_mean <-soil_merge %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
