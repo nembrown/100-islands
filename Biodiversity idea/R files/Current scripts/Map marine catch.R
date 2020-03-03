@@ -124,20 +124,13 @@ ggsave("C:Biodiversity idea//Plots//Maps//map_big.png", width=40, height=20, uni
 
 # Transects --------------------------------------------------------------
 #load transect 
-by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-
-
-data_subset2 <- by_tran_master[ , c("easting", "northing")]
-by_tran_master_no_na<- by_tran_master[complete.cases(data_subset2), ] 
-
-
-df.SF_transects <- st_as_sf(by_tran_master_no_na, coords = c("easting", "northing"), crs = 26909)
-df.SF_transects<-st_transform(x = df.SF_transects, crs = 4326)
+by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
+data_subset2 <- by_tran_master_0m[ , c("easting", "northing")]
+by_tran_master_0m_no_na<- by_tran_master_0m[complete.cases(data_subset2), ]
+df.SF_transects <- st_as_sf(by_tran_master_0m_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
 df.SF_transects$long<-st_coordinates(df.SF_transects)[,1] # get coordinates
 df.SF_transects$lat<-st_coordinates(df.SF_transects)[,2] # get coordinates
 head(df.SF_transects)
-
-
 
 head(ben_habitat_data)
 ben_habitat_data_simple<-ben_habitat_data[,c(3:5)]

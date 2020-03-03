@@ -569,7 +569,7 @@ fish_bycatch_richness_merged_tran_year$fish_bycatch_biomass<-fish_bycatch_richne
 write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv", row.names=FALSE)
 
 #Beachsein site SITE AND FISH ONLY 
-head(fish_bycatch_richness_merged_tran_year)
+View(fish_bycatch_richness_merged_tran_year)
 
 #####################################################
 #### adding in arch sites to just fish

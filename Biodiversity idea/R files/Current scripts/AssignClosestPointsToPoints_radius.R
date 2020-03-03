@@ -47,7 +47,8 @@ transects_beach_joined <-transects_beach_joined  %>% st_set_geometry(NULL)
 transects_beach_joined<-as.data.frame(transects_beach_joined)
 write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
 
-
+length(unique(transects_beach_joined$unq_tran))
+#234
 
 # Arch data ---------------------------------------------------------------
 
@@ -78,7 +79,7 @@ length(unique(transects_arch_joined$unq_tran))
 
 transects_arch_joined <-transects_arch_joined  %>% st_set_geometry(NULL)
 transects_arch_joined<-as.data.frame(transects_arch_joined)
-write.csv(transects_arch_joined, "C:Biodiversity idea//Output files//paired_arch_by_radius_300.csv")
+write.csv(transects_arch_joined, "C:Biodiversity idea//Output files//paired_arch_by_radius_300.csv", row.names = FALSE)
 
 
 dat_circles_arch_big <- st_buffer(df.SF_transects_simple_new, dist = 1000)
@@ -87,7 +88,7 @@ transects_arch_joined_big <-transects_arch_joined_big  %>% st_set_geometry(NULL)
 transects_arch_joined_big<-as.data.frame(transects_arch_joined_big)
 write.csv(transects_arch_joined_big, "C:Biodiversity idea//Output files//paired_arch_by_radius_1000.csv", row.names = FALSE)
 length(unique(transects_arch_joined_big$unq_tran))
-#213 transects match
+#224 transects match
 
 dat_circles_arch_100 <- st_buffer(df.SF_transects_simple_new, dist = 100)
 transects_arch_joined_100 <- st_join(arch_data_simple_st_new, dat_circles_arch_100, left=FALSE)
