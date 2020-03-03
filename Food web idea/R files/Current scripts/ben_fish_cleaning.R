@@ -42,25 +42,6 @@ ben_netdimensions<-read.csv("Biodiversity idea//Ben.data//beachseine_calvert_NB/
 ##head(ben_fish_data)
 #ggplot(ben_fish_data %>% filter(species=="herr"), aes(x=month, y=abundance, color=site))+geom_point()
 
-### Need to include May 
-# load packages ----------------------------------------------------------
-library(rlang)
-library(tidyr)
-library(vegan)
-library(ggplot2)
-library(ggcorrplot)
-library(doBy)
-library(plyr)
-library(dplyr)
-library(doBy)
-library(cowplot)
-library(viridis)
-library(matrixStats)
-library(tidyverse)
-
-#  detach(package:plyr)
-#  detach(package:dplyr)
-
 # Net dimensions ----------------------------------------------------------
 # take net dimnesion data, make it long for each set to match the other files
 
@@ -590,7 +571,7 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 #Beachsein site SITE AND FISH ONLY 
 head(fish_bycatch_richness_merged_tran_year)
 
-
+#####################################################
 #### adding in arch sites to just fish
 arch_sites_distance_beach<-read.csv("Biodiversity idea//Output files//paired_beach_arch_by_radius_1000.csv")
 head(arch_sites_distance_beach)

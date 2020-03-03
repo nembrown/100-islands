@@ -252,6 +252,19 @@ fish_biomass_day<-fish_bycatch_richness_merged_tran_year_2
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 demersal_plot<-ggplot(fish_biomass_day, aes(x=total_habitat_cover, y=log(fish_demersal_biomass_bym3_mean+1)))+
   geom_point()+geom_smooth(aes(), method="lm", alpha=0.10)+scale_colour_viridis_d()+theme_bw()+ggtitle("Demersal fish")
 
