@@ -41,14 +41,17 @@ dat_circles <- st_buffer(df.SF_transects_simple_new, dist = 2000)
 #which of the beachseines fall within 2km radius of the transect
 transects_beach_joined <- st_join(ben_habitat_data_simple.SP_new, dat_circles, left=FALSE)
 
-head(transects_beach_joined)
 
 transects_beach_joined <-transects_beach_joined  %>% st_set_geometry(NULL)
 transects_beach_joined<-as.data.frame(transects_beach_joined)
 write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
 
-length(unique(transects_beach_joined$unq_tran))
-#234
+length(unique(transects_beach_joined$site))
+#2km: 263 transects fall within 27 sites.... 
+#1km: 140 transects fall within 19 sites
+#500m: 67 transects fall within 16 sites
+
+
 
 # Arch data ---------------------------------------------------------------
 

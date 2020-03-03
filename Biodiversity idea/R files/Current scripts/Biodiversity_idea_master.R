@@ -212,7 +212,7 @@ master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_t
 marine_by_transect_from_notes_selected<-read.csv("C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv")
 
 master_transect<-merge(master_transect2, marine_by_transect_from_notes_selected, by="unq_tran", all=TRUE)
-View(master_transect)
+head(master_transect)
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
@@ -228,8 +228,7 @@ write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.c
 
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-by_isl_master<-by_isl_master[,-1]
-###head(by_isl_master)
+head(by_isl_master)
 by_isl_master_col_names<-c("unq_isl",
        "mammal_richness",
        "total_richness",
@@ -258,6 +257,8 @@ by_isl_master_col_names<-c("unq_isl",
 by_isl_master_subset<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names]
 ###head(by_isl_master_subset)
 
+#View(fish_bycatch_richness_merged_tran)
+fish_bycatch_richness_merged_tran$unq_isl<-str_sub(fish_bycatch_richness_merged_tran$unq_tran, start=0, end=4)
 
 ##head(fish_bycatch_richness_merged_tran)
 fish_bycatch_richness_merged_isl <-fish_bycatch_richness_merged_tran %>% group_by(unq_isl) %>%
@@ -267,7 +268,7 @@ fish_bycatch_richness_merged_isl <-fish_bycatch_richness_merged_tran %>% group_b
 fish_richness_merged_isl<-merge(fish_bycatch_richness_merged_isl, by_isl_master, by="unq_isl", all.y=TRUE)
 ##head(fish_richness_merged_isl)
 length(unique(fish_richness_merged_isl$unq_isl))
-#103 islands
+#102 islands
 
 xs4<- quantile(na.omit(fish_richness_merged_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
 labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
