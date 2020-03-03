@@ -99,8 +99,8 @@ head(owen_key_expanded)
 head(soil_clean)
 
 #put isotope data together with the key
-soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
-head(soil_merge)
+soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot", all=TRUE)
+View(soil_merge)
 
 soil_merge$easting[soil_merge$unq_plot=="MM09WE1"]<-539907
 soil_merge$northing[soil_merge$unq_plot=="MM09WE1"]<-5766077
@@ -128,9 +128,9 @@ soil_merge_s<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
 head(soil_merge_s)
 
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
-soil_merge_0m<-soil_merge_0m[,-c(8,10, 11, 13, 14, 15)]
+soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist"))
 
-head(soil_merge_0m)
+View(soil_merge_0m)
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
 
@@ -141,8 +141,6 @@ write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merg
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
 head(longform_plant_percentcover)
-#longform_plant_percentcover$unq_tran<-strtrim(longform_plant_percentcover$unq_tran, 5)
-
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
 head(longform_plant_percentcover_owen_0m)
@@ -183,10 +181,17 @@ longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_pe
 longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)], na.rm=TRUE)
 
 
-head(soil_merge_0m)
+
 
 habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
-head(habitat_veg_soil_by_tran_0m)
+View(habitat_veg_soil_by_tran_0m)
+
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="AD07SW2"]<-"AD07SW"
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="TB07W2"]<-"TB07W"
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="TB07E2"]<-"TB07E"
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="AD07NE2"]<-"AD07NE"
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-"MM09N"
+habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="MM11S2"]<-"MM11S"
 
 
 # Vegetation isotopes -----------------------------------------------------
@@ -252,9 +257,12 @@ head(owen.veg_tran_0m_midi)
 
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_midi[,c(1:7)], by="unq_tran", all=TRUE)
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_gash[,c(1:7)], by="unq_tran", all=TRUE)
-head(habitat_veg_soil_by_tran_0m)
+View(habitat_veg_soil_by_tran_0m)
 
-
+habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM11S2"]<-540619
+habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM11S2"]<-5767388
+habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-539916
+habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-5766116
 
 
 # Chris insects diversity -----------------------------------------------------------
@@ -611,7 +619,6 @@ names(chris.isotopes.tran_ISO)[7]<-"cn_isopods"
 names(chris.isotopes.tran_ISO)[8]<-"s_isopods"
 
 
-head(by_tran_master_0m)
 by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_COL[,-2], by="unq_tran", all.x=TRUE)
 by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_CUR[,-2], by="unq_tran", all.x=TRUE)
 by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="unq_tran", all.x=TRUE)
@@ -620,4 +627,7 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 # Tidying up -------------------------------------------------------------
 
 
+
+
 write.csv(by_tran_master_0m, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv", row.names=FALSE)
+#View(by_tran_master_0m)

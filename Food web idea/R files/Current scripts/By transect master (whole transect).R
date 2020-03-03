@@ -97,7 +97,7 @@ head(owen_key_expanded)
 
 
 #put isotope data together with the key
-soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
+soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot", all=TRUE)
 head(soil_merge)
 
 
@@ -240,7 +240,7 @@ habitat_veg_soil_by_tran<-merge(habitat_soil_by_tran, longform_plant_percentcove
 head(habitat_veg_soil_by_tran)
 
 length(habitat_veg_soil_by_tran$unq_tran)
-#381
+#386
 
 
 
@@ -725,7 +725,7 @@ write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_m
 
 length(unique(by_tran_master$unq_tran))
 #there's the interior veg plots and insect plots too... that's why there's 565
-
+View(by_tran_master)
 
 
 
