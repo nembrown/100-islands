@@ -25,7 +25,7 @@ fish_bycatch_richness_merged_tran_year<- read.csv("C:Biodiversity idea//Output f
 #This is working with a 2km radius around the transects - pairing beachseine sites to transects within 2km
 hakai_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_sites_by_radius.csv")
 length(unique(hakai_sites_distance_tran$unq_tran))
-#30 unique transects if using 1km radius , 49 if I use 1.5km, 61 if I use 2km 
+#263 transects match within 2km! 
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
@@ -35,17 +35,16 @@ length(unique(fish_bycatch_richness_merged_tran$unq_tran))
 ### averaging across sites
 fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group_by(unq_tran) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 
-xs4<-quantile(fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean,c(0,0.25,0.75,1))
-labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
-fish_bycatch_richness_merged_tran<- fish_bycatch_richness_merged_tran %>% mutate(fish_biomass_bym3_cat_tran = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
-fish_bycatch_richness_merged_tran$fish_biomass_bym3_cat_tran[fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean<2]<-"low fish biomass"
+# xs4<-quantile(fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean,c(0,0.25,0.75,1))
+# labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
+# fish_bycatch_richness_merged_tran<- fish_bycatch_richness_merged_tran %>% mutate(fish_biomass_bym3_cat_tran = cut(fish_biomass_bym3_mean, xs4, labels = labels4))
+# fish_bycatch_richness_merged_tran$fish_biomass_bym3_cat_tran[fish_bycatch_richness_merged_tran$fish_biomass_bym3_mean<2]<-"low fish biomass"
 
 #fish_bycatch_richness_merged_tran$unq_isl<-gsub('.{1}$', '', fish_bycatch_richness_merged_tran$unq_tran)
 
 ###FISH with unq_tran added but no transect data NO UNQ_ISL
 write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv", row.names=FALSE)
-#head(fish_bycatch_richness_merged_tran)
-#22 islands with 1km, 36 with 1.5km, 40 with 2 km 
+head(fish_bycatch_richness_merged_tran)
 
 
 
@@ -102,7 +101,7 @@ by_tran_master_subset$beachy_substrate<-as.numeric(by_tran_master_subset$beachy_
 
 
 by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all=TRUE)
-#head(by_tran_master_0m_with_tran)
+View(by_tran_master_0m_with_tran)
 
 
 
@@ -122,16 +121,15 @@ write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_ri
 ###View(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
-#566 tran
+#565 tran but that includes Is and Bs
 
 
 # adding in arch sites ----------------------------------------------------
 #arch sites paired
 arch_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_arch_by_radius_300.csv")
-arch_sites_distance_tran<-arch_sites_distance_tran[,-1]
-#head(arch_sites_distance_tran)
+head(arch_sites_distance_tran)
 length(unique(arch_sites_distance_tran$unq_tran))
-#20 unique transects if using 300m radius 
+#81 unique transects if using 300m radius 
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran, arch_sites_distance_tran, by="unq_tran", all.x=TRUE)
 
@@ -202,14 +200,9 @@ fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_t
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock+1)
 
 ###culturally important plants
-
 plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
-
 master_transect2<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richness, all=TRUE)
-
-
 head(master_transect2)
-
 master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_transect2[,c("midden_feature_sem","fish_feature_sem")], ordered)
 
 
@@ -219,7 +212,7 @@ master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_t
 marine_by_transect_from_notes_selected<-read.csv("C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv")
 
 master_transect<-merge(master_transect2, marine_by_transect_from_notes_selected, by="unq_tran", all=TRUE)
-View(master_transect)
+head(master_transect)
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
@@ -235,8 +228,7 @@ write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.c
 
 #adding in a few interesting island-level components
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-by_isl_master<-by_isl_master[,-1]
-###head(by_isl_master)
+head(by_isl_master)
 by_isl_master_col_names<-c("unq_isl",
        "mammal_richness",
        "total_richness",
@@ -265,6 +257,8 @@ by_isl_master_col_names<-c("unq_isl",
 by_isl_master_subset<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names]
 ###head(by_isl_master_subset)
 
+#View(fish_bycatch_richness_merged_tran)
+fish_bycatch_richness_merged_tran$unq_isl<-str_sub(fish_bycatch_richness_merged_tran$unq_tran, start=0, end=4)
 
 ##head(fish_bycatch_richness_merged_tran)
 fish_bycatch_richness_merged_isl <-fish_bycatch_richness_merged_tran %>% group_by(unq_isl) %>%
@@ -274,7 +268,7 @@ fish_bycatch_richness_merged_isl <-fish_bycatch_richness_merged_tran %>% group_b
 fish_richness_merged_isl<-merge(fish_bycatch_richness_merged_isl, by_isl_master, by="unq_isl", all.y=TRUE)
 ##head(fish_richness_merged_isl)
 length(unique(fish_richness_merged_isl$unq_isl))
-#103 islands
+#102 islands
 
 xs4<- quantile(na.omit(fish_richness_merged_isl$fish_biomass_bym3_mean),c(0,0.25,0.75, 1))
 labels4 <- c("low fish biomass", "med fish biomass", "high fish biomass")
