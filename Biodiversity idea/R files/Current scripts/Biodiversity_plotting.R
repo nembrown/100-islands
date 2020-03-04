@@ -49,6 +49,9 @@ isotope_master_fish_feces<- isotope_master_fish_feces%>%
 
 View(fish_richness_merged_tran_arch)
 
+fish_richness_merged_tran_arch<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv")
+
+
 ggplot(fish_richness_merged_tran_arch, aes(x=fish_feature, y=d15n, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
@@ -79,6 +82,7 @@ ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d34s, col=feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 
+fish_bycatch_richness_merged_tran_year_arch<-read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv")
 
 ### arch and fish
 head(fish_bycatch_richness_merged_tran_year_arch)
@@ -87,7 +91,7 @@ head(fish_bycatch_richness_merged_tran_year_arch)
 ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_pelagic_biomass_bym3_mean, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
-ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_demersal_biomass_bym3_mean, col=fish_feature))+
+ggplot(fish_bycatch_richness_merged_tran_year_arch, aes(x=fish_feature, y=fish_biomass_bym3_mean, col=fish_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
 
@@ -1058,7 +1062,7 @@ ggplot(fish_richness_merged_isl, aes(y=d34s, x=log(Area)))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("Area")
 
 
-ggplot(master_transect, aes(d34s, y=fish_biomass_bym3_mean))+
+ggplot(master_transect, aes(d15n, y=fish_biomass_bym3_mean))+
          geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n soil")
 
 ggplot(fish_richness_merged_isl, aes(d34s, y=fish_biomass_bym3_mean))+
@@ -1142,7 +1146,7 @@ ggplot(fish_richness_merged_isl  %>% filter(SITE_SUM_cat_isl!="NA"), aes(col=SIT
 
 # Histograms --------------------------------------------------------------
 
-ggplot(fish_richness_merged_isl, aes(schooling_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
+ggplot(fish_richness_merged_isl, aes(fish_biomass_bym3_mean))+ geom_density(alpha=.7)
 ggplot(fish_richness_merged_isl, aes(individual_fish_biomass_bym3_mean))+ geom_density(alpha=.7)
 
 ggplot(fish_richness_merged_isl, aes(bycatch_biomass_bym3_mean))+ geom_density(alpha=.7)

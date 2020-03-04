@@ -202,6 +202,11 @@ head(marine_by_transect_from_notes_selected)
 write.csv(marine_by_transect_from_notes_selected, "C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv", row.names=FALSE)
 
 
+
+
+
+master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
+
 ggplot(master_transect, aes(x=as.factor(total_marine_evidence), y=d15n))+geom_boxplot()
 
 
@@ -221,6 +226,7 @@ ggplot(master_transect3, aes(x=marine_evidence, y=d15n))+geom_point()+geom_smoot
 ### try by plot?? 
 #would need to merge with plot-level d15n
 soil_merge<-read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge.csv")
+marine_by_plot_from_notes_selected<-read.csv("C:Biodiversity idea//Output files//marine_by_plot_from_notes_selected.csv")
 
 master_plot<-merge(soil_merge, marine_by_plot_from_notes_selected)
 head(master_plot)
