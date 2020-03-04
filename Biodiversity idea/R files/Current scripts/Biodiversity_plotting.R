@@ -1,4 +1,4 @@
-
+#loading necesasry libraries
 
 library(here)
 library(rlang)
@@ -48,40 +48,6 @@ isotope_master_fish_feces<- isotope_master_fish_feces%>%
 
 
 # Arch --------------------------------------------------------------------
-
-View(fish_richness_merged_tran_arch)
-
-fish_richness_merged_tran_arch<-read.csv("C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv")
-
-
-ggplot(fish_richness_merged_tran_arch, aes(x=fish_feature, y=d15n, col=fish_feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-
-ggplot(fish_richness_merged_tran_arch, aes(x=CMT, y=d34s, col=CMT))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-#### why do i have more plots for sum_basal than d15n? 
-
-
-
-ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d15n, col=midden_feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-
-
-
-
-ggplot(fish_richness_merged_tran_arch, aes(x=midden_feature, y=d34s, col=midden_feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-
-
-ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d15n, col=feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
-
-ggplot(fish_richness_merged_tran_arch, aes(x=feature, y=d34s, col=feature))+
-  geom_boxplot()+geom_jitter(width=0.2)
 
 
 fish_bycatch_richness_merged_tran_year_arch<-read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year_arch.csv")

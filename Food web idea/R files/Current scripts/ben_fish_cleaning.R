@@ -660,9 +660,8 @@ View(fish_bycatch_richness_merged_tran_year)
 
 
 
+#  adding in arch sites to just fish --------------------------------------
 
-#####################################################
-#### adding in arch sites to just fish
 arch_sites_distance_beach<-read.csv("Biodiversity idea//Output files//paired_beach_arch_by_radius_1000.csv")
 head(arch_sites_distance_beach)
 
