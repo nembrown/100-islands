@@ -107,6 +107,8 @@ ben_fish_data_wide_year_richness<-merge(ben_fish_data_wide_year_richness, ben_ne
 ben_fish_data_wide_year_richness$fish_richness_bym3<-ben_fish_data_wide_year_richness$fish_richness/(ben_fish_data_wide_year_richness$sum_volume)
 ben_fish_data_wide_year_richness$fish_abundance_bym3<-ben_fish_data_wide_year_richness$fish_abundance/(ben_fish_data_wide_year_richness$sum_volume)
 
+
+
 #average these values across years
 ben_fish_data_wide_year_richness <- ben_fish_data_wide_year_richness[,-2] %>% group_by(site) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 ###head(ben_fish_data_wide_year_richness)
@@ -618,18 +620,24 @@ fish_bycatch_richness_merged_tran_year<-merge(fish_bycatch_richness_merged_tran_
 
 head(fish_bycatch_richness_merged_tran_year)
 
-#commented out the bycatch part b/c I think no bycatch = NA not zero ... but check the fish notes for "no bycatch" and then assign a zero. 
 
-#correcting richness and abundance for average net dimensions at that site 
-#as opposed to bym3, this _corrected is correcting for the problem that not every site was seined with 
-#the same sized net 
+#fish_richness_corrected is # of fish species in total found at that site corrected by the average volume of a beach seine at that site 
+    #corrects the problem that not every site is seined with the same size net
+
+fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected<-((fish_bycatch_richness_merged_tran_year$bycatch_richness)/fish_bycatch_richness_merged_tran_year$volume)*100
+fish_bycatch_richness_merged_tran_year$fish_richness_corrected<-((fish_bycatch_richness_merged_tran_year$fish_richness)/fish_bycatch_richness_merged_tran_year$volume)*100
+
+#fish_richness_bym3 is number of fish spp corrected by total volume of beach seines done at that site... 
+    #corrects the problem that some sites were sampled more than others, i.e. species-Area curve... 
+
+
+
+
+
 ##then times 100 to get estimate of # fish per 100m3 fished 
 # fish_bycatch_richness_merged_tran_year$fish_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$fish_biomass)/fish_bycatch_richness_merged_tran_year$volume)*100
 # fish_bycatch_richness_merged_tran_year$bycatch_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$bycatch_abundance)/fish_bycatch_richness_merged_tran_year$volume)*100
 # fish_bycatch_richness_merged_tran_year$fish_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$fish_abundance)/fish_bycatch_richness_merged_tran_year$volume)*100
-fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected<-((fish_bycatch_richness_merged_tran_year$bycatch_richness)/fish_bycatch_richness_merged_tran_year$volume)*100
-fish_bycatch_richness_merged_tran_year$fish_richness_corrected<-((fish_bycatch_richness_merged_tran_year$fish_richness)/fish_bycatch_richness_merged_tran_year$volume)*100
-fish_bycatch_richness_merged_tran_year$marine_richness_corrected<-(fish_bycatch_richness_merged_tran_year$fish_richness_corrected+fish_bycatch_richness_merged_tran_year$bycatch_richness_corrected)
 # fish_bycatch_richness_merged_tran_year$pelagic_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$fish_pelagic_biomass)/fish_bycatch_richness_merged_tran_year$volume)*100
 # fish_bycatch_richness_merged_tran_year$pelagic_abundance_corrected<-((fish_bycatch_richness_merged_tran_year$pelagic_abundance)/fish_bycatch_richness_merged_tran_year$volume)*100
 # fish_bycatch_richness_merged_tran_year$demersal_biomass_corrected<-((fish_bycatch_richness_merged_tran_year$fish_demersal_biomass)/fish_bycatch_richness_merged_tran_year$volume)*100
@@ -652,7 +660,6 @@ write.csv(fish_bycatch_richness_merged_tran_year, "C:Biodiversity idea//Output f
 
 #Beachsein site SITE AND FISH ONLY 
 View(fish_bycatch_richness_merged_tran_year)
-
 
 
 

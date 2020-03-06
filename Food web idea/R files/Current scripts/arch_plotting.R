@@ -77,3 +77,10 @@ ggplot(fish_arch, aes(x=midden_feature, y=bycatch_richness_corrected, col=midden
 ggplot(fish_arch, aes(x=midden_feature, y=marine_richness_bym3, col=midden_feature))+
   geom_boxplot()+geom_jitter(width=0.2)
 
+#but not the uncorrected? ... need to correct for area sampled. 
+ggplot(fish_arch, aes(x=midden_feature, y=marine_richness, col=midden_feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
+ggplot(fish_arch, aes(x=midden_feature, y=marine_richness_corrected, col=midden_feature))+
+  geom_boxplot()+geom_jitter(width=0.2)
+
