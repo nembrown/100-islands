@@ -89,7 +89,9 @@ head(owen_key_expanded)
 owen_coords<-read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 
 head(owen_coords)
-owen_coords<-owen_coords[,c(1:3)]
+names(owen_coords)[7]<-"slope_plot"
+
+owen_coords<-owen_coords[,c(1:3,7,8)]
 head(owen_coords)
 
 owen_key_expanded<-merge(owen_key_expanded, owen_coords, by="unq_plot", all=TRUE)
@@ -725,7 +727,7 @@ write.csv(by_tran_master, "C:Food web idea//Data by person//Norah.data/by_tran_m
 
 length(unique(by_tran_master$unq_tran))
 #there's the interior veg plots and insect plots too... that's why there's 565
-View(by_tran_master)
+head(by_tran_master)
 
 
 
