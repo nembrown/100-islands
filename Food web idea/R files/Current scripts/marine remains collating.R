@@ -12,11 +12,14 @@ library(viridis)
 library(matrixStats)
 library(tidyverse)
 
+
+#data from Owen's plots, marine remains that got into the percent cover of plots
 marine_by_plot_from_plants<- read.csv("C:Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv")
 head(marine_by_plot_from_plants)
-head(marine_by_plot_from_plants)
 
-
+#data from Chris Ernst's plots 
+marine_by_plot_from_chris<- read.csv("C:Food web idea//Data by person//Chris.data//chris_habitat.csv", header=TRUE, sep=",")
+head(marine_by_plot_from_chris)
 
 marine_by_plot_from_notes<- read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 head(marine_by_plot_from_notes)
@@ -32,14 +35,15 @@ marine_by_plot_from_notes$raven_pres <- ifelse(grepl("raven", marine_by_plot_fro
 marine_by_plot_from_notes$unk_bird_pres <- ifelse(grepl("guano|feather|bird poo|bird", marine_by_plot_from_notes$notes), 1, 0)
 
 marine_by_plot_from_notes$marine_invert_pres <- ifelse(grepl("bivalve|shell|crab|abalone|ablone|limpet|snail|clam|scallop|mussel|mussell|urchin|claw|carapace|tube worm", marine_by_plot_from_notes$notes), 1, 0)
+
 marine_by_plot_from_notes$marine_invert_pres[marine_by_plot_from_notes$unq_plot=="ST07NS5"]<-0
 marine_by_plot_from_notes$marine_invert_pres[marine_by_plot_from_notes$unq_plot=="TQ15W1"]<-0
 marine_by_plot_from_notes$marine_invert_pres[marine_by_plot_from_notes$unq_plot=="MM06N1"]<-0
-
 marine_by_plot_from_notes$marine_invert_pres[marine_by_plot_from_notes$unq_plot=="PR04E1"]<-0
 marine_by_plot_from_notes$marine_invert_pres[marine_by_plot_from_notes$unq_plot=="PR05NS3"]<-1
 
-#these are where it said shell cove - so not a shell actually, the 1 is from a barnacle in plot but couldn't use that as search term becuase Owen would say "barnacle line" a lot to say where the transect started. 
+#these are where it said shell cove - so not a shell actually, 
+#the 1 is from a barnacle in plot but couldn't use that as search term becuase Owen would say "barnacle line" a lot to say where the transect started. 
 
 marine_by_plot_from_notes$driftwood <- ifelse(grepl("driftwood", marine_by_plot_from_notes$notes), 1, 0)
 marine_by_plot_from_notes$midden <- ifelse(grepl("shelly|midden", marine_by_plot_from_notes$notes), 1, 0)
