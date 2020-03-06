@@ -1033,6 +1033,12 @@ ggplot(fish_richness_merged_isl, aes(y=d34s, x=log(Area)))+
 ggplot(master_transect, aes(d15n, y=fish_biomass_bym3_mean))+
          geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n soil")
 
+
+ggplot(master_transect, aes(y=d15n, x=midden_feature))+ geom_boxplot()
+ggplot(master_transect, aes(y=plot_cc, x=midden_feature))+ geom_boxplot()
+
+
+
 ggplot(fish_richness_merged_isl, aes(d34s, y=fish_biomass_bym3_mean))+
   geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d34s soil")
 

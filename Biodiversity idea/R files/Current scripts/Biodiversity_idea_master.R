@@ -74,7 +74,7 @@ by_tran_master_0m_2<-by_tran_master_0m_2 %>% dplyr::select(-unq_isl)
 ### adding in tree diversity (at the whole transect level, i.e. from 0 to 40m)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
 head(by_tran_master)
-by_tran_master_col_names<-c("unq_isl", "unq_tran", "tree_richness" ,
+by_tran_master_col_names<-c("unq_isl", "unq_tran","plot_cc", "tree_richness" ,
                             "tree_abundance",
                             "sum_basal",
                             "site_mean_by_tran" ,
