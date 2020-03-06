@@ -83,24 +83,27 @@ ben_fish_data <- ben_fish_data %>% filter(between(month, 5,8))
 #make wide format to calculate number of species
 #use sum of abundance to reflect total of all fish caught in a given summer
 
-ben_fish_data_wide_year_2 <-ben_fish_data %>% group_by(site, year, month, day, species) %>% 
+ben_fish_data_wide_day_2 <-ben_fish_data %>% group_by(site, year, month, day, species) %>% 
   summarise(sum_abundance = sum(abundance, na.rm=TRUE)) %>% 
   spread(species, sum_abundance) %>% 
   replace(is.na(.), 0) 
 
-head(ben_fish_data_wide_year_2)
+head(ben_fish_data_wide_day_2)
 
 #calculate richness & abundance  from the wide dataframe
-ben_fish_data_wide_year_richness_2<-ben_fish_data_wide_year_2[,c(1,2,3,4)]
-ben_fish_data_wide_year_richness_2$fish_richness<-specnumber(ben_fish_data_wide_year_2[,-c(1,2,3,4)])
-ben_fish_data_wide_year_richness_2$fish_abundance<-rowSums(ben_fish_data_wide_year_2[,-c(1,2,3,4)],na.rm = TRUE)
-head(ben_fish_data_wide_year_richness_2)
+ben_fish_data_wide_day_richness_2<-ben_fish_data_wide_day_2[,c(1,2,3,4)]
+ben_fish_data_wide_day_richness_2$fish_richness<-specnumber(ben_fish_data_wide_day_2[,-c(1,2,3,4)])
+ben_fish_data_wide_day_richness_2$fish_abundance<-rowSums(ben_fish_data_wide_day_2[,-c(1,2,3,4)],na.rm = TRUE)
+head(ben_fish_data_wide_day_richness_2)
 
 #adjust richness and abundance by total volume seined at that site
 #bym3 is correcting problem that some sites were sampled more than others (aka species/Area curve)
-ben_fish_data_wide_year_richness_2<-merge(ben_fish_data_wide_year_richness_2, ben_netdimensions_day)
-ben_fish_data_wide_year_richness_2$fish_richness_bym3<-ben_fish_data_wide_year_richness_2$fish_richness/(ben_fish_data_wide_year_richness_2$sum_volume)
-ben_fish_data_wide_year_richness_2$fish_abundance_bym3<-ben_fish_data_wide_year_richness_2$fish_abundance/(ben_fish_data_wide_year_richness_2$sum_volume)
+ben_fish_data_wide_day_richness_2<-merge(ben_fish_data_wide_day_richness_2, ben_netdimensions_day)
+ben_fish_data_wide_day_richness_2$fish_richness_bym3<-ben_fish_data_wide_day_richness_2$fish_richness/(ben_fish_data_wide_day_richness_2$sum_volume)
+ben_fish_data_wide_day_richness_2$fish_abundance_bym3<-ben_fish_data_wide_day_richness_2$fish_abundance/(ben_fish_data_wide_day_richness_2$sum_volume)
+
+ggplot(ben_fish_data_wide_day_richness_2, aes(y=fish_richness, x=sum_volume))+geom_point()
+
 
 #this file we will skip the averaging step!
 head(ben_netdimensions_day)
