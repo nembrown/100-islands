@@ -3,17 +3,18 @@
 
 library(lavaan)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
-
+View(master_transect)
 
 
 # #pair down the 
-sem_variables_names<-c( "fish_biomass_bym3_mean", "fish_bycatch_biomass", "MEAN_kparea2k", "MEAN_egarea2k",
+sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
                         "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl", 
-                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n") 
+                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
+                        "otter_pres_all", "marine_invert_pres_all", "fish_all") 
                                      
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names ]
 
-cor(master_transec_sem_subset, use = "complete.obs")
+#cor(master_transec_sem_subset, use = "complete.obs")
 
 
 
@@ -116,14 +117,14 @@ nobs(fit2)
 
 
 ######################## Alternative model with fish biomass as estimated ... might help with the problem of not many #s
-### edited feb 14th
+### edited march 10
 N15_model_novector2<-'#latent variables as responses
 
             #composite
             
-            human_pres <~ fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area
+            human_pres <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
             
-            marine_animal_biomass_shore <~ fish_biomass_bym3_mean + fish_bycatch_biomass + ravens  + WAVE_EXPOSURE
+            marine_animal_biomass_shore <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE
             
             algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope 
             
@@ -131,21 +132,25 @@ N15_model_novector2<-'#latent variables as responses
             
             algae_biomass_shore + human_pres + marine_animal_biomass_shore ~ d15n
             
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_bycatch_biomass
-            
+            # log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
+            # 
+            # log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
+            # 
             human_pres ~ marine_animal_biomass_shore
             
             #correlations
-           # fish_biomass_bym3_mean ~~ fish_bycatch_biomass
+           # fish_biomass_bym3_mean ~~ bycatch_biomass_bym3_mean
 
             
             #latent variables measurement models
             human_pres =~ midden_feature_sem + fish_feature_sem + cult_imp_plant_richness + d15n
-            algae_biomass_shore =~ log_site_sum_by_isl + d15n
-            marine_animal_biomass_shore =~ d15n
+            algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all + d15n
+            marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all + d15n
                                                 '
+
+fit2 <- sem(N15_model_novector2, data=master_transect, missing = "ML", std.lv=TRUE, fixed.x=FALSE)
+summary(fit2, fit.measures=TRUE)
+
 
 fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",
             missing = "available.cases",  std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
@@ -154,9 +159,17 @@ fit5 <- sem(N15_model_novector2, data=master_transect,missing="pairwise", std.lv
 
 
 #missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE
+#stdv.lvn If TRUE, the metric of each latent variable is determined by fixing their variances to 1.0. 
+#If FALSE, the metric of each latent variable is determined by fixing the factor loading 
+#of the first indicator to 1.0. If there are multiple groups, std.lv = TRUE and "loadings" 
+#is included in the group.label argument, then only the latent variances i of the first group 
+#will be fixed to 1.0, while the latent variances of other groups are set free.
+
+
+
 
 summary(fit4)
-varTable(fit4)
+varTable(fit5)
 lavTables(fit4)
 print(modindices(fit3))
 

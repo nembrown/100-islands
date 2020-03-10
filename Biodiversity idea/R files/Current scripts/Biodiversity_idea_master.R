@@ -207,11 +207,11 @@ master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_t
 
 
 
-### adding marine remains from owens notes
+### adding marine remains from owen and chris's notes
 
-marine_by_transect_from_notes_selected<-read.csv("C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv")
+marine_by_tran_combined_pres_abs<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combined_pres_abs.csv")
 
-master_transect<-merge(master_transect2, marine_by_transect_from_notes_selected, by="unq_tran", all=TRUE)
+master_transect<-merge(master_transect2, marine_by_tran_combined_pres_abs, by="unq_tran", all=TRUE)
 head(master_transect)
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)

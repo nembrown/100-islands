@@ -12,14 +12,47 @@ library(viridis)
 library(matrixStats)
 library(tidyverse)
 
-
+# keep this commented out - this is data from the plot level that got into percent cover, 
+#but the data from _from_notes is a lot more detailed and covers the same plots so 
+#we shoudl use that + Chris's transect level information
 #data from Owen's plots, marine remains that got into the percent cover of plots
-marine_by_plot_from_plants<- read.csv("C:Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv")
-head(marine_by_plot_from_plants)
+# marine_by_plot_from_plants<- read.csv("C:Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv")
+# head(marine_by_plot_from_plants)
 
-#data from Chris Ernst's plots 
+
+# Data from Chris Ernst ---------------------------------------------------
+#data from Chris Ernst's plots on trapline
 marine_by_plot_from_chris<- read.csv("C:Food web idea//Data by person//Chris.data//chris_habitat.csv", header=TRUE, sep=",")
 head(marine_by_plot_from_chris)
+marine_by_plot_from_chris$unq_tran<- paste(marine_by_plot_from_chris$island,marine_by_plot_from_chris$direction)
+marine_by_plot_from_chris$unq_tran<-gsub(" ", "", marine_by_plot_from_chris$unq_tran, fixed = TRUE)
+
+
+marine_by_plot_from_chris$otter_pres_chris <- ifelse(grepl("otter|ottre|latrine|nearotter", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$marine_invert_pres_chris <- ifelse(grepl("bivalve|shell|crab|abalone|ablone|limpet|geoduck|sea star|whelk|snail|chiton|clam|scallop|mussel|mussell|urchin|claw|carapace|tube worm|barnacle", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$fish_chris <- ifelse(grepl("fish|rockfish|marine vertebrae", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$unk_bird_pres_chris <- ifelse(grepl("guano|feather|bird poo|bird", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$eagle_pres_chris <- ifelse(grepl("eagle", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$raven_pres_chris <- ifelse(grepl("raven", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$driftwood_chris <- ifelse(grepl("driftwood", marine_by_plot_from_chris$marine), 1, 0)
+marine_by_plot_from_chris$seaweed_chris <- ifelse(grepl("seaweed|algae|fucus|kelp", marine_by_plot_from_chris$marine), 1, 0)
+
+marine_by_tran_from_chris_selected<-marine_by_plot_from_chris %>% 
+  dplyr::select(unq_tran, otter_pres_chris, unk_bird_pres_chris, marine_invert_pres_chris, driftwood_chris, seaweed_chris,  fish_chris) %>% 
+  group_by(unq_tran) %>%   
+  summarise_if(is.numeric, sum, na.rm=TRUE)
+
+
+
+marine_by_tran_from_chris_selected$vector_evidence_chris<-marine_by_tran_from_chris_selected$otter_pres_chris 
+marine_by_tran_from_chris_selected$marine_evidence_chris<-marine_by_tran_from_chris_selected$seaweed_chris+ marine_by_tran_from_chris_selected$marine_invert_pres_chris+marine_by_tran_from_chris_selected$fish_chris
+marine_by_tran_from_chris_selected$total_marine_evidence_chris<-marine_by_tran_from_chris_selected$otter_pres_chris  + marine_by_tran_from_chris_selected$seaweed_chris + marine_by_tran_from_chris_selected$marine_invert_pres_chris +marine_by_tran_from_chris_selected$fish_chris
+
+head(marine_by_tran_from_chris_selected)
+
+
+# Data from Owen's notes --------------------------------------------------
+#from Owen's plot-level notes
 
 marine_by_plot_from_notes<- read.csv("C:Food web idea//Data by person//Owen's data//100Islands_Fitzpatrick_plot.csv", header=TRUE, sep=",")
 head(marine_by_plot_from_notes)
@@ -57,9 +90,9 @@ head(marine_by_plot_from_notes)
 marine_by_plot_from_notes_selected<-marine_by_plot_from_notes %>% dplyr::select(unq_plot, easting, northing, otter_pres, eagle_pres, raven_pres, unk_bird_pres, marine_invert_pres, driftwood, midden, seaweed, mink, fish, mammal_bones )
 head(marine_by_plot_from_notes_selected)
 
-marine_by_plot_from_notes_selected$vector_evidence<-marine_by_plot_from_notes_selected$otter_pres + marine_by_plot_from_notes_selected$eagle_pres + marine_by_plot_from_notes_selected$unk_bird_pres+ marine_by_plot_from_notes_selected$mink + marine_by_plot_from_notes_selected$raven_pres
+marine_by_plot_from_notes_selected$vector_evidence<-marine_by_plot_from_notes_selected$otter_pres + marine_by_plot_from_notes_selected$eagle_pres + marine_by_plot_from_notes_selected$mink + marine_by_plot_from_notes_selected$raven_pres
 marine_by_plot_from_notes_selected$marine_evidence<-marine_by_plot_from_notes_selected$seaweed+ marine_by_plot_from_notes_selected$marine_invert_pres+marine_by_plot_from_notes_selected$fish
-marine_by_plot_from_notes_selected$total_marine_evidence<-marine_by_plot_from_notes_selected$otter_pres + marine_by_plot_from_notes_selected$eagle_pres + marine_by_plot_from_notes_selected$unk_bird_pres+ marine_by_plot_from_notes_selected$mink + marine_by_plot_from_notes_selected$raven_pres + marine_by_plot_from_notes_selected$seaweed+ marine_by_plot_from_notes_selected$marine_invert_pres +marine_by_plot_from_notes_selected$fish+marine_by_plot_from_notes_selected$midden
+marine_by_plot_from_notes_selected$total_marine_evidence<-marine_by_plot_from_notes_selected$otter_pres + marine_by_plot_from_notes_selected$eagle_pres + marine_by_plot_from_notes_selected$mink + marine_by_plot_from_notes_selected$raven_pres + marine_by_plot_from_notes_selected$seaweed+ marine_by_plot_from_notes_selected$marine_invert_pres +marine_by_plot_from_notes_selected$fish+marine_by_plot_from_notes_selected$midden
 
 marine_by_plot_from_notes_selected[duplicated(marine_by_plot_from_notes_selected$unq_plot),]
 
@@ -102,6 +135,9 @@ owen_key_subset<-owen_key %>% dplyr::select(unq_plot, unq_tran)
 
 marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, owen_key_subset, by="unq_plot")
 
+
+
+# Matching plots within 10m radius ----------------------------------------
 
 
 ###Making sure that plots close to eachother get considered properly... see TB04SW for an eg of this problem... within 4m of an otter site but doesn't pick it up
@@ -187,46 +223,70 @@ write.csv(marine_by_plot_from_notes_selected, "C:Biodiversity idea//Output files
 
 
 
+# Summarizing Owen's plot-level data to transect-level --------------------
 
-#### by transect
 
 
 marine_by_transect_from_notes_selected_sum<- marine_by_plot_from_notes_selected %>% group_by(unq_tran) %>%   
                                         summarise_if(is.numeric, sum, na.rm=TRUE)
 
 head(marine_by_transect_from_notes_selected_sum)
-marine_by_transect_pres_abs<-ifelse(marine_by_transect_from_notes_selected_sum[,-1] > 0, 1, 0)
-head(marine_by_transect_pres_abs)
-
-marine_by_transect_from_notes_selected<-cbind(marine_by_transect_from_notes_selected_sum[,1], marine_by_transect_pres_abs)
-head(marine_by_transect_from_notes_selected)
-
-
-
-write.csv(marine_by_transect_from_notes_selected, "C:Biodiversity idea//Output files//marine_by_transect_from_notes_selected.csv", row.names=FALSE)
 
 
 
 
 
-master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
+# Merging Chris Ernst's transect level data with Owen's -------------------
 
-ggplot(master_transect, aes(x=as.factor(total_marine_evidence), y=d15n))+geom_boxplot()
+head(marine_by_transect_from_notes_selected_sum)
+head(marine_by_tran_from_chris_selected)
+
+marine_by_tran_combined<-merge(marine_by_transect_from_notes_selected_sum[,-c(2:3)], marine_by_tran_from_chris_selected, by="unq_tran", all=TRUE)
+head(marine_by_tran_combined)
+
+marine_by_tran_combined[is.na(marine_by_tran_combined)] <- 0
+
+marine_by_tran_combined <- marine_by_tran_combined %>% 
+                          mutate(otter_pres_all = otter_pres + otter_pres_chris) %>% 
+                          mutate(unk_bird_pres_all = unk_bird_pres + unk_bird_pres_chris) %>% 
+                          mutate(marine_invert_pres_all = marine_invert_pres + marine_invert_pres_chris) %>% 
+                          mutate(driftwood_all = driftwood + driftwood_chris) %>% 
+                          mutate(seaweed_all = seaweed + seaweed_chris) %>% 
+                          mutate(fish_all = fish + fish_chris) %>% 
+                          mutate(vector_evidence_all = vector_evidence + vector_evidence_chris) %>% 
+                          mutate(marine_evidence_all = marine_evidence + marine_evidence_chris) %>% 
+                          mutate(total_marine_evidence_all = total_marine_evidence + total_marine_evidence_chris)
 
 
 
+write.csv(marine_by_tran_combined, "C:Biodiversity idea//Output files//marine_by_tran_combined.csv", row.names=FALSE)
 
+
+marine_by_tran_combined_pres_abs<-marine_by_tran_combined[-1]
+marine_by_tran_combined_pres_abs[marine_by_tran_combined_pres_abs>0]<-1
+
+marine_by_tran_combined_pres_abs<-cbind(marine_by_tran_combined_pres_abs, marine_by_tran_combined[1])
+
+
+head(marine_by_tran_combined_pres_abs)
+
+write.csv(marine_by_tran_combined_pres_abs, "C:Biodiversity idea//Output files//marine_by_tran_combined_pres_abs.csv", row.names=FALSE)
+
+
+
+ggplot(master_transect, aes(y=d15n, x=otter_pres_all))+geom_point()
 
 #### SUM
 head(master_transect2)
-master_transect3<-merge(master_transect2, marine_by_transect_from_notes_selected_sum[,-c(2,3)])
+master_transect3<-merge(master_transect2, marine_by_tran_combined)
 
-ggplot(master_transect3, aes(x=otter_pres, y=d15n))+geom_point()+geom_smooth(method="lm")
-ggplot(master_transect3, aes(x=marine_invert_pres, y=d15n))+geom_point()+geom_smooth(method="lm")
-ggplot(master_transect3, aes(x=total_marine_evidence, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
-ggplot(master_transect3, aes(x=vector_evidence, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
-ggplot(master_transect3, aes(x=marine_evidence, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
-  
+ggplot(master_transect3, aes(x=otter_pres_all, y=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(master_transect3, aes(x=marine_invert_pres_all, y=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(master_transect3, aes(x=total_marine_evidence_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
+ggplot(master_transect3, aes(x=vector_evidence_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
+ggplot(master_transect3, aes(x=marine_evidence_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
+ggplot(master_transect3, aes(x=fish_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
+
 ### try by plot?? 
 #would need to merge with plot-level d15n
 soil_merge<-read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge.csv")
