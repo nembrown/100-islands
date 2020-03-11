@@ -149,12 +149,12 @@ head(fish_richness_merged_tran_arch)
 fish_richness_merged_tran_arch$midden_feature_sem<-as.character(fish_richness_merged_tran_arch$midden_feature)
 fish_richness_merged_tran_arch$midden_feature_sem<- dplyr::recode(fish_richness_merged_tran_arch$midden_feature_sem, yes = "1", no="0")
 fish_richness_merged_tran_arch$midden_feature_sem[is.na(fish_richness_merged_tran_arch$midden_feature_sem)] <- 0
-fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem, ordered=TRUE)
+fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem)
 
 fish_richness_merged_tran_arch$fish_feature_sem<-as.character(fish_richness_merged_tran_arch$fish_feature)
 fish_richness_merged_tran_arch$fish_feature_sem<-dplyr::recode(fish_richness_merged_tran_arch$fish_feature_sem, yes = "1", no="0")
 fish_richness_merged_tran_arch$fish_feature_sem[is.na(fish_richness_merged_tran_arch$fish_feature_sem)] <- 0
-fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem, ordered=TRUE)
+fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem)
 
 fish_richness_merged_tran_arch$canoe_skid_sem<-as.character(fish_richness_merged_tran_arch$canoe_skid)
 fish_richness_merged_tran_arch$canoe_skid_sem<-dplyr::recode(fish_richness_merged_tran_arch$canoe_skid_sem, yes = "1", no="0")
@@ -203,7 +203,6 @@ fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2
 plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
 master_transect2<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richness, all=TRUE)
 head(master_transect2)
-master_transect2[,c("midden_feature_sem","fish_feature_sem")] <- lapply(master_transect2[,c("midden_feature_sem","fish_feature_sem")], ordered)
 
 
 
@@ -213,6 +212,9 @@ marine_by_tran_combined_pres_abs<-read.csv("C:Biodiversity idea//Output files//m
 
 master_transect<-merge(master_transect2, marine_by_tran_combined_pres_abs, by="unq_tran", all=TRUE)
 head(master_transect)
+
+master_transect[,c( "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c( "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
+
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
