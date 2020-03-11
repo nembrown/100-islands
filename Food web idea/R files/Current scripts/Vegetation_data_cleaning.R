@@ -184,6 +184,19 @@ Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_fill
 
 
 head(Deb_Owen_veg_combined_complete_filled)
+Deb_Owen_veg_combined_complete_filled[duplicated(Deb_Owen_veg_combined_complete_filled),]
+
+#add in Deb coords
+pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv", header=TRUE, sep=",")
+pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
+pointcount.gps<-pointcount.gps[,c(3,16,17)]
+pointcount.gps<-pointcount.gps[!duplicated(pointcount.gps$pcid),]
+#sometimes taken twice...  
+pointcount.gps$unq_tran<- paste("Deb",pointcount.gps$pcid, sep="_")
+deb_coords<-pointcount.gps[,-1]
+head(deb_coords)
+
+Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled,deb_coords,by="unq_tran", all.x = TRUE)
 
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names=FALSE)
@@ -221,7 +234,7 @@ head(owen_coords)
 # kacey_coords<-read.csv("C:Food web idea//Data by person//Kacey.data//coords_final.csv", header=TRUE, sep=",")
 # head(kacey_coords)
 # kacey_coords<-kacey_coords[,-1]
-# 
+#
 
 
 
@@ -242,13 +255,7 @@ head(Deb_Owen_veg_coords)
 
 Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords %>%  group_by(unq_isl, unq_tran, species) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords_transect[,-4]
-Deb_Owen_veg_coords_transect_presabs<-Deb_Owen_veg_coords_transect
-Deb_Owen_veg_coords_transect_presabs$pres_abs<-  ifelse(Deb_Owen_veg_coords_transect$cover>0, 1, 0)
 
-head(Deb_Owen_veg_coords_transect_presabs)
-
-
-write.csv(Deb_Owen_veg_coords_transect_presabs, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_coords_transect_presabs.csv", row.names = FALSE)
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names = FALSE)
 

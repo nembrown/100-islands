@@ -279,7 +279,7 @@ owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14SN3"]<-"CV14N"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="CV14EW3"]<-"CV14W"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="MM07NS3"]<-"MM07S"
 owen.veg_tran$unq_tran[owen.veg_tran$unq_plot=="ST09WE3"]<-"ST09E"
-
+ 
 
 owen.veg_tran_gash <- owen.veg_tran %>% filter(species == "gash")
 owen.veg_tran_midi <- owen.veg_tran %>% filter(species == "midi")
