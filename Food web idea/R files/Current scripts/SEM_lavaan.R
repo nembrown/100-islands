@@ -14,6 +14,9 @@ sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_by
                                      
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names ]
 
+str(master_transec_sem_subset)
+
+
 #cor(master_transec_sem_subset, use = "complete.obs")
 
 
@@ -124,20 +127,19 @@ N15_model_novector2<-'#latent variables as responses
             
             human_pres <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
             
-            marine_animal_biomass_shore <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE
+            marine_animal_biomass_shore <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
             
             algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope 
             
             
             
-            algae_biomass_shore + human_pres + marine_animal_biomass_shore ~ d15n
+           # algae_biomass_shore + human_pres + marine_animal_biomass_shore ~ d15n
             
             # log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
             # 
             # log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
-            # 
-            human_pres ~ marine_animal_biomass_shore
-            
+
+
             #correlations
            # fish_biomass_bym3_mean ~~ bycatch_biomass_bym3_mean
 
@@ -148,15 +150,19 @@ N15_model_novector2<-'#latent variables as responses
             marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all + d15n
                                                 '
 
-fit2 <- sem(N15_model_novector2, data=master_transect, missing = "ML", std.lv=TRUE, fixed.x=FALSE)
+fit2 <- sem(N15_model_novector2, data=master_transect,missing="ML")
 summary(fit2, fit.measures=TRUE)
 
 
-fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",
-            missing = "available.cases",  std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
+fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",missing = "available.cases",std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
 
 fit5 <- sem(N15_model_novector2, data=master_transect,missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE)
 
+
+# ordered=c("fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem"),
+
+#note: otter_pres can't be ordered bc it is exogenous.... 
+#only order the endogenous (i.e. arrow going into) variables
 
 #missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE
 #stdv.lvn If TRUE, the metric of each latent variable is determined by fixing their variances to 1.0. 
