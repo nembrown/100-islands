@@ -369,7 +369,7 @@ head(habitat_veg_wrack_soil_by_tran)
 
 # Chris insects diversity -----------------------------------------------------------
 
-chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
+chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance_v4.csv", header=TRUE, sep=",")
 head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)

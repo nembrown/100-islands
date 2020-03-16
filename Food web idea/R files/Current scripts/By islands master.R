@@ -406,8 +406,9 @@ by_isl_master$eagles[is.na(by_isl_master$eagles)] <- 0
 # Chris insects -----------------------------------------------------------
 
 #new data July 2019 
-chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance.csv", header=TRUE, sep=",")
-#head(chris_insects_master)
+### NEED TO UPDATE DATA!!!!!!!
+chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance_v4.csv", header=TRUE, sep=",")
+head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
 chris_insects_master$unq_tran<-strtrim(chris_insects_master$Trapline, 5)
 chris_insects_master$plot<-substr(chris_insects_master$Trapline, 5, 5)
@@ -422,8 +423,8 @@ chris_insects_master_wide <-chris_insects_master %>% group_by(unq_isl, SpeciesID
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
-#head(chris_insects_master_wide)
-#659 Species!!! 
+head(chris_insects_master_wide)
+#871 Species!!! 
 
 chris_insects_master_wide_richness<-chris_insects_master_wide[,1]
 chris_insects_master_wide_richness$insect_richness<-specnumber(chris_insects_master_wide[,-1])

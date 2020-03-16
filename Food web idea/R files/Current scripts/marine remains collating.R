@@ -280,7 +280,9 @@ ggplot(master_transect, aes(y=d15n, x=otter_pres_all))+geom_point()
 head(master_transect2)
 master_transect3<-merge(master_transect2, marine_by_tran_combined)
 
-ggplot(master_transect3, aes(x=otter_pres_all, y=d15n))+geom_point()+geom_smooth(method="lm")
+ggplot(master_transect3, aes(x=as.factor(otter_pres_all), y=d15n))+geom_boxplot()
+
+
 ggplot(master_transect3, aes(x=marine_invert_pres_all, y=d15n))+geom_point()+geom_smooth(method="lm")
 ggplot(master_transect3, aes(x=total_marine_evidence_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
 ggplot(master_transect3, aes(x=vector_evidence_all, y=d15n))+geom_point()+geom_smooth(method="lm")+geom_text(label=master_transect3$unq_tran)
