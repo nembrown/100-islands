@@ -101,8 +101,6 @@ head(marine_by_plot_from_notes_selected)
 
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
 length(unique(owen_key$unq_tran))
-owen_key<-owen_key %>% dplyr::select(-unq_tran)
-owen_key$unq_tran<-str_sub(owen_key$unq_plot, end=-2)
 
 owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
@@ -133,7 +131,7 @@ head(owen_key)
 owen_key_subset<-owen_key %>% dplyr::select(unq_plot, unq_tran)
 
 
-marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, owen_key_subset, by="unq_plot")
+marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, owen_key_subset, by="unq_plot", all.x=TRUE)
 
 
 

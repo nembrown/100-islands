@@ -1,127 +1,49 @@
-# install.packages("lavaan", dependencies = TRUE)
-# install.packages("ggm", dependencies = TRUE)
 
+# load libraries and data -------------------------------------------------------
 library(lavaan)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
-View(master_transect)
+head(master_transect)
+
+# # pair down the variables
+# sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+#                         "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl", 
+#                         "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
+#                         "otter_pres_all", "marine_invert_pres_all", "fish_all") 
+#                                      
+# master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names ]
+# str(master_transec_sem_subset)
 
 
-# #pair down the 
-sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
-                        "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl", 
-                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
-                        "otter_pres_all", "marine_invert_pres_all", "fish_all") 
-                                     
-master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names ]
+# Simple full model -------------------------------------------------------
 
-str(master_transec_sem_subset)
+N15_model_simple<-'
+          
+          human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
 
+          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
 
-#cor(master_transec_sem_subset, use = "complete.obs")
+          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
+          
+          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
 
+          log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
 
-
-
-N15_model<-'#latent variables as responses
-            fish_biomass_bym3_mean + fish_bycatch_biomass + log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE + PA_norml + WAVE_EXPOSURE + log_Rock + slope  ~ vector_pres
-            
-            fish_biomass_bym3_mean + fish_bycatch_biomass + log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE + PA_norml + WAVE_EXPOSURE + log_Rock + slope ~ human_pres
-            
-            fish_biomass_bym3_mean + fish_bycatch_biomass  + vector_pres + SLOPE  + WAVE_EXPOSURE + log_Rock + slope ~ marine_animal_biomass_shore
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + log_Rock + slope ~ algae_biomass_shore
-            
-            #correlations
-            fish_biomass_bym3_mean ~~ fish_bycatch_biomass
-            fish_biomass_bym3_mean ~~ log_MEAN_kparea2k
-            fish_biomass_bym3_mean ~~ log_MEAN_egarea2k
-            fish_bycatch_biomass ~~ log_MEAN_kparea2k
-            fish_bycatch_biomass ~~ log_MEAN_egarea2k
-            log_MEAN_kparea2k ~~ log_MEAN_egarea2k
-            
-            SLOPE ~~ PA_norml
-            SLOPE ~~ WAVE_EXPOSURE
-            SLOPE ~~ log_Rock
-            SLOPE ~~ slope
-            PA_norml ~~ WAVE_EXPOSURE
-            PA_norml ~~ log_Rock
-            PA_norml ~~ slope
-            WAVE_EXPOSURE ~~ log_Rock
-            WAVE_EXPOSURE ~~ slope
-            log_Rock ~~ slope
-
-            
-            #latent variables measurement models
-            vector_pres =~ ravens + eagles + midi
-            human_pres =~ midden_feature_sem + cult_imp_plant_richness + fish_feature_sem + d15n
-            algae_biomass_shore =~ log_site_sum_by_isl + d15n
-            marine_animal_biomass_shore =~ d15n '
+          log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
 
 
-fit <- sem(N15_model, data=master_transect,  missing = "ML")
-summary(fit, fit.measures=TRUE)
+        #latent variables measurement models
+        human_pres =~ midden_feature_sem + fish_feature_sem + cult_imp_plant_richness
+        algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all
+        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
+        '
 
-varTable(fit)
-
-
-
-length(na.omit(master_transect$d15n))                    
-
-?varTable()
-
-
-N15_model_novector<-'#latent variables as responses
-
-            fish_biomass_bym3_mean + fish_bycatch_biomass + log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE + PA_norml + WAVE_EXPOSURE + log_Rock + slope ~ human_pres
-            
-            fish_biomass_bym3_mean + fish_bycatch_biomass  + ravens + eagles + SLOPE  + WAVE_EXPOSURE + log_Rock + slope ~ marine_animal_biomass_shore
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + log_Rock + slope ~ algae_biomass_shore
-            
-            algae_biomass_shore + human_pres + marine_animal_biomass_shore ~ d15n
-            
-            #correlations
-            fish_biomass_bym3_mean ~~ fish_bycatch_biomass
-            fish_biomass_bym3_mean ~~ log_MEAN_kparea2k
-            fish_biomass_bym3_mean ~~ log_MEAN_egarea2k
-            fish_bycatch_biomass ~~ log_MEAN_kparea2k
-            fish_bycatch_biomass ~~ log_MEAN_egarea2k
-            log_MEAN_kparea2k ~~ log_MEAN_egarea2k
-
-            SLOPE ~~ PA_norml
-            SLOPE ~~ WAVE_EXPOSURE
-            SLOPE ~~ log_Rock
-            SLOPE ~~ slope
-            PA_norml ~~ WAVE_EXPOSURE
-            PA_norml ~~ log_Rock
-            PA_norml ~~ slope
-            WAVE_EXPOSURE ~~ log_Rock
-            WAVE_EXPOSURE ~~ slope
-            log_Rock ~~ slope
-
-            
-            #latent variables measurement models
-            human_pres =~ midden_feature_sem
-            algae_biomass_shore =~ log_site_sum_by_isl
-            human_pres =~ d15n
-            algae_biomass_shore = ~d15n
-            marine_animal_biomass_shore =~ d15n '
-
-fit2 <- sem(N15_model_novector, data=master_transect)
-summary(fit2, fit.measures=TRUE)
-
-varTable(fit2)
-parameterEstimates(fit2)
-
-residualsCor(fit2)
-nobs(fit2)
-#returns the effective number of observations used whenfitting the model. In a multiple group analysis, this is the sum of all observations per group
+fit_simple <- sem(N15_model_simple, data=master_transect, missing="pairwise", fixed.x=FALSE, conditional.x=FALSE)
+summary(fit_simple, fit.measures=TRUE)
+varTable(fit_simple)
 
 
-
-######################## Alternative model with fish biomass as estimated ... might help with the problem of not many #s
-### edited march 10
-N15_model_novector2<-'#latent variables as responses
+######################## 
+N15_model_composite<-'#latent variables as responses
 
             #composite
             
@@ -129,7 +51,7 @@ N15_model_novector2<-'#latent variables as responses
             
             marine_animal_biomass_shore <~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
             
-            algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope 
+            algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
             
             
             
@@ -156,7 +78,8 @@ summary(fit2, fit.measures=TRUE)
 
 fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",missing = "available.cases",std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
 
-fit5 <- sem(N15_model_novector2, data=master_transect,missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE)
+fit5 <- sem(N15_model_composite, data=master_transect,missing="pairwise", std.lv=TRUE)
+summary(fit5)
 
 
 # ordered=c("fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem"),
@@ -185,25 +108,31 @@ head(master_transect)
 
 
 
+# Piecewise fitting -------------------------------------------------------
 
-### piecewise fitting
+#Algal model only
+
 N15_model_algae_only<-'#latent variables as responses
             
-            log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope ~ algae_biomass_shore
-            
-            algae_biomass_shore ~ d15n
-            
-            #correlations
-            # log_MEAN_kparea2k ~~ log_MEAN_egarea2k
+            algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope 
+            a1*algae_biomass_shore ~ d15n
 
             
-            #latent variables measurement models
-            algae_biomass_shore =~ log_site_sum_by_isl + d15n
-                                                '
+           #latent variables measurement models
+            algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all'
+                                
 
-fit_algae <- sem(N15_model_algae_only, data=master_transect,  missing = "ML")
+fit_algae <- sem(N15_model_algae_only, data=master_transect)
 summary(fit_algae, fit.measures=TRUE)
 varTable(fit_algae)
+
+# fit_algae_PML<-sem(N15_model_algae_only, data=master_transect,estimator = "PML",missing = "available.cases",std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
+# summary(fit_algae_PML, fit.measures=TRUE)
+
+fit_algae_pairwise <- sem(N15_model_algae_only, data=master_transect,missing="pairwise", std.lv=TRUE)
+summary(fit_algae_pairwise, fit.measures=TRUE)
+
+
 #This runs, and gives SE estimates so that is good
 #The errors have to do with the variance/covariance matrix - can run "ridge" to help with this
 

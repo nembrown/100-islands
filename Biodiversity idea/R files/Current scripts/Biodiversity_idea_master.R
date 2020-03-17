@@ -213,7 +213,7 @@ marine_by_tran_combined_pres_abs<-read.csv("C:Biodiversity idea//Output files//m
 master_transect<-merge(master_transect2, marine_by_tran_combined_pres_abs, by="unq_tran", all=TRUE)
 head(master_transect)
 
-master_transect[,c( "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c( "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
+master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
 
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
