@@ -731,6 +731,26 @@ head(by_tran_master)
 
 
 
+#### tran and arch data:
+arch_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_arch_by_radius_300.csv")
+head(arch_sites_distance_tran)
+length(unique(arch_sites_distance_tran$unq_tran))
+#81 unique transects if using 300m radius 
+
+by_tran_master_arch<-merge(by_tran_master, arch_sites_distance_tran, by="unq_tran", all.x=TRUE)
+head(by_tran_master_arch)
+
+##adding in arch data from output file fed from arch sites cleaning.R
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_feature", "fish_feature", "canoe_skid")]
+
+by_tran_master_arch<-merge(by_tran_master_arch, arch_data_simple, by="site_id", all.x=TRUE)
+
+
+write.csv(by_tran_master_arch, "C:Biodiversity idea//Output files//by_tran_master_arch.csv", row.names=FALSE)
+
+
 
 
 
