@@ -164,6 +164,7 @@ df.SF_transects_simple_df<-df.SF_transects_simple %>% st_set_geometry(NULL)
 head(df.SF_transects_simple_df)
 df.SF_transects_simple_df<-df.SF_transects_simple_df[,-2]
 
+head(df.SF_transects_simple_df)
 
 AssignClosestTempPoints2 <- function()
 {
@@ -393,4 +394,324 @@ AssignClosestTempPoints4 <- function()
 }
 
 AssignClosestTempPoints4()
+
+
+# Transects to midden sites -------------------------------------------------
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+midden_data<-arch_data[arch_data$midden_feature=="yes",] 
+head(midden_data)
+midden_data_simple_new<-midden_data[ , c("site_id", "easting", "northing")]
+data_midden_subset2_new <- midden_data_simple_new[ , c("easting", "northing")]
+midden_data_simple_new<- midden_data_simple_new[complete.cases(data_midden_subset2_new), ] 
+midden_data_simple_new$site_id<-as.factor(midden_data_simple_new$site_id)
+midden_data_simple_sf_new <- st_as_sf(midden_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+midden_data_simple_st_new_long<-st_transform(x = midden_data_simple_sf_new, crs = 4326)
+midden_data_simple_st_new_long$long<-st_coordinates(midden_data_simple_st_new_long)[,1]
+midden_data_simple_st_new_long$lat<-st_coordinates(midden_data_simple_st_new_long)[,2]
+midden_data_simple_st_new_long<-midden_data_simple_st_new_long %>% st_set_geometry(NULL)
+names(midden_data_simple_st_new_long)[1]<-"midden"
+head(midden_data_simple_st_new_long)
+
+
+soil_merge_0m<- read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+head(soil_merge_0m)
+soil_merge_0m_simple<-soil_merge_0m %>% dplyr::select("unq_tran", "easting", "northing")
+soil_merge_0m_simple<-soil_merge_0m_simple[!duplicated(soil_merge_0m_simple$unq_tran),]
+head(soil_merge_0m_simple)
+
+data_subset2_soil <- soil_merge_0m_simple[ , c("easting", "northing")]
+soil_merge_0m_simple_no_na<- soil_merge_0m_simple[complete.cases(data_subset2_soil), ]
+df_soil_merge_0m_simple <- st_as_sf(soil_merge_0m_simple_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+names(df_soil_merge_0m_simple)[1]<-"site"
+head(df_soil_merge_0m_simple)
+df_soil_merge_0m_simple$long<-st_coordinates(df_soil_merge_0m_simple)[,1] # get coordinates
+df_soil_merge_0m_simple$lat<-st_coordinates(df_soil_merge_0m_simple)[,2]
+df_soil_merge_0m_simple_df<-df_soil_merge_0m_simple %>% st_set_geometry(NULL)
+head(df_soil_merge_0m_simple_df)
+
+#Need:
+head(df_soil_merge_0m_simple_df)
+View(midden_data_simple_st_new_long)
+
+
+
+
+AssignClosestTempPoints8 <- function()
+{
+   
+   # Latest version: Assign closest points from a second point set
+   
+   require(sp)
+   
+   
+   # promote the input lists to SpatialPointsDataFrames
+   
+   coordinates(midden_data_simple_st_new_long) <- c("long", "lat")
+   coordinates(df_soil_merge_0m_simple_df) <- c("long", "lat")             
+   
+   
+   #  Define these vectors, used in the loop.
+   
+   closestSiteVec <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   minDistVec     <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   
+   # Get the vector index of the midden station closest to each field station.
+   # Use the spDistsN1 function to compute the distance vector between each
+   # field station site and all of the midden stations. Then, find and
+   # retain the actual midden, and the index of the closest midden
+   # to each transect station.
+   #
+   # spDistsN1 usage: spDistsN1(pointList, pointToMatch, longlat)
+   #
+   # where:
+   #         pointList   : List of candidate points.
+   #         pointToMatch: Single point for which we seek the closest point in pointList.
+   #         longlat     : TRUE  computes Great Circle distance in km,
+   #                       FALSE computes Euclidean distance in units of input geographic coordinates
+   #
+   # We use Great Circle distance to increase distance calculation accuracy at high latitudes
+   # See the discussion of distance units in the header portion of this file
+   #
+   # minDistVec stores the distance from to the closest midden station to each site measurement point.
+   # closestSiteVec stores the index of the closest midden station to each site measurement point.
+   #
+   for (i in 1 : nrow(df_soil_merge_0m_simple_df))
+   {
+      distVec <- spDistsN1(midden_data_simple_st_new_long,df_soil_merge_0m_simple_df[i,],longlat = TRUE)
+      minDistVec[i] <- min(distVec)
+      closestSiteVec[i] <- which.min(distVec)
+   }
+   #
+   # Create the output file: merge the midden point list with the transect point list
+   # into a five-column table by merging the midden point and transect point lists.
+   #
+   PointAssignTemps <- as(midden_data_simple_st_new_long[closestSiteVec,]$midden,"character")
+   FinalTable8 = data.frame(coordinates(df_soil_merge_0m_simple_df),df_soil_merge_0m_simple_df$site,closestSiteVec,minDistVec,PointAssignTemps)
+   #
+   # Update the FinalTable column names 
+   #
+   names(FinalTable8) <- c("Long","Lat","site","CloseTempIndex","Distance","midden")
+   #
+   # And, at the end, write the point assignment file.
+   #
+   message("Write middenne/site assignment table to disk in .csv format")
+   write.csv(FinalTable8,file="C:Biodiversity idea//Output files//Distance_btwn_points_midden_transects.csv", row.names = FALSE)
+}
+
+AssignClosestTempPoints8()
+
+
+# Any arch vs. transects --------------------------------------------------
+
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+any_arch_data<-arch_data[arch_data$any_arch=="yes",] 
+head(any_arch_data)
+any_arch_data_simple_new<-any_arch_data[ , c("site_id", "easting", "northing")]
+data_any_arch_subset2_new <- any_arch_data_simple_new[ , c("easting", "northing")]
+any_arch_data_simple_new<- any_arch_data_simple_new[complete.cases(data_any_arch_subset2_new), ] 
+any_arch_data_simple_new$site_id<-as.factor(any_arch_data_simple_new$site_id)
+any_arch_data_simple_sf_new <- st_as_sf(any_arch_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+any_arch_data_simple_st_new_long<-st_transform(x = any_arch_data_simple_sf_new, crs = 4326)
+any_arch_data_simple_st_new_long$long<-st_coordinates(any_arch_data_simple_st_new_long)[,1]
+any_arch_data_simple_st_new_long$lat<-st_coordinates(any_arch_data_simple_st_new_long)[,2]
+any_arch_data_simple_st_new_long<-any_arch_data_simple_st_new_long %>% st_set_geometry(NULL)
+names(any_arch_data_simple_st_new_long)[1]<-"any_arch"
+head(any_arch_data_simple_st_new_long)
+
+
+soil_merge_0m<- read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+head(soil_merge_0m)
+soil_merge_0m_simple<-soil_merge_0m %>% dplyr::select("unq_tran", "easting", "northing")
+soil_merge_0m_simple<-soil_merge_0m_simple[!duplicated(soil_merge_0m_simple$unq_tran),]
+head(soil_merge_0m_simple)
+
+data_subset2_soil <- soil_merge_0m_simple[ , c("easting", "northing")]
+soil_merge_0m_simple_no_na<- soil_merge_0m_simple[complete.cases(data_subset2_soil), ]
+df_soil_merge_0m_simple <- st_as_sf(soil_merge_0m_simple_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+names(df_soil_merge_0m_simple)[1]<-"site"
+head(df_soil_merge_0m_simple)
+df_soil_merge_0m_simple$long<-st_coordinates(df_soil_merge_0m_simple)[,1] # get coordinates
+df_soil_merge_0m_simple$lat<-st_coordinates(df_soil_merge_0m_simple)[,2]
+df_soil_merge_0m_simple_df<-df_soil_merge_0m_simple %>% st_set_geometry(NULL)
+head(df_soil_merge_0m_simple_df)
+
+#Need:
+head(df_soil_merge_0m_simple_df)
+View(any_arch_data_simple_st_new_long)
+
+
+
+
+AssignClosestTempPoints9 <- function()
+{
+   
+   # Latest version: Assign closest points from a second point set
+   
+   require(sp)
+   
+   
+   # promote the input lists to SpatialPointsDataFrames
+   
+   coordinates(any_arch_data_simple_st_new_long) <- c("long", "lat")
+   coordinates(df_soil_merge_0m_simple_df) <- c("long", "lat")             
+   
+   
+   #  Define these vectors, used in the loop.
+   
+   closestSiteVec <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   minDistVec     <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   
+   # Get the vector index of the any_arch station closest to each field station.
+   # Use the spDistsN1 function to compute the distance vector between each
+   # field station site and all of the any_arch stations. Then, find and
+   # retain the actual any_arch, and the index of the closest any_arch
+   # to each transect station.
+   #
+   # spDistsN1 usage: spDistsN1(pointList, pointToMatch, longlat)
+   #
+   # where:
+   #         pointList   : List of candidate points.
+   #         pointToMatch: Single point for which we seek the closest point in pointList.
+   #         longlat     : TRUE  computes Great Circle distance in km,
+   #                       FALSE computes Euclidean distance in units of input geographic coordinates
+   #
+   # We use Great Circle distance to increase distance calculation accuracy at high latitudes
+   # See the discussion of distance units in the header portion of this file
+   #
+   # minDistVec stores the distance from to the closest any_arch station to each site measurement point.
+   # closestSiteVec stores the index of the closest any_arch station to each site measurement point.
+   #
+   for (i in 1 : nrow(df_soil_merge_0m_simple_df))
+   {
+      distVec <- spDistsN1(any_arch_data_simple_st_new_long,df_soil_merge_0m_simple_df[i,],longlat = TRUE)
+      minDistVec[i] <- min(distVec)
+      closestSiteVec[i] <- which.min(distVec)
+   }
+   #
+   # Create the output file: merge the any_arch point list with the transect point list
+   # into a five-column table by merging the any_arch point and transect point lists.
+   #
+   PointAssignTemps <- as(any_arch_data_simple_st_new_long[closestSiteVec,]$any_arch,"character")
+   FinalTable9 = data.frame(coordinates(df_soil_merge_0m_simple_df),df_soil_merge_0m_simple_df$site,closestSiteVec,minDistVec,PointAssignTemps)
+   #
+   # Update the FinalTable column names 
+   #
+   names(FinalTable9) <- c("Long","Lat","site","CloseTempIndex","Distance","any_arch")
+   #
+   # And, at the end, write the point assignment file.
+   #
+   message("Write any_archne/site assignment table to disk in .csv format")
+   write.csv(FinalTable9,file="C:Biodiversity idea//Output files//Distance_btwn_points_any_arch_transects.csv", row.names = FALSE)
+}
+
+AssignClosestTempPoints9()
+
+
+# Fish_traps and transects ------------------------------------------------
+
+arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")
+head(arch_data)
+fish_data<-arch_data[arch_data$fish_feature=="yes",] 
+head(fish_data)
+fish_data_simple_new<-fish_data[ , c("site_id", "easting", "northing")]
+data_fish_subset2_new <- fish_data_simple_new[ , c("easting", "northing")]
+fish_data_simple_new<- fish_data_simple_new[complete.cases(data_fish_subset2_new), ] 
+fish_data_simple_new$site_id<-as.factor(fish_data_simple_new$site_id)
+fish_data_simple_sf_new <- st_as_sf(fish_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+fish_data_simple_st_new_long<-st_transform(x = fish_data_simple_sf_new, crs = 4326)
+fish_data_simple_st_new_long$long<-st_coordinates(fish_data_simple_st_new_long)[,1]
+fish_data_simple_st_new_long$lat<-st_coordinates(fish_data_simple_st_new_long)[,2]
+fish_data_simple_st_new_long<-fish_data_simple_st_new_long %>% st_set_geometry(NULL)
+names(fish_data_simple_st_new_long)[1]<-"fish"
+head(fish_data_simple_st_new_long)
+
+
+soil_merge_0m<- read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+head(soil_merge_0m)
+soil_merge_0m_simple<-soil_merge_0m %>% dplyr::select("unq_tran", "easting", "northing")
+soil_merge_0m_simple<-soil_merge_0m_simple[!duplicated(soil_merge_0m_simple$unq_tran),]
+head(soil_merge_0m_simple)
+
+data_subset2_soil <- soil_merge_0m_simple[ , c("easting", "northing")]
+soil_merge_0m_simple_no_na<- soil_merge_0m_simple[complete.cases(data_subset2_soil), ]
+df_soil_merge_0m_simple <- st_as_sf(soil_merge_0m_simple_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+names(df_soil_merge_0m_simple)[1]<-"site"
+head(df_soil_merge_0m_simple)
+df_soil_merge_0m_simple$long<-st_coordinates(df_soil_merge_0m_simple)[,1] # get coordinates
+df_soil_merge_0m_simple$lat<-st_coordinates(df_soil_merge_0m_simple)[,2]
+df_soil_merge_0m_simple_df<-df_soil_merge_0m_simple %>% st_set_geometry(NULL)
+head(df_soil_merge_0m_simple_df)
+
+#Need:
+head(df_soil_merge_0m_simple_df)
+View(fish_data_simple_st_new_long)
+
+
+
+
+AssignClosestTempPoints10 <- function()
+{
+   
+   # Latest version: Assign closest points from a second point set
+   
+   require(sp)
+   
+   
+   # promote the input lists to SpatialPointsDataFrames
+   
+   coordinates(fish_data_simple_st_new_long) <- c("long", "lat")
+   coordinates(df_soil_merge_0m_simple_df) <- c("long", "lat")             
+   
+   
+   #  Define these vectors, used in the loop.
+   
+   closestSiteVec <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   minDistVec     <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   
+   # Get the vector index of the fish station closest to each field station.
+   # Use the spDistsN1 function to compute the distance vector between each
+   # field station site and all of the fish stations. Then, find and
+   # retain the actual fish, and the index of the closest fish
+   # to each transect station.
+   #
+   # spDistsN1 usage: spDistsN1(pointList, pointToMatch, longlat)
+   #
+   # where:
+   #         pointList   : List of candidate points.
+   #         pointToMatch: Single point for which we seek the closest point in pointList.
+   #         longlat     : TRUE  computes Great Circle distance in km,
+   #                       FALSE computes Euclidean distance in units of input geographic coordinates
+   #
+   # We use Great Circle distance to increase distance calculation accuracy at high latitudes
+   # See the discussion of distance units in the header portion of this file
+   #
+   # minDistVec stores the distance from to the closest fish station to each site measurement point.
+   # closestSiteVec stores the index of the closest fish station to each site measurement point.
+   #
+   for (i in 1 : nrow(df_soil_merge_0m_simple_df))
+   {
+      distVec <- spDistsN1(fish_data_simple_st_new_long,df_soil_merge_0m_simple_df[i,],longlat = TRUE)
+      minDistVec[i] <- min(distVec)
+      closestSiteVec[i] <- which.min(distVec)
+   }
+   #
+   # Create the output file: merge the fish point list with the transect point list
+   # into a five-column table by merging the fish point and transect point lists.
+   #
+   PointAssignTemps <- as(fish_data_simple_st_new_long[closestSiteVec,]$fish,"character")
+   FinalTable10   = data.frame(coordinates(df_soil_merge_0m_simple_df),df_soil_merge_0m_simple_df$site,closestSiteVec,minDistVec,PointAssignTemps)
+   #
+   # Update the FinalTable column names 
+   #
+   names(FinalTable10) <- c("Long","Lat","site","CloseTempIndex","Distance","fish")
+   #
+   # And, at the end, write the point assignment file.
+   #
+   message("Write fishne/site assignment table to disk in .csv format")
+   write.csv(FinalTable10,file="C:Biodiversity idea//Output files//Distance_btwn_points_fish_transects.csv", row.names = FALSE)
+}
+
+AssignClosestTempPoints10()
 
