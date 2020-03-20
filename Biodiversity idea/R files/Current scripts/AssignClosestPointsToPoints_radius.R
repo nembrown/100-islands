@@ -27,6 +27,7 @@ head(ben_habitat_data_simple.SP_new)
 by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
 data_subset2 <- by_tran_master_0m[ , c("easting", "northing")]
 by_tran_master_0m_no_na<- by_tran_master_0m[complete.cases(data_subset2), ]
+by_tran_master_0m_no_na<-by_tran_master_0m_no_na[!duplicated(by_tran_master_0m_no_na$unq_tran),]
 df.SF_transects <- st_as_sf(by_tran_master_0m_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
 df.SF_transects_simple<-df.SF_transects[,1]
 df.SF_transects_simple_new<- df.SF_transects_simple %>% st_transform(3035) 
@@ -46,7 +47,7 @@ transects_beach_joined <-transects_beach_joined  %>% st_set_geometry(NULL)
 transects_beach_joined<-as.data.frame(transects_beach_joined)
 write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
 
-length(unique(transects_beach_joined$site))
+length(unique(transects_beach_joined$unq_tran))
 #2km: 263 transects fall within 27 sites.... 
 #1km: 140 transects fall within 19 sites
 #500m: 67 transects fall within 16 sites
