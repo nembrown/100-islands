@@ -100,7 +100,7 @@ head(soil_clean)
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot", all=TRUE)
-View(soil_merge)
+#View(soil_merge)
 
 soil_merge$easting[soil_merge$unq_plot=="MM09WE1"]<-539907
 soil_merge$northing[soil_merge$unq_plot=="MM09WE1"]<-5766077
@@ -130,7 +130,7 @@ head(soil_merge_s)
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist"))
 
-View(soil_merge_0m)
+head(soil_merge_0m)
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
 
@@ -148,6 +148,8 @@ head(longform_plant_percentcover_owen_0m)
 longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
                                        group_by(unq_plot,species) %>% 
                                        spread(species, cover)%>%  replace(is.na(.), 0)
+
+head(longform_plant_percentcover2_tran_0m)
 
 
 longform_plant_percentcover_owen_0m_shrub<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="shrub")
@@ -168,7 +170,7 @@ which( colnames(longform_plant_percentcover2_tran_0m)=="gash" )
 which( colnames(longform_plant_percentcover2_tran_0m)=="midi" )
 
 
-longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(1,4,41,56)]
+longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(2,4,41,56)]
 head(longform_plant_percentcover3_tran_0m)
 longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-c(1:5)], index="shannon")
@@ -182,9 +184,10 @@ longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentc
 
 
 
-
+head(soil_merge_0m)
+head(longform_plant_percentcover3_tran_0m)
 habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
-View(habitat_veg_soil_by_tran_0m)
+head(habitat_veg_soil_by_tran_0m)
 
 habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="AD07SW2"]<-"AD07SW"
 habitat_veg_soil_by_tran_0m$unq_tran[habitat_veg_soil_by_tran_0m$unq_plot=="TB07W2"]<-"TB07W"
@@ -257,12 +260,13 @@ head(owen.veg_tran_0m_midi)
 
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_midi[,c(1:7)], by="unq_tran", all=TRUE)
 habitat_veg_soil_by_tran_0m<-merge(habitat_veg_soil_by_tran_0m, owen.veg_tran_0m_gash[,c(1:7)], by="unq_tran", all=TRUE)
-View(habitat_veg_soil_by_tran_0m)
 
 habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM11S2"]<-540619
 habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM11S2"]<-5767388
 habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-539916
 habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-5766116
+
+head(habitat_veg_soil_by_tran_0m)
 
 
 # Chris insects diversity -----------------------------------------------------------
@@ -286,7 +290,7 @@ chris_insects_master_wide_tran <-chris_insects_master %>% group_by(unq_tran, Spe
   spread(SpeciesID, sum_abundance) %>% 
   replace(is.na(.), 0)
 head(chris_insects_master_wide_tran)
-#659 Species!!! 
+#871 Species!!! 
 
 chris_insects_master_wide_tran_richness<-chris_insects_master_wide_tran[,1]
 chris_insects_master_wide_tran_richness$insect_richness<-specnumber(chris_insects_master_wide_tran[,-1])
@@ -630,4 +634,4 @@ by_tran_master_0m<-merge(by_tran_master_0m, chris.isotopes.tran_ISO[,-2], by="un
 
 
 write.csv(by_tran_master_0m, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv", row.names=FALSE)
-#View(by_tran_master_0m)
+head(by_tran_master_0m)
