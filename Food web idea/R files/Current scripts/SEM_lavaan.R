@@ -5,13 +5,46 @@ master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.cs
 head(master_transect)
 
 # # pair down the variables
-# sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
-#                         "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl", 
-#                         "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
-#                         "otter_pres_all", "marine_invert_pres_all", "fish_all") 
-#                                      
-# master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names ]
-# str(master_transec_sem_subset)
+sem_variables_names<-c( "unq_tran","fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+                        "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl",
+                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
+                        "otter_pres_all", "marine_invert_pres_all", "fish_all", "distance_to_any_arch", "distance_to_midden",
+                        "distance_to_fish")
+
+master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
+str(master_transec_sem_subset)
+
+
+# Simple non-categorical model  -------------------------------------------------------
+
+N15_model_simple_nocat<-'
+          
+          human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
+
+          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
+
+          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
+          
+          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
+
+          log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
+
+          log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
+
+
+        #latent variables measurement models
+        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness
+        algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all
+        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
+        '
+
+fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transect, missing="ML", std.lv=TRUE)
+summary(fit_simple_nocat, fit.measures=TRUE)
+varTable(fit_simple_nocat)
+
+
+
+
 
 
 # Simple full model -------------------------------------------------------
