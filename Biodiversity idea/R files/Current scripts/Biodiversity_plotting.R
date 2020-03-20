@@ -1034,7 +1034,14 @@ ggplot(master_transect, aes(d15n, y=fish_biomass_bym3_mean))+
          geom_point(size=2)+geom_smooth() +theme_classic()+xlab("d15n soil")
 
 
-ggplot(master_transect, aes(y=d15n, x=midden_feature))+ geom_boxplot()
+ggplot(master_transect, aes(y=d15n, x=distance_to_midden))+ geom_point()+geom_smooth(method="lm")
+ggplot(master_transect, aes(y=d34s, x=distance_to_midden))+ geom_point()+geom_smooth(method="lm")
+
+ggplot(master_transect, aes(y=cult_imp_plant_richness, x=distance_to_any_arch))+ geom_point()+geom_smooth()
+ggplot(master_transect, aes(y=cult_imp_plant_richness, x=distance_to_midden))+ geom_point()+geom_smooth()
+
+
+
 ggplot(master_transect, aes(y=plot_cc, x=midden_feature))+ geom_boxplot()
 
 
