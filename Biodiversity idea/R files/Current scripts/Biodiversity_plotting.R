@@ -1038,7 +1038,8 @@ ggplot(master_transect, aes(y=d15n, x=distance_to_midden))+ geom_point()+geom_sm
 ggplot(master_transect, aes(y=d34s, x=distance_to_midden))+ geom_point()+geom_smooth(method="lm")
 
 ggplot(master_transect, aes(y=cult_imp_plant_richness, x=distance_to_any_arch))+ geom_point()+geom_smooth()
-ggplot(master_transect, aes(y=cult_imp_plant_richness, x=distance_to_midden))+ geom_point()+geom_smooth()
+ggplot(master_transect, aes(y=d15n, x=log(distance_to_midden)))+ geom_point()+geom_smooth()
+ggplot(master_transect, aes(y=d15n, x=log(distance_to_any_arch)))+ geom_point()+geom_smooth()
 
 
 
