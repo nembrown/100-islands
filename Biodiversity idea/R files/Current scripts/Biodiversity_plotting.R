@@ -46,6 +46,59 @@ isotope_master_fish_feces<- isotope_master_fish_feces%>%
 
 
 
+#Correlations
+head(master_transect)
+
+sem_variables_names<-c( "fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+                        "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "site_sum_by_isl",
+                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
+                        "otter_pres_all", "marine_invert_pres_all", "fish_all", "distance_to_any_arch", "distance_to_midden",
+                        "distance_to_fish")
+
+master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
+str(master_transec_sem_subset)
+
+corr_by_isl_selected_2 <- round(cor(master_transec_sem_subset, use="pairwise.complete.obs"), 1)
+#head(corr_by_isl_selected_2[, 1:6])
+p.mat_by_isl_selected_2 <- cor_pmat(master_transec_sem_subset)
+#head(p.mat_by_isl_selected_2[, 1:4])
+
+ggcorrplot(corr_by_isl_selected_2)
+ggcorrplot(corr_by_isl_selected_2, hc.order = TRUE, type = "lower",
+           outline.col = "white")
+ggcorrplot(corr_by_isl_selected_2, hc.order = TRUE,
+           type = "lower", p.mat = p.mat_by_isl_selected_2)
+ggcorrplot(corr_by_isl_selected_2, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+
+
+#Network plot
+master_transec_sem_subset %>% correlate() %>%  network_plot(min_cor = 0.1)
+
+#using Performance Analytics
+chart.Correlation(master_transec_sem_subset , histogram=TRUE, pch=19)
+
+
+human_influence_variables_names<-c( "fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+                        "SLOPE", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
+                         "distance_to_midden", "distance_to_fish", "log_DistW_ML", "log_Dist_Near", "habitat_het", "elevation_max", "elevation_mean", "slope_mean", "NDVI_mean", "Neighb_250")
+
+master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% human_influence_variables_names]
+str(master_transec_sem_subset)
+
+corr_by_isl_selected_2 <- round(cor(master_transec_sem_subset, use="pairwise.complete.obs"), 1)
+p.mat_by_isl_selected_2 <- cor_pmat(master_transec_sem_subset)
+ggcorrplot(corr_by_isl_selected_2, hc.order = TRUE, type = "lower",lab = TRUE)
+
+#Network plot
+master_transec_sem_subset %>% correlate() %>%  network_plot(min_cor = 0.1)
+
+#using Performance Analytics
+chart.Correlation(master_transec_sem_subset , histogram=TRUE, pch=19)
+
+
+ggplot(master_transect, aes(x=log_distance_to_midden, y=d15n))+ geom_point()+geom_smooth(method="lm")
+
 
 # Arch --------------------------------------------------------------------
 
