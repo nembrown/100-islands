@@ -128,7 +128,7 @@ soil_merge_s<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
 head(soil_merge_s)
 
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
-soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist"))
+soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist", "node"))
 
 head(soil_merge_0m)
 
