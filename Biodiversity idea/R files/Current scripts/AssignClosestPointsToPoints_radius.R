@@ -14,14 +14,17 @@ library(maps)
 library(mapdata)
 library(here)
 
+
 #Ben's beachseine sites coordinates
 ben_habitat_data<-read.csv("C:Biodiversity idea//Ben.data//beachseine_calvert_NB//hakaiBS_habitat_20142018.csv")
 head(ben_habitat_data)
-ben_habitat_data_simple<-ben_habitat_data[,c(3:5)]
+ben_habitat_data_simple<-ben_habitat_data[     ,c(3:5,6)]
+head(ben_habitat_data_simple)
+
 ben_habitat_data_simple$long<- -(ben_habitat_data_simple$long)
 ben_habitat_data_simple.SP_new <- st_as_sf(ben_habitat_data_simple, coords = c("long", "lat"), crs = 4326)
 ben_habitat_data_simple.SP_new<-ben_habitat_data_simple.SP_new %>% st_transform(3035)
-head(ben_habitat_data_simple.SP_new)
+#head(ben_habitat_data_simple.SP_new)
 
 #Transect-level coordinates at the 0m marker
 by_tran_master_0m<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master_0m.csv")
@@ -31,7 +34,7 @@ by_tran_master_0m_no_na<-by_tran_master_0m_no_na[!duplicated(by_tran_master_0m_n
 df.SF_transects <- st_as_sf(by_tran_master_0m_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
 df.SF_transects_simple<-df.SF_transects[,1]
 df.SF_transects_simple_new<- df.SF_transects_simple %>% st_transform(3035) 
-head(df.SF_transects_simple_new)
+#head(df.SF_transects_simple_new)
 
 #Followed code from here: 
 #https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
@@ -65,11 +68,11 @@ arch_data_simple_new$site_id<-as.factor(arch_data_simple_new$site_id)
 
 arch_data_simple_sf_new <- st_as_sf(arch_data_simple_new, coords = c("easting", "northing"), crs = 26909)
 arch_data_simple_st_new<-st_transform(x = arch_data_simple_sf_new, crs = 3035)
-head(arch_data_simple_st_new)
+#head(arch_data_simple_st_new)
 
 #Transect-level information
 #as above
-head(df.SF_transects_simple_new)
+#head(df.SF_transects_simple_new)
 
 # Buffer circles by 2000m -- creates polygons around the 
 dat_circles_arch <- st_buffer(df.SF_transects_simple_new, dist = 300)
@@ -77,7 +80,7 @@ dat_circles_arch <- st_buffer(df.SF_transects_simple_new, dist = 300)
 #which of the arch sites fall within 2km radius of the transect
 transects_arch_joined <- st_join(arch_data_simple_st_new, dat_circles_arch, left=FALSE)
 
-head(transects_arch_joined)
+#head(transects_arch_joined)
 length(unique(transects_arch_joined$unq_tran))
 # 300m = 70 transects
 
@@ -105,8 +108,8 @@ length(unique(transects_arch_joined_100$unq_tran))
 
 
 ###### arch and beachsine created from above
-head(arch_data_simple_st_new)
-head(ben_habitat_data_simple.SP_new)
+#head(arch_data_simple_st_new)
+#head(ben_habitat_data_simple.SP_new)
 
 # Buffer circles by 300m -- creates polygons around the beach sites
 dat_circles_arch_beach <- st_buffer(ben_habitat_data_simple.SP_new, dist = 1000)
