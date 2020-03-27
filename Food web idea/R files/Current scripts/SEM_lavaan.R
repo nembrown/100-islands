@@ -21,7 +21,7 @@ N15_model_simple_nocat<-'
           
           human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
 
-          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
+          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE  + human_pres
 
           algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
           
@@ -38,12 +38,12 @@ N15_model_simple_nocat<-'
         marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
         '
 
-fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transect, missing="ML", fixed.x=FALSE, conditional.x=FALSE)
+fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transect, group="super_node")
 summary(fit_simple_nocat, fit.measures=TRUE)
 modindices(fit_simple_nocat)
 residuals(fit_simple_nocat, type="cor")
 modI<-modificationIndices(fit_simple_nocat, standardized=F)
-modI[modI$mi>3,]
+modI[modI$mi<3,]
 
 
 library(MVN)
@@ -63,26 +63,31 @@ mshapiro.test(t(fitdata))
 
 N15_model_simple_nocat_alt<-'
           
-          human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
+          human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_DistW_ML + Neighb_250 + beachy_substrate 
 
-          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
+          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all 
 
-          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
+          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + Neighb_250
           
           log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
-
+          
           log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
+ 
+          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
 
 
         #latent variables measurement models
-        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness + d15n
-        algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all + d15n
-        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all + d15n
+        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness 
+        algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all
+        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
         '
 
-fit_simple_nocat_alt <- sem(N15_model_simple_nocat_alt, data=master_transect, missing="ML", fixed.x=FALSE, conditional.x=FALSE)
+fit_simple_nocat_alt <- sem(N15_model_simple_nocat_alt, data=master_transect, missing="ml.x")
 summary(fit_simple_nocat_alt, fit.measures=TRUE)
 varTable(fit_simple_nocat_alt)
+
+modI<-modificationIndices(fit_simple_nocat_alt, standardized=F)
+modI[modI$mi<3,]
 
 
 # Simple full model -------------------------------------------------------
