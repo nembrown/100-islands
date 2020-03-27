@@ -15,6 +15,7 @@ library(viridis)
 library(matrixStats)
 library(tidyverse)
 
+
 #load fish data - an output of from ben_fish_cleaning.R
 fish_bycatch_richness_merged_tran_year<- read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
 
@@ -101,7 +102,7 @@ by_tran_master_subset$beachy_substrate<-as.numeric(by_tran_master_subset$beachy_
 
 
 by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all=TRUE)
-#View(by_tran_master_0m_with_tran)
+head(by_tran_master_0m_with_tran)
 
 
 
@@ -118,7 +119,7 @@ fish_richness_merged_tran$habitat_cover_2km<-(fish_richness_merged_tran$sum_2km)
 
 
 write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv", row.names=FALSE)
-####View(fish_richness_merged_tran)
+#####View(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
 #565 tran but that includes Is and Bs
@@ -182,7 +183,7 @@ fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, distance_b
 head(fish_richness_merged_tran_arch)
 
 distance_btwn_points_any_arch_transects<- read.csv("C:Biodiversity idea//Output files//Distance_btwn_points_any_arch_transects.csv")
-#View(distance_btwn_points_any_arch_transects)
+##View(distance_btwn_points_any_arch_transects)
 names(distance_btwn_points_any_arch_transects)[3]<-"unq_tran"
 names(distance_btwn_points_any_arch_transects)[5]<-"distance_to_any_arch"
 
@@ -191,15 +192,38 @@ head(fish_richness_merged_tran_arch)
 
 
 distance_btwn_points_fish_transects<- read.csv("C:Biodiversity idea//Output files//Distance_btwn_points_fish_transects.csv")
-#View(distance_btwn_points_fish_transects)
+##View(distance_btwn_points_fish_transects)
 names(distance_btwn_points_fish_transects)[3]<-"unq_tran"
 names(distance_btwn_points_fish_transects)[5]<-"distance_to_fish"
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, distance_btwn_points_fish_transects[,c(3,5)], by="unq_tran")
-head(fish_richness_merged_tran_arch)
-
+#View(fish_richness_merged_tran_arch)
 
 write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv", row.names=FALSE)
+
+
+
+###culturally important plants
+plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
+head(plant_data_cult_richness)
+fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch, plant_data_cult_richness, all=TRUE)
+head(fish_richness_merged_tran_arch_2)
+
+
+### adding marine remains from owen and chris's notes - changed away from pres_abs
+
+marine_by_tran_combined<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combined.csv")
+head(marine_by_tran_combined)
+marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
+marine_by_tran_combined$fish_all<-as.numeric(marine_by_tran_combined$fish_all)
+marine_by_tran_combined$marine_invert_pres_all<-as.numeric(marine_by_tran_combined$marine_invert_pres_all)
+
+fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, marine_by_tran_combined, by="unq_tran", all=TRUE)
+
+fish_richness_merged_tran_arch_2$unq_isl<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 4)
+fish_richness_merged_tran_arch_2$node<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 2)
+
+#View(fish_richness_merged_tran_arch_2)
 
 
 ##### adding in island-level characteristics to the transect file
@@ -212,9 +236,11 @@ by_isl_master_col_names_tran<-c("unq_isl",
                                 "PA_norml",
                                 "eagles",
                                 "ravens",
-                                "node", 
                                 "site_sum_by_isl", 
-                                "Rock")
+                                "Rock", 
+                                "DistW_ML", 
+                                "Dist_Near", 
+                                "habitat_het", "elevation_max", "elevation_mean", "slope_mean", "NDVI_mean", "Neighb_250")
 
 #ravens eagles site_sum_by_isl SLOPE PA_norml Rock slope_mean
 
@@ -224,40 +250,44 @@ by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_ma
 by_isl_master_subset_tran$log_Area<-log(by_isl_master_subset_tran$Area)
 
 #head(fish_richness_merged_tran_arch)
-fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch, by_isl_master_subset_tran, by="unq_isl", all.y=TRUE)
+fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_isl_master_subset_tran, by="unq_isl", all.y=TRUE)
 
 fish_richness_merged_tran_arch_2$log_site_sum_by_isl <- log(fish_richness_merged_tran_arch_2$site_sum_by_isl+1)
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock+1)
-
-###culturally important plants
-plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
-master_transect2<-merge(fish_richness_merged_tran_arch_2, plant_data_cult_richness, all=TRUE)
-head(master_transect2)
+fish_richness_merged_tran_arch_2$log_DistW_ML<- log(fish_richness_merged_tran_arch_2$DistW_ML)
+fish_richness_merged_tran_arch_2$log_Dist_NearL<- log(fish_richness_merged_tran_arch_2$Dist_Near)
+fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merged_tran_arch_2$distance_to_midden)
 
 
-
-### adding marine remains from owen and chris's notes - changed away from pres_abs
-
-marine_by_tran_combined<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combineds.csv")
-head(marine_by_tran_combined)
-marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
-marine_by_tran_combined$fish_all<-as.numeric(marine_by_tran_combined$fish_all)
-marine_by_tran_combined$marine_invert_pres_all<-as.numeric(marine_by_tran_combined$marine_invert_pres_all)
-
-master_transect<-merge(master_transect2, marine_by_tran_combined, by="unq_tran", all=TRUE)
-head(master_transect)
 
 #master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
-
+master_transect<-fish_richness_merged_tran_arch_2
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
-head(master_transect)
+
+
+master_transect$unq_isl<-strtrim(master_transect$unq_tran, 4)
+master_transect$node<-strtrim(master_transect$unq_tran, 2)
 
 
 
+master_transect<- master_transect[complete.cases(master_transect$node), ]
+
+master_transect$super_node<-master_transect$node
+master_transect$super_node[master_transect$node=="PR"]<-"SCPR"
+master_transect$super_node[master_transect$node=="SC"]<-"SCPR"
+master_transect$super_node[master_transect$node=="TB"]<-"TBADMMGS"
+master_transect$super_node[master_transect$node=="AD"]<-"TBADMMGS"
+master_transect$super_node[master_transect$node=="MM"]<-"TBADMMGS"
+master_transect$super_node[master_transect$node=="GS"]<-"TBADMMGS"
+# master_transect$super_node[master_transect$node=="TQ"]<-"TQSTCV"
+# master_transect$super_node[master_transect$node=="ST"]<-"TQSTCV"
+# master_transect$super_node[master_transect$node=="CV"]<-"TQSTCV"
+
+master_transect$super_node
 
 
 
@@ -295,7 +325,7 @@ by_isl_master_col_names<-c("unq_isl",
 by_isl_master_subset<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names]
 ###head(by_isl_master_subset)
 
-##View(fish_bycatch_richness_merged_tran)
+###View(fish_bycatch_richness_merged_tran)
 fish_bycatch_richness_merged_tran$unq_isl<-str_sub(fish_bycatch_richness_merged_tran$unq_tran, start=0, end=4)
 
 ##head(fish_bycatch_richness_merged_tran)
