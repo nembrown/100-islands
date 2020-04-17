@@ -137,86 +137,88 @@ marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, ow
 
 # Matching plots within 10m radius ----------------------------------------
 
-
-###Making sure that plots close to eachother get considered properly... see TB04SW for an eg of this problem... within 4m of an otter site but doesn't pick it up
-library(sf)
-library(raster)
-library(spData)
-library(tmap)    # for static and interactive maps
-library(leaflet) # for interactive maps
-library(maphead) # for interactive maps
-library(ggplot2) # tidyverse vis package
-library(shiny)
-library(rgdal) # spatial/shp reading
-library(viridis) # nice color palette
-library(ggmap) # ggplot functionality for maps ---> dplyr, purr is dependency
-library(ggsn) # for scale bars/north arrows in ggplots
-library(maps)
-library(mapdata)
-library(here)
-
-
-
-by_plot_master<-marine_by_plot_from_notes_selected %>% dplyr::select(unq_plot, unq_tran, easting, northing, total_marine_evidence)
-head(by_plot_master)
-
-by_plot_master_marine<-by_plot_master %>% filter(total_marine_evidence >0)
-by_plot_master_not_marine<-by_plot_master %>% filter(total_marine_evidence == 0)
-
-data_subset3_marine <- by_plot_master_marine[ , c("easting", "northing")]
-by_plot_master_marine_no_na<- by_plot_master_marine[complete.cases(data_subset3_marine), ]
-df.SF_plot_marine <- st_as_sf(by_plot_master_marine_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
-df.SF_plot_simple_marine<-df.SF_plot_marine[,1:2]
-df.SF_plot_simple_marine_new<- df.SF_plot_simple_marine %>% st_transform(3035) 
-head(df.SF_plot_simple_marine_new)
-
-data_subset3_not_marine <- by_plot_master_not_marine[ , c("easting", "northing")]
-by_plot_master_not_marine_no_na<- by_plot_master_not_marine[complete.cases(data_subset3_not_marine), ]
-df.SF_plot_not_marine <- st_as_sf(by_plot_master_not_marine_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
-df.SF_plot_simple_not_marine<-df.SF_plot_not_marine[,1:2]
-df.SF_plot_simple_not_marine_new<- df.SF_plot_simple_not_marine %>% st_transform(3035) 
-head(df.SF_plot_simple_not_marine_new)
-colnames(df.SF_plot_simple_not_marine_new)[1]<-"unq_plot_not_marine"
-colnames(df.SF_plot_simple_not_marine_new)[2]<-"unq_tran_not_marine"
-
-#https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
-
-# Buffer circles by 10m -- creates polygons around the 
-marine_circles <- st_buffer(df.SF_plot_simple_marine_new, dist = 10)
-
-#which of the not-marine plots fall within 10m radius of the marine plots
-plots_marine_joined <- st_join(df.SF_plot_simple_not_marine_new, marine_circles, left=FALSE)
-
-head(plots_marine_joined)
-### Alright so this is a big list because there are plots every 10 m along the same trasnsect so I only really need to do this for when the transects dont 
-#match up
-#the transects will get captured when we collect by transect later.... 
-
-#fuzzy matching
-# install.packages("stringdist")
-library(stringdist)
-plots_marine_joined$stringdist<-stringdist(plots_marine_joined$unq_tran_not_marine, plots_marine_joined$unq_tran)
-
-
-head(plots_marine_joined)
-
-plots_marine_joined_should_marine <- plots_marine_joined %>% filter(stringdist>0) 
-head(plots_marine_joined_should_marine)
-#There are 106 plots that should get a "marine" indicator since they are within 10m of another plot (but on another TRANSECT) that has a marine indicator
-
-plots_marine_joined_should_marine <-plots_marine_joined_should_marine %>% st_set_geometry(NULL)
-plots_marine_joined_should_marine<-as.data.frame(plots_marine_joined_should_marine)
-plots_should_marine<-plots_marine_joined_should_marine %>% dplyr::select(unq_plot_not_marine) %>% droplevels()
-head(plots_should_marine)
-
-levels(plots_should_marine$unq_plot_not_marine)
-
-head(marine_by_plot_from_notes_selected)
-marine_by_plot_from_notes_selected$total_marine_evidence[(levels(marine_by_plot_from_notes_selected$unq_plot) %in% levels(plots_should_marine$unq_plot_not_marine))==TRUE]<-1
-
-head(marine_by_plot_from_notes_selected)
-
-write.csv(marine_by_plot_from_notes_selected, "C:Biodiversity idea//Output files//marine_by_plot_from_notes_selected.csv", row.names=FALSE)
+#This is only useful for by-transect analysis
+# Commenting this section out for now (April 2020), using for by-isl analysis so this part is unnecessary
+# 
+# ###Making sure that plots close to eachother get considered properly... see TB04SW for an eg of this problem... within 4m of an otter site but doesn't pick it up
+# library(sf)
+# library(raster)
+# library(spData)
+# library(tmap)    # for static and interactive maps
+# library(leaflet) # for interactive maps
+# library(maphead) # for interactive maps
+# library(ggplot2) # tidyverse vis package
+# library(shiny)
+# library(rgdal) # spatial/shp reading
+# library(viridis) # nice color palette
+# library(ggmap) # ggplot functionality for maps ---> dplyr, purr is dependency
+# library(ggsn) # for scale bars/north arrows in ggplots
+# library(maps)
+# library(mapdata)
+# library(here)
+# 
+# 
+# 
+# by_plot_master<-marine_by_plot_from_notes_selected %>% dplyr::select(unq_plot, unq_tran, easting, northing, total_marine_evidence)
+# head(by_plot_master)
+# 
+# by_plot_master_marine<-by_plot_master %>% filter(total_marine_evidence >0)
+# by_plot_master_not_marine<-by_plot_master %>% filter(total_marine_evidence == 0)
+# 
+# data_subset3_marine <- by_plot_master_marine[ , c("easting", "northing")]
+# by_plot_master_marine_no_na<- by_plot_master_marine[complete.cases(data_subset3_marine), ]
+# df.SF_plot_marine <- st_as_sf(by_plot_master_marine_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+# df.SF_plot_simple_marine<-df.SF_plot_marine[,1:2]
+# df.SF_plot_simple_marine_new<- df.SF_plot_simple_marine %>% st_transform(3035) 
+# head(df.SF_plot_simple_marine_new)
+# 
+# data_subset3_not_marine <- by_plot_master_not_marine[ , c("easting", "northing")]
+# by_plot_master_not_marine_no_na<- by_plot_master_not_marine[complete.cases(data_subset3_not_marine), ]
+# df.SF_plot_not_marine <- st_as_sf(by_plot_master_not_marine_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+# df.SF_plot_simple_not_marine<-df.SF_plot_not_marine[,1:2]
+# df.SF_plot_simple_not_marine_new<- df.SF_plot_simple_not_marine %>% st_transform(3035) 
+# head(df.SF_plot_simple_not_marine_new)
+# colnames(df.SF_plot_simple_not_marine_new)[1]<-"unq_plot_not_marine"
+# colnames(df.SF_plot_simple_not_marine_new)[2]<-"unq_tran_not_marine"
+# 
+# #https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
+# 
+# # Buffer circles by 10m -- creates polygons around the 
+# marine_circles <- st_buffer(df.SF_plot_simple_marine_new, dist = 10)
+# 
+# #which of the not-marine plots fall within 10m radius of the marine plots
+# plots_marine_joined <- st_join(df.SF_plot_simple_not_marine_new, marine_circles, left=FALSE)
+# 
+# head(plots_marine_joined)
+# ### Alright so this is a big list because there are plots every 10 m along the same trasnsect so I only really need to do this for when the transects dont 
+# #match up
+# #the transects will get captured when we collect by transect later.... 
+# 
+# #fuzzy matching
+# # install.packages("stringdist")
+# library(stringdist)
+# plots_marine_joined$stringdist<-stringdist(plots_marine_joined$unq_tran_not_marine, plots_marine_joined$unq_tran)
+# 
+# 
+# head(plots_marine_joined)
+# 
+# plots_marine_joined_should_marine <- plots_marine_joined %>% filter(stringdist>0) 
+# head(plots_marine_joined_should_marine)
+# #There are 106 plots that should get a "marine" indicator since they are within 10m of another plot (but on another TRANSECT) that has a marine indicator
+# 
+# plots_marine_joined_should_marine <-plots_marine_joined_should_marine %>% st_set_geometry(NULL)
+# plots_marine_joined_should_marine<-as.data.frame(plots_marine_joined_should_marine)
+# plots_should_marine<-plots_marine_joined_should_marine %>% dplyr::select(unq_plot_not_marine) %>% droplevels()
+# head(plots_should_marine)
+# 
+# levels(plots_should_marine$unq_plot_not_marine)
+# 
+# head(marine_by_plot_from_notes_selected)
+# marine_by_plot_from_notes_selected$total_marine_evidence[(levels(marine_by_plot_from_notes_selected$unq_plot) %in% levels(plots_should_marine$unq_plot_not_marine))==TRUE]<-1
+# 
+# head(marine_by_plot_from_notes_selected)
+# 
+# write.csv(marine_by_plot_from_notes_selected, "C:Biodiversity idea//Output files//marine_by_plot_from_notes_selected.csv", row.names=FALSE)
 
 
 
@@ -271,6 +273,17 @@ head(marine_by_tran_combined_pres_abs)
 write.csv(marine_by_tran_combined_pres_abs, "C:Biodiversity idea//Output files//marine_by_tran_combined_pres_abs.csv", row.names=FALSE)
 
 
+
+
+
+
+
+
+
+
+
+
+###### Plotting 
 
 ggplot(master_transect, aes(y=d15n, x=otter_pres_all))+geom_point()
 

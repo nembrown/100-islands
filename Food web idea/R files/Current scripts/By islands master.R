@@ -142,7 +142,7 @@ soil_s<-read.csv("C:Food web idea/Data by person/Norah.data/soil_s.csv")
 head(soil_s)
 
 soil_owen_deb<-merge(soil_owen_deb, soil_s[,-3], by="unq_plot", all=TRUE)
-
+head(soil_owen_deb)
 #NOW we want to cut down to one value per island: 
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
@@ -775,10 +775,23 @@ by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_ri
 
 #head(soil_owen_deb)
 node.adding<-soil_owen_deb[,c(8,9)]
-#head(node.adding)
-node.adding<-unique(node.adding)
+head(node.adding)
+#node.adding<-unique(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
+
+
+marine_by_tran_combined<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combined.csv")
+head(marine_by_tran_combined)
+marine_by_tran_combined$unq_isl<-str_sub(marine_by_tran_combined$unq_tran, end=-2)
+
+marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
+
+marine_by_tran_combined_isl <- marine_by_tran_combined %>% dplyr::select(unq_isl, otter_pres_all) %>% group_by(unq_isl) %>%  summarise_all(funs(sum))
+View(marine_by_tran_combined_isl)
+hist(marine_by_tran_combined_isl$otter_pres_all, breaks=10)
+
+by_isl_master<-merge(by_isl_master, marine_by_tran_combined_isl, by="unq_isl")
 
 write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
 head(by_isl_master)
