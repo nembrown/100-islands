@@ -259,7 +259,7 @@ Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords_transect[,-4]
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names = FALSE)
 
-
+View(Deb_Owen_veg_combined_complete_filled)
 head(Deb_Owen_veg_coords)
 
 # Mean for each island ----------------------------------------------------

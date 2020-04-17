@@ -82,7 +82,7 @@ N15_model_simple_nocat_alt<-'
         marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
         '
 
-fit_simple_nocat_alt <- sem(N15_model_simple_nocat_alt, data=master_transect, missing="ml.x")
+fit_simple_nocat_alt <- sem(N15_model_simple_nocat_alt, data=master_transect, missing="ml.x", std.lv=TRUE)
 summary(fit_simple_nocat_alt, fit.measures=TRUE)
 varTable(fit_simple_nocat_alt)
 
