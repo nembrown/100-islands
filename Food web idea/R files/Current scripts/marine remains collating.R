@@ -23,10 +23,11 @@ library(tidyverse)
 # Data from Chris Ernst ---------------------------------------------------
 #data from Chris Ernst's plots on trapline
 marine_by_plot_from_chris<- read.csv("C:Food web idea//Data by person//Chris.data//chris_habitat.csv", header=TRUE, sep=",")
-head(marine_by_plot_from_chris)
 marine_by_plot_from_chris$unq_tran<- paste(marine_by_plot_from_chris$island,marine_by_plot_from_chris$direction)
 marine_by_plot_from_chris$unq_tran<-gsub(" ", "", marine_by_plot_from_chris$unq_tran, fixed = TRUE)
-
+marine_by_plot_from_chris$unq_isl<-marine_by_plot_from_chris$island
+marine_by_plot_from_chris$unq_plot<-paste(marine_by_plot_from_chris$island,marine_by_plot_from_chris$direction,"q", marine_by_plot_from_chris$quadrat)
+marine_by_plot_from_chris$unq_plot<-gsub(" ", "", marine_by_plot_from_chris$unq_plot, fixed = TRUE)
 
 marine_by_plot_from_chris$otter_pres_chris <- ifelse(grepl("otter|ottre|latrine|nearotter", marine_by_plot_from_chris$marine), 1, 0)
 marine_by_plot_from_chris$marine_invert_pres_chris <- ifelse(grepl("bivalve|shell|crab|abalone|ablone|limpet|geoduck|sea star|whelk|snail|chiton|clam|scallop|mussel|mussell|urchin|claw|carapace|tube worm|barnacle", marine_by_plot_from_chris$marine), 1, 0)
@@ -36,6 +37,17 @@ marine_by_plot_from_chris$eagle_pres_chris <- ifelse(grepl("eagle", marine_by_pl
 marine_by_plot_from_chris$raven_pres_chris <- ifelse(grepl("raven", marine_by_plot_from_chris$marine), 1, 0)
 marine_by_plot_from_chris$driftwood_chris <- ifelse(grepl("driftwood", marine_by_plot_from_chris$marine), 1, 0)
 marine_by_plot_from_chris$seaweed_chris <- ifelse(grepl("seaweed|algae|fucus|kelp", marine_by_plot_from_chris$marine), 1, 0)
+
+head(marine_by_plot_from_chris)
+
+marine_by_isl_from_chris_selected<-marine_by_plot_from_chris %>% 
+  dplyr::select(unq_isl, otter_pres_chris) %>% 
+  group_by(unq_isl) %>%   
+  summarise_all(list(otter_chris_plot_sum=sum, n_otter_chris_plots=length))
+
+View(marine_by_isl_from_chris_selected)
+hist(marine_by_isl_from_chris_selected$n_otter_chris_plots)
+# minimum is 19 but 3 from transects NESW and 7 is lowest from interior. 
 
 marine_by_tran_from_chris_selected<-marine_by_plot_from_chris %>% 
   dplyr::select(unq_tran, otter_pres_chris, unk_bird_pres_chris, marine_invert_pres_chris, driftwood_chris, seaweed_chris,  fish_chris) %>% 
@@ -85,7 +97,6 @@ marine_by_plot_from_notes$mink <- ifelse(grepl("mink", marine_by_plot_from_notes
 marine_by_plot_from_notes$fish <- ifelse(grepl("fish|rockfish|marine vertebrae", marine_by_plot_from_notes$notes), 1, 0)
 marine_by_plot_from_notes$mammal_bones <- ifelse(grepl("mammal bones|mammale bones", marine_by_plot_from_notes$notes), 1, 0)
 
-head(marine_by_plot_from_notes)
 
 marine_by_plot_from_notes_selected<-marine_by_plot_from_notes %>% dplyr::select(unq_plot, easting, northing, otter_pres, eagle_pres, raven_pres, unk_bird_pres, marine_invert_pres, driftwood, midden, seaweed, mink, fish, mammal_bones )
 head(marine_by_plot_from_notes_selected)
@@ -98,42 +109,53 @@ marine_by_plot_from_notes_selected[duplicated(marine_by_plot_from_notes_selected
 
 
 head(marine_by_plot_from_notes_selected)
+key<-marine_by_plot_from_notes_selected
+key$unq_tran<-str_sub(key$unq_plot, end=-2)
+key$plot<-str_sub(key$unq_plot, start=-1)
+key<-key[, c("unq_plot", "unq_tran", "plot")]
+head(key)
 
-owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-length(unique(owen_key$unq_tran))
-
-owen_key<- owen_key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+key<- key %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
 
 #these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
-owen_key$unq_tran[owen_key$unq_plot=="CV04SN25"]<-"CV04S"
-owen_key$unq_tran[owen_key$unq_plot=="MM04WE25"]<-"MM04W"
-owen_key$unq_tran[owen_key$unq_plot=="MM08NS25"]<-"MM08N"
-owen_key$unq_tran[owen_key$unq_plot=="PR05EW25"]<-"PR05E"
-owen_key$unq_tran[owen_key$unq_plot=="PR06EW25"]<-"PR06E"
-owen_key$unq_tran[owen_key$unq_plot=="TQ02NS25"]<-"TQ02N"
-owen_key$unq_tran[owen_key$unq_plot=="TQ05EW25"]<-"TQ05E"
-owen_key$unq_tran[owen_key$unq_plot=="MM01WE15"]<-"MM01W"
-owen_key$unq_tran[owen_key$unq_plot=="MM03WE15"]<-"MM03W"
-owen_key$unq_tran[owen_key$unq_plot=="MM08EW15"]<-"MM08E"
-owen_key$unq_tran[owen_key$unq_plot=="TQ06EW15"]<-"TQ06E"
+key$unq_tran[key$unq_plot=="CV04SN25"]<-"CV04S"
+key$unq_tran[key$unq_plot=="MM04WE25"]<-"MM04W"
+key$unq_tran[key$unq_plot=="MM08NS25"]<-"MM08N"
+key$unq_tran[key$unq_plot=="PR05EW25"]<-"PR05E"
+key$unq_tran[key$unq_plot=="PR06EW25"]<-"PR06E"
+key$unq_tran[key$unq_plot=="TQ02NS25"]<-"TQ02N"
+key$unq_tran[key$unq_plot=="TQ05EW25"]<-"TQ05E"
+key$unq_tran[key$unq_plot=="MM01WE15"]<-"MM01W"
+key$unq_tran[key$unq_plot=="MM03WE15"]<-"MM03W"
+key$unq_tran[key$unq_plot=="MM08EW15"]<-"MM08E"
+key$unq_tran[key$unq_plot=="TQ06EW15"]<-"TQ06E"
 
 #this transect was only 3 plots long, two exterior and one interior.... so plot #3 is East
-owen_key$unq_tran[owen_key$unq_plot=="AD03WE3"]<-"AD03E"
-owen_key$unq_tran[owen_key$unq_plot=="CV14SN3"]<-"CV14N"
-owen_key$unq_tran[owen_key$unq_plot=="CV14EW3"]<-"CV14W"
-owen_key$unq_tran[owen_key$unq_plot=="MM07NS3"]<-"MM07S"
-owen_key$unq_tran[owen_key$unq_plot=="ST09WE3"]<-"ST09E"
+key$unq_tran[key$unq_plot=="AD03WE3"]<-"AD03E"
+key$unq_tran[key$unq_plot=="CV14SN3"]<-"CV14N"
+key$unq_tran[key$unq_plot=="CV14EW3"]<-"CV14W"
+key$unq_tran[key$unq_plot=="MM07NS3"]<-"MM07S"
+key$unq_tran[key$unq_plot=="ST09WE3"]<-"ST09E"
 
-head(owen_key)
-owen_key_subset<-owen_key %>% dplyr::select(unq_plot, unq_tran)
-
-
-marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, owen_key_subset, by="unq_plot", all.x=TRUE)
+head(key)
+key_subset<-key %>% dplyr::select(unq_plot, unq_tran)
 
 
+marine_by_plot_from_notes_selected<-merge(marine_by_plot_from_notes_selected, key_subset, by="unq_plot", all.x=TRUE)
+head(marine_by_plot_from_notes_selected)
+marine_by_plot_from_notes_selected$unq_isl<-str_sub(marine_by_plot_from_notes_selected$unq_tran, end=4)
+# 
+# marine_by_plot_from_notes_selected_isl<-marine_by_plot_from_notes_selected
+# 
+# marine_by_plot_from_notes_selected_isl$unq_isl<-str_sub(marine_by_plot_from_notes_selected_isl$unq_tran, end=4)
+# head(marine_by_plot_from_notes_selected_isl)
+# 
+# 
+# marine_by_plot_from_notes_selected_isl <- marine_by_plot_from_notes_selected_isl %>% dplyr::select(unq_isl, otter_pres) %>% group_by(unq_isl) %>%  summarise_all(list(sum = sum, n=length))
+# View(marine_by_plot_from_notes_selected_isl)
 
 # Matching plots within 10m radius ----------------------------------------
 
@@ -275,12 +297,34 @@ write.csv(marine_by_tran_combined_pres_abs, "C:Biodiversity idea//Output files//
 
 
 
+########### combing chris' plot level data with owen's plot-level data
+#Owen:
+head(marine_by_plot_from_notes_selected)
+owen_otter<-marine_by_plot_from_notes_selected[ ,c("unq_plot", "unq_isl", "otter_pres")]
+
+#chris
+head(marine_by_plot_from_chris)
+marine_by_plot_from_chris$otter_pres<-marine_by_plot_from_chris$otter_pres_chris  
+chris_otter<-marine_by_plot_from_chris[, c("unq_plot", "unq_isl", "otter_pres")]
+
+#did they do the same islands? 
+#what's in owen's but not chris'? 
+subset(owen_otter, !(unq_isl %in% chris_otter$unq_isl)) %>% select(unq_isl, otter_pres) %>% group_by(unq_isl) %>% summarise_all(list(sum, length))
+#CV15, MM07, ST01, ST08, TQ12
+
+#what's in chris's but not owen's? 
+subset(chris_otter, !(unq_isl %in% owen_otter$unq_isl)) %>% select(unq_isl, otter_pres) %>% group_by(unq_isl) %>% summarise_all(list(sum, length))
+#MM09, MM10, MM11
+
+combined_otter<-rbind(owen_otter, chris_otter)
+head(combined_otter)
 
 
 
+combined_otter_sum <- combined_otter %>% dplyr::select(unq_isl, otter_pres) %>% group_by(unq_isl) %>%  summarise_all(list(sum = sum, n=length))
+combined_otter_sum$prop_otter<-combined_otter_sum$sum/combined_otter_sum$n
 
-
-
+View(combined_otter_sum)
 
 
 ###### Plotting 

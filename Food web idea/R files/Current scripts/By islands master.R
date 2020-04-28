@@ -787,7 +787,7 @@ marine_by_tran_combined$unq_isl<-str_sub(marine_by_tran_combined$unq_tran, end=-
 
 marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
 
-marine_by_tran_combined_isl <- marine_by_tran_combined %>% dplyr::select(unq_isl, otter_pres_all) %>% group_by(unq_isl) %>%  summarise_all(funs(sum))
+marine_by_tran_combined_isl <- marine_by_tran_combined %>% dplyr::select(unq_isl, otter_pres_all) %>% group_by(unq_isl) %>%  summarise_all(list(sum = sum, n=length))
 View(marine_by_tran_combined_isl)
 hist(marine_by_tran_combined_isl$otter_pres_all, breaks=10)
 
