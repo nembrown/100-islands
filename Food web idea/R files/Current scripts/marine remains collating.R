@@ -39,6 +39,7 @@ marine_by_plot_from_chris$driftwood_chris <- ifelse(grepl("driftwood", marine_by
 marine_by_plot_from_chris$seaweed_chris <- ifelse(grepl("seaweed|algae|fucus|kelp", marine_by_plot_from_chris$marine), 1, 0)
 
 head(marine_by_plot_from_chris)
+length(unique(marine_by_plot_from_chris$island))
 
 marine_by_isl_from_chris_selected<-marine_by_plot_from_chris %>% 
   dplyr::select(unq_isl, otter_pres_chris) %>% 
@@ -319,12 +320,15 @@ subset(chris_otter, !(unq_isl %in% owen_otter$unq_isl)) %>% select(unq_isl, otte
 combined_otter<-rbind(owen_otter, chris_otter)
 head(combined_otter)
 
+write.csv(combined_otter, "C:Biodiversity idea//Output files//combined_otter.csv", row.names=FALSE)
 
 
-combined_otter_sum <- combined_otter %>% dplyr::select(unq_isl, otter_pres) %>% group_by(unq_isl) %>%  summarise_all(list(sum = sum, n=length))
-combined_otter_sum$prop_otter<-combined_otter_sum$sum/combined_otter_sum$n
 
-View(combined_otter_sum)
+
+combined_otter_sum <- combined_otter %>% dplyr::select(unq_isl, otter_pres) %>% group_by(unq_isl) %>%  summarise_all(list(otter_pres_all = sum, otter_n_plots=length))
+# combined_otter_sum$prop_otter<-combined_otter_sum$sum/combined_otter_sum$n
+
+head(combined_otter_sum)
 
 
 ###### Plotting 
