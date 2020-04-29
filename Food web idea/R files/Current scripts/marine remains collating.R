@@ -320,7 +320,6 @@ subset(chris_otter, !(unq_isl %in% owen_otter$unq_isl)) %>% select(unq_isl, otte
 combined_otter<-rbind(owen_otter, chris_otter)
 head(combined_otter)
 
-write.csv(combined_otter, "C:Biodiversity idea//Output files//combined_otter.csv", row.names=FALSE)
 
 
 
@@ -329,6 +328,8 @@ combined_otter_sum <- combined_otter %>% dplyr::select(unq_isl, otter_pres) %>% 
 # combined_otter_sum$prop_otter<-combined_otter_sum$sum/combined_otter_sum$n
 
 head(combined_otter_sum)
+write.csv(combined_otter_sum, "C:Biodiversity idea//Output files//combined_otter_sum.csv", row.names=FALSE)
+
 
 
 ###### Plotting 
