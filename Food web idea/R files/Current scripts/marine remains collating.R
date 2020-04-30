@@ -301,12 +301,13 @@ write.csv(marine_by_tran_combined_pres_abs, "C:Biodiversity idea//Output files//
 ########### combing chris' plot level data with owen's plot-level data
 #Owen:
 head(marine_by_plot_from_notes_selected)
-owen_otter<-marine_by_plot_from_notes_selected[ ,c("unq_plot", "unq_isl", "otter_pres")]
+owen_otter<-marine_by_plot_from_notes_selected[ ,c("unq_plot", "unq_tran", "unq_isl", "otter_pres")]
+View(owen_otter)
 
 #chris
 head(marine_by_plot_from_chris)
 marine_by_plot_from_chris$otter_pres<-marine_by_plot_from_chris$otter_pres_chris  
-chris_otter<-marine_by_plot_from_chris[, c("unq_plot", "unq_isl", "otter_pres")]
+chris_otter<-marine_by_plot_from_chris[, c("unq_plot", "unq_tran", "unq_isl", "otter_pres")]
 
 #did they do the same islands? 
 #what's in owen's but not chris'? 
@@ -320,14 +321,16 @@ subset(chris_otter, !(unq_isl %in% owen_otter$unq_isl)) %>% select(unq_isl, otte
 combined_otter<-rbind(owen_otter, chris_otter)
 head(combined_otter)
 
-
-
-
+combined_otter_sum_tran <- combined_otter %>% dplyr::select(unq_tran, otter_pres) %>% group_by(unq_tran) %>%  summarise_all(list(otter_pres_all = sum, otter_n_plots=length))
+head(combined_otter_sum_tran)
+combined_otter_sum_tran$takeout <- ifelse(grepl("NE|NW|SE|SW|I",combined_otter_sum_tran$unq_tran), 1, 0)
+combined_otter_sum_tran<-combined_otter_sum_tran %>% filter(takeout==0)
+View(combined_otter_sum_tran)
 
 combined_otter_sum <- combined_otter %>% dplyr::select(unq_isl, otter_pres) %>% group_by(unq_isl) %>%  summarise_all(list(otter_pres_all = sum, otter_n_plots=length))
 # combined_otter_sum$prop_otter<-combined_otter_sum$sum/combined_otter_sum$n
 
-head(combined_otter_sum)
+View(combined_otter_sum)
 write.csv(combined_otter_sum, "C:Biodiversity idea//Output files//combined_otter_sum.csv", row.names=FALSE)
 
 

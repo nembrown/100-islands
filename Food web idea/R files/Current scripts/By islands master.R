@@ -780,25 +780,18 @@ head(node.adding)
 by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
 
 
+combined_otter_sum<-read.csv("C:Biodiversity idea//Output files//combined_otter_sum.csv")
 
-marine_by_tran_combined<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combined.csv")
-head(marine_by_tran_combined)
-marine_by_tran_combined$unq_isl<-str_sub(marine_by_tran_combined$unq_tran, end=-2)
 
-marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
-
-marine_by_tran_combined_isl <- marine_by_tran_combined %>% dplyr::select(unq_isl, otter_pres_all) %>% group_by(unq_isl) %>%  summarise_all(list(sum = sum, n=length))
-View(marine_by_tran_combined_isl)
-hist(marine_by_tran_combined_isl$otter_pres_all, breaks=10)
-
-by_isl_master<-merge(by_isl_master, marine_by_tran_combined_isl, by="unq_isl")
+by_isl_master<-merge(by_isl_master, combined_otter_sum, by="unq_isl")
 
 write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
 head(by_isl_master)
 
 
+ggplot(by_isl_master, aes(y=d15n, x=log(((otter_pres_all)/(otter_n_plots))+1))) + geom_point() + geom_smooth()
 
-
+       
 
 
 
