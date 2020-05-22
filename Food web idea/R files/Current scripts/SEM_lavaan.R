@@ -1,6 +1,8 @@
+# updated since taking the workshop
 
 # load libraries and data -------------------------------------------------------
 library(lavaan)
+library(semPlot)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 head(master_transect)
 
@@ -15,35 +17,42 @@ master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_
 str(master_transec_sem_subset)
 
 
+
+##3 I think I need to do this at the island levell to reduce the # of missing values.... ??
+#what about PANOrml and distance to neighbours .... 
+
+
 # Simple non-categorical model  -------------------------------------------------------
 
 N15_model_simple_nocat<-'
           
-          human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
-
-          marine_animal_biomass_shore ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE  + human_pres
-
-          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
+        fish_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
+        
+        bycatch_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
           
-          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
+        otter_pres_all ~  fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_Area + slope
+          
+        ravens ~  fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_Area
+        
+        log_site_sum_by_isl ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + log_Area
 
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_biomass_bym3_mean
+        human_pres ~ fish_biomass_bym3_mean + bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area + SLOPE 
 
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ bycatch_biomass_bym3_mean
+        marine_animal_biomass_shore ~ ravens + otter_pres_all  + human_pres
 
+        d15n ~ a1*log_site_sum_by_isl + h1*human_pres + o1*marine_animal_biomass_shore + slope
 
         #latent variables measurement models
-        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness
-        algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all
-        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
+        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness 
+        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all 
         '
 
-fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transect, group="super_node")
+fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transect, std.lv=TRUE, missing="ml")
 summary(fit_simple_nocat, fit.measures=TRUE)
-modindices(fit_simple_nocat)
-residuals(fit_simple_nocat, type="cor")
-modI<-modificationIndices(fit_simple_nocat, standardized=F)
-modI[modI$mi<3,]
+modindices(fit_simple_nocat, sort.=TRUE, minimum.value=10)
+
+semPaths(fit_simple_nocat, whatLabels="est", intercepts="FALSE", layout="tree2")
+
 
 
 library(MVN)
@@ -77,7 +86,7 @@ N15_model_simple_nocat_alt<-'
 
 
         #latent variables measurement models
-        human_pres =~ distance_to_midden + distance_to_fish + cult_imp_plant_richness 
+        human_pres =~ distance_to_midden  + cult_imp_plant_richness 
         algae_biomass_shore =~ log_site_sum_by_isl + seaweed_all
         marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
         '
