@@ -30,7 +30,7 @@ N15_model_simple_nocat<-'
         
         bycatch_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
           
-        otter_pres_all ~  fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_Area + slope
+        otter_pres_all ~  fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_Area + slope + PA_norml
           
         ravens ~  fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + log_Area
         
