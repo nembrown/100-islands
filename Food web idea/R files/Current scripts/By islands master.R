@@ -744,7 +744,7 @@ by_isl_master<-merge(by_isl_master, katie_richness, by="unq_isl", all=TRUE)
 
 # Tiidying up -------------------------------------------------------------
 
-#head(by_isl_master)
+head(by_isl_master)
 
 by_isl_master$log_Area<-log(by_isl_master$Area)
 by_isl_master$log_SITE_SUM<-log(by_isl_master$SITE_SUM+1)
@@ -755,43 +755,25 @@ by_isl_master_habitat<-by_isl_master[,24:28]
 by_isl_master$habitat_het<-diversity(by_isl_master_habitat)
 #head(by_isl_master)
 by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_richness+by_isl_master$insect_richness+by_isl_master$bird.richness+by_isl_master$mammal_richness
-#head(by_isl_master)
-
-# 
-# #Label small islands as those with Area less than 6000m2
-# levels <- c(-Inf, 6000, Inf)
-# xs2=quantile(na.omit(by_isl_master$Area),c(0,1/2,1))
-# xs2
-# xs=quantile(na.omit(by_isl_master$Area),c(0,0.25,0.75,1))
-# xs
-# xs3=quantile(na.omit(by_isl_master$d15n),c(0,0.25, 0.75,1))
-# 
-# labels <- c("small", "medium", "large")
-# labels2 <- c("small", "large")
-# labels3 <- c("low 15N", "med 15N", "high 15N")
-# by_isl_master<- by_isl_master %>% mutate(size.cat = cut(Area, xs, labels = labels))
-# by_isl_master<- by_isl_master %>% mutate(size.cat2 = cut(Area, xs2, labels = labels2))
-# by_isl_master<- by_isl_master %>% mutate(d15n.cat = cut(d15n, xs3, labels = labels3))
-
-#head(soil_owen_deb)
-node.adding<-soil_owen_deb[,c(8,9)]
-head(node.adding)
-#node.adding<-unique(node.adding)
-by_isl_master<-merge(by_isl_master, node.adding, by="unq_isl", all=TRUE)
-
-
-combined_otter_sum<-read.csv("C:Biodiversity idea//Output files//combined_otter_sum.csv")
-
-
-by_isl_master<-merge(by_isl_master, combined_otter_sum, by="unq_isl")
-
-write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
 head(by_isl_master)
 
+by_isl_master$node<-str_sub(by_isl_master$unq_isl, end=2)
 
-ggplot(by_isl_master, aes(y=d15n, x=log(((otter_pres_all)/(otter_n_plots))+1))) + geom_point() + geom_smooth()
 
-       
+# combined_otter_sum<-read.csv("C:Biodiversity idea//Output files//combined_otter_sum.csv")
+
+
+by_isl_master<-merge(by_isl_master, owen_otter_edge_isl, by="unq_isl")
+
+write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
+
+head(by_isl_master)
+write.csv(by_isl_master, "C://Users//norah//Dropbox//Projects//Owen's MS//Owen_MS//Analysis Data//by_isl_master.csv", row.names=FALSE)
+
+
+ggplot(aes(x=log_Area, y=otter_pres), data=by_isl_master)+ geom_point()+geom_smooth()
+ggplot(aes(x=log_Area, y=otter_pres), data=by_isl_master)+ geom_point()+geom_smooth()
+
 
 
 

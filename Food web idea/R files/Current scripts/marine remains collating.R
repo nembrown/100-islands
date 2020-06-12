@@ -10,7 +10,7 @@
 #Or we could use a shoreline estimate, based on 8 of chris' plots + the 0m and 10m plots of owens to combine to 10 plots: marine_by_tran_combined
 #for SEM will do proportion of plots found in at least 8 plots - I think below that I will change to NA, so doesn't estimate
 
-#if we're doing by island, use: combined_otter_sum; which is a combo of the shoreline plots only (8 Chris Ernst, 2 Owen's), i.e. not interior 
+#if we're doing by island, use: combined_otter_sum; which is a combo of the shoreline plots only (8 Chris Ernst, 2 Owen's x 4 = 40), i.e. not interior 
 
 #load packages
 library(vegan)
@@ -264,4 +264,30 @@ combined_otter_sum <- combined_otter_sum %>% filter(otter_n_plots > 20)
 combined_otter_sum$prop_otter<-combined_otter_sum$otter_pres_all/combined_otter_sum$otter_n_plots
 head(combined_otter_sum)
 write.csv(combined_otter_sum, "C:Biodiversity idea//Output files//combined_otter_sum.csv", row.names=FALSE)
+write.csv(combined_otter_sum, "C://Users//norah//Dropbox//Projects//Owen's MS//Owen_MS//Analysis Data//combined_otter_sum.csv", row.names=FALSE)
 
+
+
+#alternative way to look at ist is the mean of the transect
+combined_otter_mean_tran <- combined_otter %>% dplyr::select(unq_tran, otter_pres) %>% group_by(unq_tran) %>%  summarise_all(list(otter_pres_all = sum, otter_n_plots=length))
+head(combined_otter_mean_tran)
+
+combined_otter_mean_tran<- combined_otter_mean_tran %>% filter(otter_n_plots > 8)
+combined_otter_mean_tran$prop_otter<-combined_otter_mean_tran$otter_pres_all/combined_otter_mean_tran$otter_n_plots
+combined_otter_mean_tran$unq_isl<-str_sub(combined_otter_mean_tran$unq_tran, end=4)
+
+combined_otter_mean_tran_isl<-combined_otter_mean_tran %>% group_by(unq_isl) %>%  summarise_if(is.numeric, mean, na.rm=TRUE)
+head(combined_otter_mean_tran_isl)
+write.csv(combined_otter_mean_tran_isl, "C://Users//norah//Dropbox//Projects//Owen's MS//Owen_MS//Analysis Data//combined_otter_mean_tran_isl.csv", row.names=FALSE)
+
+
+
+
+
+### Just looking at edge plots:
+head(marine_by_plot_from_notes_selected)
+marine_by_plot_from_notes_selected_shoreline_edge<- marine_by_plot_from_notes_selected %>% filter(plot == 1)
+owen_otter_edge<-marine_by_plot_from_notes_selected_shoreline_edge[ ,c("unq_plot", "unq_tran", "unq_isl", "otter_pres")]
+
+owen_otter_edge_isl <- owen_otter_edge %>% group_by(unq_isl) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+head(owen_otter_edge_isl)
