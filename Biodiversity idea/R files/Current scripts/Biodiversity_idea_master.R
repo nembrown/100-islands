@@ -69,6 +69,9 @@ by_tran_master_0m_2$d15N_over_N<-by_tran_master_0m_2$d15n/by_tran_master_0m_2$n
 
 
 head(by_tran_master_0m_2)
+
+by_tran_master_0m_2$slope_degrees<-(180*(atan(by_tran_master_0m_2$slope/100)))/pi
+
 #taking out unq_isl for merging purposes
 by_tran_master_0m_2<-by_tran_master_0m_2 %>% dplyr::select(-unq_isl)
 
@@ -98,6 +101,7 @@ by_tran_master_subset <- by_tran_master_subset %>% group_by(unq_tran)
 by_tran_master_subset$beachy_substrate<- ifelse(grepl("ROCK", by_tran_master_subset$SUBSTRATE), "0", "1")
 by_tran_master_subset$beachy_substrate<-as.character(by_tran_master_subset$beachy_substrate)
 by_tran_master_subset$beachy_substrate<-as.numeric(by_tran_master_subset$beachy_substrate)
+by_tran_master_subset$SLOPE_degrees<-(180*(atan(by_tran_master_subset$SLOPE/100)))/pi
 
 
 
@@ -211,19 +215,15 @@ head(fish_richness_merged_tran_arch_2)
 
 
 ### adding marine remains from owen and chris's notes - changed away from pres_abs
+combined_otter_mean_tran<- read.csv("C:Biodiversity idea//Output files//combined_otter_mean_tran.csv")
+head(combined_otter_mean_tran)
 
-marine_by_tran_combined<-read.csv("C:Biodiversity idea//Output files//marine_by_tran_combined.csv")
-head(marine_by_tran_combined)
-marine_by_tran_combined$otter_pres_all<-as.numeric(marine_by_tran_combined$otter_pres_all)
-marine_by_tran_combined$fish_all<-as.numeric(marine_by_tran_combined$fish_all)
-marine_by_tran_combined$marine_invert_pres_all<-as.numeric(marine_by_tran_combined$marine_invert_pres_all)
-
-fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, marine_by_tran_combined, by="unq_tran", all=TRUE)
+fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, combined_otter_mean_tran, by="unq_tran", all=TRUE)
 
 fish_richness_merged_tran_arch_2$unq_isl<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 4)
 fish_richness_merged_tran_arch_2$node<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 2)
 
-#View(fish_richness_merged_tran_arch_2)
+head(fish_richness_merged_tran_arch_2)
 
 
 ##### adding in island-level characteristics to the transect file
@@ -265,12 +265,19 @@ fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merg
 #master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
 master_transect<-fish_richness_merged_tran_arch_2
 
+
+head(master_transect)
+
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
 
 
 master_transect$unq_isl<-strtrim(master_transect$unq_tran, 4)
 master_transect$node<-strtrim(master_transect$unq_tran, 2)
+
+hist(master_transect$SLOPE_degrees)
+hist(master_transect$prop_fish, breaks=100)
+
 
 
 
