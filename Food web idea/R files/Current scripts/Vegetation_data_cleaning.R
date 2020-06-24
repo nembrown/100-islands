@@ -88,7 +88,7 @@ head(veg1x1_Deb_mod_interior_size_sum)
 
 #add this back to the main dataframe without the "species, layer, cover, notes" categories
 #make a transect that is the same as plot for Deb's (since each plot is it's own transect) 
-veg1x1_Deb_mod_interior_size_sum$unq_plot<-veg1x1_Deb_mod_interior_size_sum$unq_tran
+veg1x1_Deb_mod_interior_size_sum$unq_plot<-substr(veg1x1_Deb_mod_interior_size_sum$unq_tran, 5, 11)
 
 veg1x1_Deb_mod_interior_size_filtered<-merge(veg1x1_Deb_mod_interior_size_sum, veg1x1_Deb_mod_interior_shore)
 head(veg1x1_Deb_mod_interior_size_filtered)
@@ -197,7 +197,7 @@ deb_coords<-pointcount.gps[,-1]
 head(deb_coords)
 
 Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled,deb_coords,by="unq_tran", all.x = TRUE)
-
+head(Deb_Owen_veg_combined_complete_filled)
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names=FALSE)
 #### This is complete with no "bad" species- all are plnats, no bare ground etc.... 
@@ -215,119 +215,3 @@ head(marine_by_plot_from_plants)
 write.csv(marine_by_plot_from_plants, "Food web idea//Data by person//Norah.data/marine_by_plot_from_plants.csv", row.names=FALSE)
 
 head(marine_by_plot_from_plants)
-
-####################### below here I have left the same
-
-
-
-
-### add in coordinates
-owen_coords<-read.csv("C:Food web idea//Data by person//Becky.data//ofwi_tran_coords_mod_2.csv", header=TRUE, sep=",")
-owen_coords<-owen_coords[,c(1:9)]
-owen_coords$unq_tran<- paste(owen_coords$unq_isl,owen_coords$TRANSECT)
-owen_coords$unq_tran<-gsub(" ", "", owen_coords$unq_tran, fixed = TRUE)
-owen_coords<-owen_coords[,c(3,4, 10)]
-names(owen_coords)[1]<-"easting"
-names(owen_coords)[2]<-"northing"
-head(owen_coords)
-
-# kacey_coords<-read.csv("C:Food web idea//Data by person//Kacey.data//coords_final.csv", header=TRUE, sep=",")
-# head(kacey_coords)
-# kacey_coords<-kacey_coords[,-1]
-#
-
-
-
-
-pointcount.gps<-read.csv("C:Food web idea//Data by person//Deb.data//pointcounts.csv", header=TRUE, sep=",")
-pointcount.gps$pcid<-gsub(" ", "", pointcount.gps$pcid, fixed = TRUE)
-pointcount.gps<-pointcount.gps[,c(3,16,17)]
-pointcount.gps<-pointcount.gps[!duplicated(pointcount.gps$pcid),]
-#sometimes taken twice...  
-pointcount.gps$unq_tran<- paste("Deb",pointcount.gps$pcid, sep="_")
-deb_coords<-pointcount.gps[,-1]
-head(deb_coords)
-
-Deb_Owen_veg_coords<-rbind(deb_coords,owen_coords)
-Deb_Owen_veg_coords<-merge(Deb_Owen_veg_combined_complete_filled,Deb_Owen_veg_coords,by="unq_tran", all.x = TRUE)
-
-head(Deb_Owen_veg_coords)
-
-Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords %>%  group_by(unq_isl, unq_tran, species) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
-Deb_Owen_veg_coords_transect<-Deb_Owen_veg_coords_transect[,-4]
-
-
-write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names = FALSE)
-
-View(Deb_Owen_veg_combined_complete_filled)
-head(Deb_Owen_veg_coords)
-
-# Mean for each island ----------------------------------------------------
-
-#small islands
-Deb_Owen_veg_combined_complete_filled_small<-Deb_Owen_veg_combined_complete_filled[Deb_Owen_veg_combined_complete_filled$size.cat=="small",]
-
-length2 <- function (x, na.rm=FALSE) {if (na.rm) sum(!is.na(x))else length(x)}
-
-cdata.Deb_Owen_veg_combined_complete_filled_small <- summaryBy(cover ~ unq_isl + species, data=as.data.frame(Deb_Owen_veg_combined_complete_filled_small), FUN=function(x) { c(mean = mean(x, na.rm=TRUE), sd = sd(x, na.rm=TRUE), length=length2(x)) } )
-head(cdata.Deb_Owen_veg_combined_complete_filled_small )
-names(cdata.Deb_Owen_veg_combined_complete_filled_small)[5]<-"N"
-cdata.Deb_Owen_veg_combined_complete_filled_small$cover.se<-cdata.Deb_Owen_veg_combined_complete_filled_small$cover.sd/sqrt(cdata.Deb_Owen_veg_combined_complete_filled_small$N)
-cdata.Deb_Owen_veg_combined_complete_filled_small$size.cat<-"small"
-head(cdata.Deb_Owen_veg_combined_complete_filled_small)
-
-#call transect just all_together
-cdata.Deb_Owen_veg_combined_complete_filled_small$unq_tran<-"all_together"
-cdata.Deb_Owen_veg_combined_complete_filled_small<-cdata.Deb_Owen_veg_combined_complete_filled_small[,c(1,8,2:7)]
-
-
-
-
-#large islands
-Deb_Owen_veg_combined_complete_filled_large<-Deb_Owen_veg_combined_complete_filled[Deb_Owen_veg_combined_complete_filled$size.cat=="large",]
-head(Deb_Owen_veg_combined_complete_filled_large)
-
-#First separate by Deb and Owen
-Deb_Owen_veg_combined_complete_filled_large_Owen<-Deb_Owen_veg_combined_complete_filled_large[Deb_Owen_veg_combined_complete_filled_large$person=="Owen",]
-Deb_Owen_veg_combined_complete_filled_large_Deb<-Deb_Owen_veg_combined_complete_filled_large[Deb_Owen_veg_combined_complete_filled_large$person=="Deb",]
-
-Deb_Owen_veg_combined_complete_filled_large_Deb[duplicated(Deb_Owen_veg_combined_complete_filled_large_Deb),]
-head(Deb_Owen_veg_combined_complete_filled_large_Deb)
-#Deb's plots collapse into one interior transect
-Deb_Owen_veg_combined_complete_filled_large_Deb_mean<- Deb_Owen_veg_combined_complete_filled_large_Deb %>%  group_by(unq_isl, species)%>% summarise(cover.mean =mean(cover), cover.sd=sd(cover), N=length(cover))
-Deb_Owen_veg_combined_complete_filled_large_Deb_mean$cover.se<-Deb_Owen_veg_combined_complete_filled_large_Deb_mean$cover.sd/sqrt(Deb_Owen_veg_combined_complete_filled_large_Deb_mean$N)
-
-#give each island Deb combo a named transect
-Deb_Owen_veg_combined_complete_filled_large_Deb_mean <-Deb_Owen_veg_combined_complete_filled_large_Deb_mean  %>% mutate(unq_tran=paste(unq_isl, "Deb_interior", sep='_'))
-head(Deb_Owen_veg_combined_complete_filled_large_Deb_mean)
-
-
-#Owen's data collapse plot into transect'
-head(Deb_Owen_veg_combined_complete_filled_large_Owen)
-cdata.Deb_Owen_veg_combined_complete_filled_large_Owen <- summaryBy(cover ~ unq_isl + unq_tran + species, data=as.data.frame(Deb_Owen_veg_combined_complete_filled_large_Owen), FUN=function(x) { c(mean = mean(x, na.rm=TRUE), sd = sd(x, na.rm=TRUE), length=length2(x)) } )
-names(cdata.Deb_Owen_veg_combined_complete_filled_large_Owen)[6]<-"N"
-cdata.Deb_Owen_veg_combined_complete_filled_large_Owen$cover.se<-cdata.Deb_Owen_veg_combined_complete_filled_large_Owen$cover.sd/sqrt(cdata.Deb_Owen_veg_combined_complete_filled_large_Owen$N)
-head(cdata.Deb_Owen_veg_combined_complete_filled_large_Owen)
-
-
-#combined Owen and Deb's - large islands are now 5 transects per species: 4 Owen's and one interior. 
-Deb_Owen_veg_large<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_large_Owen, as.data.frame(Deb_Owen_veg_combined_complete_filled_large_Deb_mean[,c(1,7,2:6)]))
-
-#lot's of Nas replace with 0
-Deb_Owen_veg_large$cover.sd<-replace(Deb_Owen_veg_large$cover.sd, is.nan(Deb_Owen_veg_large$cover.sd), 0)
-head(Deb_Owen_veg_large)
-Deb_Owen_veg_large$size.cat<-"large"
-
-
-
-
-# Combine small and large islands back again: 
-head(cdata.Deb_Owen_veg_combined_complete_filled_small)
-head(Deb_Owen_veg_large)
-
-Veg_means_by_island<-rbind(cdata.Deb_Owen_veg_combined_complete_filled_small, Deb_Owen_veg_large)
-head(Veg_means_by_island)
-
-write.csv(Veg_means_by_island, "Food web idea//Data by person//Kalina.data/Veg_means_by_island.csv", row.names = FALSE)
-
-
