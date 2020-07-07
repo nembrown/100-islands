@@ -240,7 +240,7 @@ by_isl_master_col_names_tran<-c("unq_isl",
                                 "Rock", 
                                 "DistW_ML", 
                                 "Dist_Near", 
-                                "habitat_het", "elevation_max", "elevation_mean", "slope_mean", "NDVI_mean", "Neighb_250")
+                                "habitat_het", "elevation_max", "elevation_mean", "slope_mean", "NDVI_mean", "Neighb_250", "Bog_Water", "Bog_Vegetation")
 
 #ravens eagles site_sum_by_isl SLOPE PA_norml Rock slope_mean
 
@@ -250,8 +250,7 @@ by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_ma
 by_isl_master_subset_tran$log_Area<-log(by_isl_master_subset_tran$Area)
 
 #head(fish_richness_merged_tran_arch)
-fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_isl_master_subset_tran, by="unq_isl", all.y=TRUE)
-
+fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_isl_master_subset_tran, by="unq_isl", all.x=TRUE)
 fish_richness_merged_tran_arch_2$log_site_sum_by_isl <- log(fish_richness_merged_tran_arch_2$site_sum_by_isl+1)
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
@@ -259,6 +258,8 @@ fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2
 fish_richness_merged_tran_arch_2$log_DistW_ML<- log(fish_richness_merged_tran_arch_2$DistW_ML)
 fish_richness_merged_tran_arch_2$log_Dist_NearL<- log(fish_richness_merged_tran_arch_2$Dist_Near)
 fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merged_tran_arch_2$distance_to_midden)
+fish_richness_merged_tran_arch_2$Bog_area<- fish_richness_merged_tran_arch_2$Bog_Vegetation + fish_richness_merged_tran_arch_2$Bog_Water 
+fish_richness_merged_tran_arch_2$log_Bog_area<- log(fish_richness_merged_tran_arch_2$Bog_area+1)
 
 
 
@@ -266,16 +267,15 @@ fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merg
 master_transect<-fish_richness_merged_tran_arch_2
 
 
-head(master_transect)
-
-write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
-
-
 
 master_transect$unq_isl<-strtrim(master_transect$unq_tran, 4)
 master_transect$node<-strtrim(master_transect$unq_tran, 2)
 
-hist(master_transect$SLOPE_degrees)
+
+write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
+
+
+plot(master_transect$log_Area~ log(master_transect$Bog_area+1))
 hist(master_transect$prop_fish, breaks=100)
 
 
