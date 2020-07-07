@@ -20,7 +20,6 @@ library(betapart)
 library(bipartite)
 library(viridis)
 library(cowplot)
-#install.packages("forcats")
 library(forcats)
 
 
@@ -62,7 +61,7 @@ names(soil.deb)[1]<-"unq_plot"
 length(unique(soil.deb$unq_plot))
 #301 plots for deb
 head(soil.deb)
-
+soil.deb<-soil.deb[,-11]
 
 #####OWEN
 #owen's soil isotope data by plot
@@ -82,6 +81,9 @@ head(soil_clean)
 
 #Owen's key data
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+head(owen_key)
+#take uot isl will put in later
+owen_key<-owen_key[,-3]
 
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
@@ -104,7 +106,6 @@ head(owen_key_expanded)
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot")
-head(soil_merge)
 soil_merge$easting[soil_merge$unq_plot=="MM09WE1"]<-539907
 soil_merge$northing[soil_merge$unq_plot=="MM09WE1"]<-5766077
 soil_merge$easting[soil_merge$unq_plot=="MM09N1"]<-539916
@@ -119,7 +120,6 @@ soil_merge$northing[soil_merge$unq_plot=="MM11S1"]<-5767388
 
 # Combining Owen and Deb's soil data --------------------------------------
 col_names_selected<-c("unq_plot" ,
-                      "unq_isl" ,
                       "shore_dist" ,
                       "d13c" ,
                       "d15n" ,
@@ -145,10 +145,12 @@ soil_owen_deb<-merge(soil_owen_deb, soil_s[,-3], by="unq_plot", all=TRUE)
 head(soil_owen_deb)
 #NOW we want to cut down to one value per island: 
 
+soil_owen_deb$unq_isl<-strtrim(soil_owen_deb$unq_plot, 4)
+
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-head(soil_owen_deb_by_isl)
+View(soil_owen_deb_by_isl)
 length(unique(soil_owen_deb_by_isl$unq_isl))
-#100 islands 
+#99 islands 
 
 #we could change this to weight different points differently but here just a mean of all samples on the island...
 
@@ -157,8 +159,9 @@ length(unique(soil_owen_deb_by_isl$unq_isl))
 
 habitat_class<-read.csv("C:Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 
-head(habitat_class)
+habitat_class<-habitat_class[,-21]
 
+habitat_class$unq_isl<-habitat_class$Island_ID
 length(habitat_class$unq_isl)
 
 island_data_wiebe<-read.csv("C:Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
@@ -169,7 +172,8 @@ names(island_data_wiebe)[1]<-"unq_isl"
 habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,17,18,19)])
 
 habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by="unq_isl", all=TRUE)
-head(habitat_soil_by_isl)
+View(habitat_soil_by_isl)
+length(habitat_soil_by_isl$unq_isl)
 
 
 
@@ -270,6 +274,7 @@ longform_plant_percentcover3_isl$herb_cover<-rowSums(longform_plant_percentcover
 
 habitat_veg_soil_by_isl<-merge(habitat_soil_by_isl, longform_plant_percentcover3_isl, by="unq_isl", all=TRUE)
 head(habitat_veg_soil_by_isl)
+length(habitat_veg_soil_by_isl$unq_isl)
 
 
 
@@ -283,10 +288,12 @@ names(birdrichness)[4]<-"bird.density"
 birdrichness$bird.evenness<-birdrichness$evenness/(log(birdrichness$bird.richness))
 #head(birdrichness)
 
-habitat_veg_bird_soil_by_isl<-merge(habitat_veg_soil_by_isl, birdrichness[,c(1,4,6,11)], by.x="unq_isl", all=TRUE)
+habitat_veg_bird_soil_by_isl<-merge(habitat_veg_soil_by_isl, birdrichness[,c(1,4,6,11)], by="unq_isl", all=TRUE)
 #head(habitat_veg_bird_soil_by_isl)
 
-
+length(habitat_veg_bird_soil_by_isl$unq_isl)
+#101
+View(habitat_veg_bird_soil_by_isl)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
@@ -374,19 +381,17 @@ head(sara_habitat_merged_by_isl)
 habitat_veg_bird_wrack_soil_by_isl<-merge(habitat_veg_bird_soil_by_isl, sara_habitat_merged_by_isl, by="unq_isl", all=TRUE)
 head(habitat_veg_bird_wrack_soil_by_isl)
 
+length(habitat_veg_bird_wrack_soil_by_isl$unq_isl)
 
 
 # Adding in eagles and ravens pointcounts ---------------------------------------------
-
-
 ravens <- read.csv("C:Food web idea//Data by person//Deb.data/ravens.csv")
-
 cora.isls <- unique(ravens$island)
 cora.isls <- as.data.frame(cora.isls)
 cora.isls$ravens <- 1
 names(cora.isls) <- c("unq_isl", "ravens")
 
-by_isl_master<-merge(habitat_veg_bird_wrack_soil_by_isl, cora.isls, by.x="unq_isl", all=TRUE)
+by_isl_master<-merge(habitat_veg_bird_wrack_soil_by_isl, cora.isls, by="unq_isl", all=TRUE)
 
 eagles <- read.csv("C:Food web idea//Data by person//Deb.data/eagles.csv")
 baea.isls <- unique(eagles$island)
@@ -395,18 +400,15 @@ baea.isls$eagles <- 1
 names(baea.isls) <- c("unq_isl", "eagles")
 #head(baea.isls)
 
+by_isl_master <- merge(by_isl_master, baea.isls, all = TRUE)
 
-by_isl_master <- merge(by_isl_master, baea.isls, all.x = TRUE)
-
-by_isl_master$ravens[is.na(by_isl_master$ravens)] <- 0
-by_isl_master$eagles[is.na(by_isl_master$eagles)] <- 0
-#head(by_isl_master)
+head(by_isl_master)
+length(by_isl_master$unq_isl)
 
 
 # Chris insects -----------------------------------------------------------
 
 #new data July 2019 
-### NEED TO UPDATE DATA!!!!!!!
 chris_insects_master<-read.csv("C:Food web idea//Data by person//Chris.data//invert_id_abundance_v4.csv", header=TRUE, sep=",")
 head(chris_insects_master)
 chris_insects_master$unq_isl<-strtrim(chris_insects_master$Trapline, 4)
@@ -717,6 +719,7 @@ chris_insects_master_wide_richness<-merge(chris_insects_master_wide_richness, ch
 
 
 by_isl_master<-merge(by_isl_master, chris_insects_master_wide_richness, by="unq_isl", all=TRUE)
+length(by_isl_master$unq_isl)
 
 
 # Mammal richness ---------------------------------------------------------
@@ -740,6 +743,7 @@ katie_richness$mammal_richness<-specnumber(katie_mammals_wide[,-1])
 #head(katie_richness)
 
 by_isl_master<-merge(by_isl_master, katie_richness, by="unq_isl", all=TRUE)
+length(by_isl_master$unq_isl)
 
 
 # Tiidying up -------------------------------------------------------------
@@ -755,23 +759,21 @@ by_isl_master_habitat<-by_isl_master[,24:28]
 by_isl_master$habitat_het<-diversity(by_isl_master_habitat)
 #head(by_isl_master)
 by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_richness+by_isl_master$insect_richness+by_isl_master$bird.richness+by_isl_master$mammal_richness
-head(by_isl_master)
+
 
 by_isl_master$node<-str_sub(by_isl_master$unq_isl, end=2)
 
-
-# combined_otter_sum<-read.csv("C:Biodiversity idea//Output files//combined_otter_sum.csv")
-
-
+#otters
+owen_otter_edge_isl<- read.csv("C:Biodiversity idea//Output files//owen_otter_edge_isl.csv")
 by_isl_master<-merge(by_isl_master, owen_otter_edge_isl, by="unq_isl")
 
-write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
-
 head(by_isl_master)
+write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
 write.csv(by_isl_master, "C://Users//norah//Dropbox//Projects//Owen's MS//Owen_MS//Analysis Data//by_isl_master.csv", row.names=FALSE)
 
+length(by_isl_master$unq_isl)
 
-ggplot(aes(x=log_Area, y=otter_pres), data=by_isl_master)+ geom_point()+geom_smooth()
+
 ggplot(aes(x=log_Area, y=otter_pres), data=by_isl_master)+ geom_point()+geom_smooth()
 
 
