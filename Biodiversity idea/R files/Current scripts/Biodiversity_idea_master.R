@@ -230,7 +230,7 @@ head(fish_richness_merged_tran_arch_2)
 #head(fish_richness_merged_tran_arch)
 
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-head(by_isl_master)
+View(by_isl_master)
 by_isl_master_col_names_tran<-c("unq_isl",
                                 "Area",
                                 "PA_norml",

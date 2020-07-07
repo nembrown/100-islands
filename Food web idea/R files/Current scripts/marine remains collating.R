@@ -310,3 +310,6 @@ owen_otter_edge<-marine_by_plot_from_notes_selected_shoreline_edge[ ,c("unq_plot
 
 owen_otter_edge_isl <- owen_otter_edge %>% group_by(unq_isl) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(owen_otter_edge_isl)
+write.csv(owen_otter_edge_isl, "C://Users//norah//Dropbox//Projects//Owen's MS//Owen_MS//Analysis Data//owen_otter_edge_isl.csv", row.names=FALSE)
+write.csv(owen_otter_edge_isl, "C:Biodiversity idea//Output files//owen_otter_edge_isl.csv", row.names=FALSE)
+
