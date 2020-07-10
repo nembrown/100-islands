@@ -148,7 +148,7 @@ head(soil_owen_deb)
 soil_owen_deb$unq_isl<-strtrim(soil_owen_deb$unq_plot, 4)
 
 soil_owen_deb_by_isl<- soil_owen_deb %>%  group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-View(soil_owen_deb_by_isl)
+head(soil_owen_deb_by_isl)
 length(unique(soil_owen_deb_by_isl$unq_isl))
 #99 islands 
 
@@ -160,8 +160,9 @@ length(unique(soil_owen_deb_by_isl$unq_isl))
 habitat_class<-read.csv("C:Food web idea//Data by person//Pat.data//HabitatClass.csv", header=TRUE, sep=",")
 
 habitat_class<-habitat_class[,-21]
-
 habitat_class$unq_isl<-habitat_class$Island_ID
+habitat_class<-habitat_class[,-1]
+head(habitat_class)
 length(habitat_class$unq_isl)
 
 island_data_wiebe<-read.csv("C:Food web idea//Data by person//Pat.data//Islands_Master_Vegetation2017.csv", header=TRUE, sep=",")
@@ -172,7 +173,7 @@ names(island_data_wiebe)[1]<-"unq_isl"
 habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,17,18,19)])
 
 habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by="unq_isl", all=TRUE)
-View(habitat_soil_by_isl)
+head(habitat_soil_by_isl)
 length(habitat_soil_by_isl$unq_isl)
 
 
@@ -293,7 +294,7 @@ habitat_veg_bird_soil_by_isl<-merge(habitat_veg_soil_by_isl, birdrichness[,c(1,4
 
 length(habitat_veg_bird_soil_by_isl$unq_isl)
 #101
-View(habitat_veg_bird_soil_by_isl)
+head(habitat_veg_bird_soil_by_isl)
 
 # Adding in wrack richness and wrack habitat ------------------------------------------------
 
@@ -748,24 +749,19 @@ length(by_isl_master$unq_isl)
 
 # Tiidying up -------------------------------------------------------------
 
-head(by_isl_master)
-
+#Extras
 by_isl_master$log_Area<-log(by_isl_master$Area)
 by_isl_master$log_SITE_SUM<-log(by_isl_master$SITE_SUM+1)
 by_isl_master$log_site_sum_by_isl<-log(by_isl_master$site_sum_by_isl+1)
 by_isl_master$log_HAB2000<-log(by_isl_master$HAB2000+1)
-
-by_isl_master_habitat<-by_isl_master[,24:28]
+by_isl_master_habitat<-by_isl_master %>%  dplyr::select(Closed_Forest, Open_Forest_or_Dense_Shrub, Light_Shrub_or_Grassy, Bog_Vegetation, Bog_Water, Snags_Woody)
 by_isl_master$habitat_het<-diversity(by_isl_master_habitat)
-#head(by_isl_master)
 by_isl_master$total_richness<-by_isl_master$plant_richness+by_isl_master$tree_richness+by_isl_master$insect_richness+by_isl_master$bird.richness+by_isl_master$mammal_richness
-
-
 by_isl_master$node<-str_sub(by_isl_master$unq_isl, end=2)
 
 #otters
 owen_otter_edge_isl<- read.csv("C:Biodiversity idea//Output files//owen_otter_edge_isl.csv")
-by_isl_master<-merge(by_isl_master, owen_otter_edge_isl, by="unq_isl")
+by_isl_master<-merge(by_isl_master, owen_otter_edge_isl, by="unq_isl", all=TRUE)
 
 head(by_isl_master)
 write.csv(by_isl_master, "C:Food web idea//Data by person//Norah.data/by_isl_master.csv", row.names = FALSE)
