@@ -217,6 +217,7 @@ head(fish_richness_merged_tran_arch_2)
 ### adding marine remains from owen and chris's notes - changed away from pres_abs
 combined_otter_mean_tran<- read.csv("C:Biodiversity idea//Output files//combined_otter_mean_tran.csv")
 head(combined_otter_mean_tran)
+hist(combined_otter_mean_tran$pres_fish)
 
 fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, combined_otter_mean_tran, by="unq_tran", all=TRUE)
 
@@ -230,7 +231,7 @@ head(fish_richness_merged_tran_arch_2)
 #head(fish_richness_merged_tran_arch)
 
 by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
-View(by_isl_master)
+head(by_isl_master)
 by_isl_master_col_names_tran<-c("unq_isl",
                                 "Area",
                                 "PA_norml",
@@ -240,18 +241,17 @@ by_isl_master_col_names_tran<-c("unq_isl",
                                 "Rock", 
                                 "DistW_ML", 
                                 "Dist_Near", 
-                                "habitat_het", "elevation_max", "elevation_mean", "slope_mean", "NDVI_mean", "Neighb_250", "Bog_Water", "Bog_Vegetation")
-
-#ravens eagles site_sum_by_isl SLOPE PA_norml Rock slope_mean
+                                "habitat_het", "elevation_max", "elevation_mean", 
+                                "slope_mean", "NDVI_mean", "Neighb_250", "Bog_Water", "Bog_Vegetation")
 
 by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names_tran]
-###head(by_isl_master_subset)
+head(by_isl_master_subset_tran)
 
 by_isl_master_subset_tran$log_Area<-log(by_isl_master_subset_tran$Area)
 
 #head(fish_richness_merged_tran_arch)
 fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_isl_master_subset_tran, by="unq_isl", all.x=TRUE)
-fish_richness_merged_tran_arch_2$log_site_sum_by_isl <- log(fish_richness_merged_tran_arch_2$site_sum_by_isl+1)
+fish_richness_merged_tran_arch_2$log_site_mean_by_tran <- log(fish_richness_merged_tran_arch_2$site_mean_by_tran+1)
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock+1)
@@ -266,18 +266,14 @@ fish_richness_merged_tran_arch_2$log_Bog_area<- log(fish_richness_merged_tran_ar
 #master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
 master_transect<-fish_richness_merged_tran_arch_2
 
-
-
-master_transect$unq_isl<-strtrim(master_transect$unq_tran, 4)
-master_transect$node<-strtrim(master_transect$unq_tran, 2)
+View(master_transect)
 
 
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
 
 plot(master_transect$log_Area~ log(master_transect$Bog_area+1))
-hist(master_transect$prop_fish, breaks=100)
-
+hist(master_transect$site_mean_by_tran, breaks=100)
 
 
 
