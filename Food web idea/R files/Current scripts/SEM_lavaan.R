@@ -8,16 +8,16 @@ library(lavaan.survey)
 library(semPlot)
 library(MuMIn)
 library(mice)
+library(ggplot2)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
-View(master_transect)
+# View(master_transect)
 
 # # pair down the variables
-sem_variables_names<-c( "unq_tran","unq_isl", "fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+sem_variables_names<-c( "unq_tran","unq_isl", "fish_biomass_bym3_mean", "bycatch_biomass_bym3_mean",
                         "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                        "ravens", "midden_feature_sem", "fish_feature_sem", "cult_imp_plant_richness", "d15n",
-                        "prop_otter", "prop_marine_invert", "prop_fish", "distance_to_any_arch", "distance_to_midden",
+                        "ravens", "cult_imp_plant_richness", "d15n", "distance_to_midden",
                         "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                        "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area")
+                        "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "northing", "easting")
 
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
 str(master_transec_sem_subset)
@@ -26,10 +26,11 @@ master_transec_sem_subset$unq_isl<-as.factor(master_transec_sem_subset$unq_isl)
 
 summary(master_transec_sem_subset)
 
+View(master_transect)
 
-fml <- list( fish_biomass_bym3_mean + bycatch_biomass_bym3_mean + MEAN_kparea2k + MEAN_egarea2k +
-             SLOPE_degrees  + WAVE_EXPOSURE + beachy_substrate + slope_degrees + log_site_mean_by_tran +
-             midden_feature_sem + fish_feature_sem + cult_imp_plant_richness + d15n + distance_to_midden +
+
+fml <- list( fish_biomass_bym3_mean + bycatch_biomass_bym3_mean +
+             SLOPE_degrees  + WAVE_EXPOSURE + beachy_substrate + slope_degrees + log_site_mean_by_tran + cult_imp_plant_richness + d15n + distance_to_midden +
              distance_to_fish + log_MEAN_kparea2k + log_MEAN_egarea2k + pres_otter +
              pres_marine_invert + pres_fish  ~ 1 + (1|unq_isl) ,                                                 # Level 1
              log_Bog_area + log_Area +  PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
@@ -44,6 +45,7 @@ plot(imp, trace="all", print="sigma", pos=c(13,5))
 
 implist <- mitmlComplete(imp, "all")
 
+View(implist[[1]])
 #think about centering variables later - if there are no interactions (currently how it's described, it shouldn't be a problem)
 # # center variables, calculate interaction terms, ignore byproducts
 # center_colmeans <- function(x) {
@@ -98,23 +100,12 @@ implist <- mitmlComplete(imp, "all")
 
 
 
-master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, omit.cols = c("unq_tran","unq_isl", "prop_otter","pres_otter", "pres_marine_invert", "pres_fish", "ravens", "eagles"), center = TRUE, scale = FALSE)
+master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, omit.cols = c("northing", "easting","unq_tran","unq_isl", "prop_otter","pres_otter", "pres_marine_invert", "pres_fish", "ravens", "eagles"), center = TRUE, scale = FALSE)
 head(master_transec_sem_subset_centered)
-summary(master_transec_sem_subset_centered)
+master_transec_sem_subset_centered_slim<-master_transec_sem_subset_centered[,-c(6:7)]
+
 ##3 I think I need to do this at the island levell to reduce the # of missing values.... ??
 #what about PANOrml and distance to neighbours .... 
-
-model <- '
-        level: 1
-            fw =~ y1 + y2 + y3
-            fw ~ x1 + x2 + x3
-        level: 2
-            fb =~ y1 + y2 + y3
-            fb ~ w1 + w2
-    '
-
-        fit <- sem(model = model, data = Demo.twolevel, cluster = "cluster")
-        View(Demo.twolevel)
 
 
 # Simple non-categorical model  -------------------------------------------------------
@@ -159,7 +150,33 @@ summary(fit_simple_nocat, standardized=T)
 
 summary(fit_simple_nocat, standardized=T)
 
+lavSpatialCorrect(fit_simple_nocat, master_transec_sem_subset_centered$northing, master_transec_sem_subset_centered$easting)
 
+library(ape)
+
+borRes <- as.data.frame(residuals(fit_simple_nocat , "casewise"))
+
+#raw visualization of NDVI residuals
+qplot(northing, easting, data=master_transec_sem_subset_centered, color=borRes$c.d15n, size=I(5)) +
+    theme_bw(base_size=17) + 
+    scale_color_gradient("d15N Residual", low="blue", high="yellow")
+
+
+library(ape)
+distMat <- as.matrix(dist(
+    cbind(master_transec_sem_subset_centered$northing, master_transec_sem_subset_centered$easting)))
+
+distsInv <- 1/distMat
+diag(distsInv) <- 0
+mi.ndvi <- Moran.I(borRes$c.d15n, distsInv, na.rm=TRUE)
+mi.ndvi$observed
+[1] 0.08014145
+$expected
+[1] -0.001879699
+$sd
+[1] 0.003986118
+$p.value
+[1] 0
 
 modindices(fit_simple_nocat, sort.=TRUE, minimum.value=10)
 coef(fit_simple_nocat )
@@ -230,11 +247,12 @@ N15_model_hierarch<-'
         
         '
 
-fit_simple_hierarch <- semList(N15_model_hierarch, dataList=implist, cluster = "unq_isl")
+fit_simple_hierarch <- semList(N15_model_hierarch, dataList=implist, cluster = "unq_isl", verbose = TRUE, optim.method = "em")
 summary(fit_simple_hierarch)
 modindices(fit_simple_nocat, sort.=TRUE, minimum.value=10)
 
-
+diag(1,5)
+diag(1,3)
 
 #####
 
