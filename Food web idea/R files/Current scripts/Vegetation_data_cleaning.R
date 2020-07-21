@@ -50,12 +50,28 @@ islands_plant_sum<- islands_plant_noT %>%  group_by(unq_plot, species)%>% summar
 #This is summed per plot across all layers per species
 head(islands_plant_sum)
 
+islands_plant_sum[duplicated(islands_plant_sum),]
+
 owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-head(owen_key)
+owen_key<-owen_key %>% dplyr::distinct()
+
 owen_key_slim<-owen_key %>%  dplyr::select(unq_plot, shore_dist)
+owen_key_slim<-owen_key_slim %>% dplyr::distinct()
+
+owen_key_slim[duplicated(owen_key_slim),]
+
+
 islands_plant_filtered<-merge(islands_plant_sum, owen_key_slim, by="unq_plot", all=TRUE)
 
-View(islands_plant_filtered)
+head(islands_plant_filtered)
+islands_plant_filtered[duplicated(islands_plant_filtered),]
+
+islands_plant_filtered$unq_tran<-str_sub(islands_plant_filtered$unq_plot, end=-2)
+islands_plant_filtered$unq_isl<-str_sub(islands_plant_filtered$unq_plot, 1, 4)
+
+islands_plant_filtered[duplicated(islands_plant_filtered),]
+
+
 
 # Deb's data read and tidy ------------------------------------------------
 
@@ -97,12 +113,16 @@ head(veg1x1_Deb_mod_interior_size_filtered)
 #Adding a column for person
 islands_plant_filtered$person<-"Owen"
 veg1x1_Deb_mod_interior_size_filtered$person<-"Deb"
+islands_plant_filtered<- islands_plant_filtered[c("unq_tran", "species", "cover", "unq_plot", "unq_isl","shore_dist", "person")]
+head(islands_plant_filtered)
+head(veg1x1_Deb_mod_interior_size_filtered)
 
 #combining deb and owen's data 
 Deb_Owen_veg_combined<-rbind(islands_plant_filtered, veg1x1_Deb_mod_interior_size_filtered)
 
 
-head(Deb_Owen_veg_combined)
+
+View(Deb_Owen_veg_combined)
 length(unique(Deb_Owen_veg_combined$unq_isl))
 #99
 

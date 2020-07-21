@@ -84,6 +84,7 @@ owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.c
 head(owen_key)
 #take uot isl will put in later
 owen_key<-owen_key[,-3]
+owen_key<-owen_key %>% dplyr::distinct()
 
 #Owen's plot-level soil info - moisture, slope etc
 hakai_plot<-read.csv("C:Food web idea//Data by person//Owen's data//hakai_plot.csv", header=TRUE, sep=",")
