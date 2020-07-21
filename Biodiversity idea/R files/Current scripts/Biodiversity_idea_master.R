@@ -26,7 +26,7 @@ fish_bycatch_richness_merged_tran_year<- read.csv("C:Biodiversity idea//Output f
 #This is working with a 2km radius around the transects - pairing beachseine sites to transects within 2km
 hakai_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_sites_by_radius.csv")
 length(unique(hakai_sites_distance_tran$unq_tran))
-#263 transects match within 2km! 
+#274 transects match within 2km! 
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
@@ -46,7 +46,7 @@ fish_bycatch_richness_merged_tran <- fish_bycatch_richness_merged_tran %>% group
 ###FISH with unq_tran added but no transect data NO UNQ_ISL
 write.csv(fish_bycatch_richness_merged_tran, "C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran.csv", row.names=FALSE)
 head(fish_bycatch_richness_merged_tran)
-
+fish_bycatch_richness_merged_tran[duplicated(fish_bycatch_richness_merged_tran),]
 
 
 # Loading terrestrial data by transect ------------------------------------
@@ -77,7 +77,6 @@ by_tran_master_0m_2<-by_tran_master_0m_2 %>% dplyr::select(-unq_isl)
 
 ### adding in tree diversity (at the whole transect level, i.e. from 0 to 40m)
 by_tran_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_tran_master.csv")
-head(by_tran_master)
 by_tran_master_col_names<-c("unq_isl", "unq_tran","plot_cc", "tree_richness" ,
                             "tree_abundance",
                             "sum_basal",
@@ -105,8 +104,8 @@ by_tran_master_subset$SLOPE_degrees<-(180*(atan(by_tran_master_subset$SLOPE/100)
 
 
 
-by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all=TRUE)
-head(by_tran_master_0m_with_tran)
+by_tran_master_0m_with_tran<-merge(by_tran_master_0m_2, by_tran_master_subset, by="unq_tran", all.x=TRUE)
+View(by_tran_master_0m_with_tran)
 
 
 
@@ -114,7 +113,7 @@ head(by_tran_master_0m_with_tran)
 # merging terrestrial with marine and adding in marine site information --------
 
 fish_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran, by_tran_master_0m_with_tran, by="unq_tran", all.y=TRUE)
-#head(fish_richness_merged_tran)
+head(fish_richness_merged_tran)
 
 
 fish_richness_merged_tran$combined_richness_corrected<-fish_richness_merged_tran$wrack_richness+fish_richness_merged_tran$marine_richness_corrected
@@ -123,10 +122,10 @@ fish_richness_merged_tran$habitat_cover_2km<-(fish_richness_merged_tran$sum_2km)
 
 
 write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv", row.names=FALSE)
-#####View(fish_richness_merged_tran)
+View(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
-#565 tran but that includes Is and Bs
+#393 transects
 
 
 # adding in arch sites ----------------------------------------------------
@@ -134,7 +133,7 @@ length(unique(fish_richness_merged_tran$unq_tran))
 arch_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_arch_by_radius_300.csv")
 head(arch_sites_distance_tran)
 length(unique(arch_sites_distance_tran$unq_tran))
-#81 unique transects if using 300m radius 
+#84 unique transects if using 300m radius 
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran, arch_sites_distance_tran, by="unq_tran", all.x=TRUE)
 
@@ -148,31 +147,31 @@ arch_data_simple<-arch_data[ , c("site_id", "CMT", "clam_garden", "midden_featur
 #head(arch_data_simple)
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, arch_data_simple, by="site_id", all.x=TRUE)
-head(fish_richness_merged_tran_arch)
+View(fish_richness_merged_tran_arch)
 
-#for sem:
-fish_richness_merged_tran_arch$midden_feature_sem<-as.character(fish_richness_merged_tran_arch$midden_feature)
-fish_richness_merged_tran_arch$midden_feature_sem<- dplyr::recode(fish_richness_merged_tran_arch$midden_feature_sem, yes = "1", no="0")
-fish_richness_merged_tran_arch$midden_feature_sem[is.na(fish_richness_merged_tran_arch$midden_feature_sem)] <- 0
-fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem)
-
-fish_richness_merged_tran_arch$fish_feature_sem<-as.character(fish_richness_merged_tran_arch$fish_feature)
-fish_richness_merged_tran_arch$fish_feature_sem<-dplyr::recode(fish_richness_merged_tran_arch$fish_feature_sem, yes = "1", no="0")
-fish_richness_merged_tran_arch$fish_feature_sem[is.na(fish_richness_merged_tran_arch$fish_feature_sem)] <- 0
-fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem)
-
-fish_richness_merged_tran_arch$canoe_skid_sem<-as.character(fish_richness_merged_tran_arch$canoe_skid)
-fish_richness_merged_tran_arch$canoe_skid_sem<-dplyr::recode(fish_richness_merged_tran_arch$canoe_skid_sem, yes = "1", no="0")
-fish_richness_merged_tran_arch$canoe_skid_sem[is.na(fish_richness_merged_tran_arch$canoe_skid_sem)] <- 0
-fish_richness_merged_tran_arch$canoe_skid_sem<-as.numeric(fish_richness_merged_tran_arch$canoe_skid_sem)
-
-
-fish_richness_merged_tran_arch$CMT<-as.factor(fish_richness_merged_tran_arch$CMT)
-fish_richness_merged_tran_arch$clam_garden<-as.factor(fish_richness_merged_tran_arch$clam_garden)
-fish_richness_merged_tran_arch$midden_feature<-factor(fish_richness_merged_tran_arch$midden_feature)
-fish_richness_merged_tran_arch$fish_feature<-as.factor(fish_richness_merged_tran_arch$fish_feature)
-fish_richness_merged_tran_arch$canoe_skid<-as.factor(fish_richness_merged_tran_arch$canoe_skid)
-
+# #for sem:
+# fish_richness_merged_tran_arch$midden_feature_sem<-as.character(fish_richness_merged_tran_arch$midden_feature)
+# fish_richness_merged_tran_arch$midden_feature_sem<- dplyr::recode(fish_richness_merged_tran_arch$midden_feature_sem, yes = "1", no="0")
+# fish_richness_merged_tran_arch$midden_feature_sem[is.na(fish_richness_merged_tran_arch$midden_feature_sem)] <- 0
+# fish_richness_merged_tran_arch$midden_feature_sem<-as.numeric(fish_richness_merged_tran_arch$midden_feature_sem)
+# 
+# fish_richness_merged_tran_arch$fish_feature_sem<-as.character(fish_richness_merged_tran_arch$fish_feature)
+# fish_richness_merged_tran_arch$fish_feature_sem<-dplyr::recode(fish_richness_merged_tran_arch$fish_feature_sem, yes = "1", no="0")
+# fish_richness_merged_tran_arch$fish_feature_sem[is.na(fish_richness_merged_tran_arch$fish_feature_sem)] <- 0
+# fish_richness_merged_tran_arch$fish_feature_sem<-as.numeric(fish_richness_merged_tran_arch$fish_feature_sem)
+# 
+# fish_richness_merged_tran_arch$canoe_skid_sem<-as.character(fish_richness_merged_tran_arch$canoe_skid)
+# fish_richness_merged_tran_arch$canoe_skid_sem<-dplyr::recode(fish_richness_merged_tran_arch$canoe_skid_sem, yes = "1", no="0")
+# fish_richness_merged_tran_arch$canoe_skid_sem[is.na(fish_richness_merged_tran_arch$canoe_skid_sem)] <- 0
+# fish_richness_merged_tran_arch$canoe_skid_sem<-as.numeric(fish_richness_merged_tran_arch$canoe_skid_sem)
+# 
+# 
+# fish_richness_merged_tran_arch$CMT<-as.factor(fish_richness_merged_tran_arch$CMT)
+# fish_richness_merged_tran_arch$clam_garden<-as.factor(fish_richness_merged_tran_arch$clam_garden)
+# fish_richness_merged_tran_arch$midden_feature<-factor(fish_richness_merged_tran_arch$midden_feature)
+# fish_richness_merged_tran_arch$fish_feature<-as.factor(fish_richness_merged_tran_arch$fish_feature)
+# fish_richness_merged_tran_arch$canoe_skid<-as.factor(fish_richness_merged_tran_arch$canoe_skid)
+# 
 
 
 #### Adding in arch site by distance
@@ -201,15 +200,16 @@ names(distance_btwn_points_fish_transects)[3]<-"unq_tran"
 names(distance_btwn_points_fish_transects)[5]<-"distance_to_fish"
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, distance_btwn_points_fish_transects[,c(3,5)], by="unq_tran")
-#View(fish_richness_merged_tran_arch)
+View(fish_richness_merged_tran_arch)
 
 write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv", row.names=FALSE)
 
 
 
-###culturally important plants
+###culturally important plants - from my R script culturally_imp_plants
 plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
 head(plant_data_cult_richness)
+
 fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch, plant_data_cult_richness, all=TRUE)
 head(fish_richness_merged_tran_arch_2)
 
@@ -224,7 +224,7 @@ fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, combin
 fish_richness_merged_tran_arch_2$unq_isl<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 4)
 fish_richness_merged_tran_arch_2$node<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 2)
 
-head(fish_richness_merged_tran_arch_2)
+View(fish_richness_merged_tran_arch_2)
 
 
 ##### adding in island-level characteristics to the transect file
