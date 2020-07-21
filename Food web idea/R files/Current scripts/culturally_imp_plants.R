@@ -15,8 +15,7 @@ library(tidyverse)
 #this loads data from "Habitation data" R script
 
 longform_plant_percentcover<-read.csv("C:Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", header=TRUE, sep=",")
-longform_plant_percentcover<-longform_plant_percentcover[,-c(1)]
-head(longform_plant_percentcover)
+View(longform_plant_percentcover)
 
 longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(person=="Owen")
 head(longform_plant_percentcover_owen)
@@ -66,7 +65,7 @@ plant_data_cult <- longform_plant_percentcover_owen %>% filter(species %in% cult
 
 
 
-plant_data_cult_wide <- plant_data_cult[,c(1:7)] %>% 
+plant_data_cult_wide <- plant_data_cult[,c(1:8)] %>% 
   group_by(unq_tran,species) %>% 
   summarise(cover_mean = mean(cover, na.rm=TRUE)) %>% 
   spread(species, cover_mean)%>%  replace(is.na(.), 0)
@@ -79,7 +78,7 @@ plant_data_cult_richness <- plant_data_cult_wide %>% dplyr::select(unq_tran)
 plant_data_cult_richness$cult_imp_plant_richness <- specnumber(plant_data_cult_wide[,-1])
 # Order nodes by richness
 
-head(plant_data_cult_richness)
+View(plant_data_cult_richness)
 
 write.csv(plant_data_cult_richness, "C:Biodiversity idea//Output files//plant_data_cult_richness.csv", row.names=FALSE)
 

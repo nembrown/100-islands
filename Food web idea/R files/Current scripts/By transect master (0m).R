@@ -104,8 +104,6 @@ head(soil_clean)
 
 #put isotope data together with the key
 soil_merge<-merge(soil_clean, owen_key_expanded, by="unq_plot", all=TRUE)
-head(soil_merge)
-
 
 soil_merge$easting[soil_merge$unq_plot=="MM09WE5"]<-539927
 soil_merge$northing[soil_merge$unq_plot=="MM09WE5"]<-5766077
@@ -137,7 +135,7 @@ head(soil_merge_s)
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist", "node"))
 
-head(soil_merge_0m)
+duplicated(soil_merge_0m)
 
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
@@ -154,7 +152,7 @@ longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(perso
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
 head(longform_plant_percentcover_owen_0m)
 
-longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
+longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:8)] %>% 
                                        group_by(unq_plot,species) %>% 
                                        spread(species, cover)%>%  replace(is.na(.), 0)
 
@@ -164,11 +162,11 @@ head(longform_plant_percentcover2_tran_0m)
 longform_plant_percentcover_owen_0m_shrub<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="shrub")
 longform_plant_percentcover_owen_0m_herb<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="herb")
 
-longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub[,c(1:7)] %>% 
+longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub[,c(1:8)] %>% 
   group_by(unq_plot,species) %>% 
   spread(species, cover)%>%  replace(is.na(.), 0)
 
-longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb[,c(1:7)] %>% 
+longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb[,c(1:8)] %>% 
   group_by(unq_plot,species) %>% 
   spread(species, cover)%>%  replace(is.na(.), 0)
 
@@ -179,7 +177,7 @@ which( colnames(longform_plant_percentcover2_tran_0m)=="gash" )
 which( colnames(longform_plant_percentcover2_tran_0m)=="midi" )
 
 
-longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(2,4,41,56)]
+longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(2,42,57)]
 head(longform_plant_percentcover3_tran_0m)
 longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-c(1:5)], index="shannon")
@@ -192,9 +190,11 @@ longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_pe
 longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)], na.rm=TRUE)
 
 
+head(longform_plant_percentcover3_tran_0m)
+
 head(soil_merge_0m)
 habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
-head(habitat_veg_soil_by_tran_0m)
+View(habitat_veg_soil_by_tran_0m)
 
 
 # Vegetation isotopes -----------------------------------------------------
@@ -274,7 +274,7 @@ habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM11
 habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-539916
 habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-5766116
 
-head(habitat_veg_soil_by_tran_0m)
+View(habitat_veg_soil_by_tran_0m)
 
 
 # Chris insects diversity -----------------------------------------------------------
@@ -580,21 +580,19 @@ head(chris_insects_master_wide_tran_richness)
 
 chris_insects_master_wide_tran_richness_0m<-chris_insects_master_wide_tran_richness %>% filter(!stringr::str_detect(unq_tran, 'I'))
 head(chris_insects_master_wide_tran_richness_0m)
-chris_insects_master_wide_tran_richness_0m$unq_plot<-paste(chris_insects_master_wide_tran_richness_0m$unq_tran, 1, sep="")
 #### this is at the transect level but need to co-erce to plot level to fit with habitat df
 
 head(habitat_veg_soil_by_tran_0m)
-by_tran_master_0m<-merge(habitat_veg_soil_by_tran_0m, chris_insects_master_wide_tran_richness_0m[,-1], by="unq_plot", all=TRUE)
-head(by_tran_master_0m)
+by_tran_master_0m<-merge(habitat_veg_soil_by_tran_0m, chris_insects_master_wide_tran_richness_0m, by="unq_tran", all=TRUE)
+View(by_tran_master_0m)
 
 
 # Insect isotopes  ---------------------------------------------------------
 
 
 chris.isotopes<-read.csv("C:Food web idea//Data by person//Chris.data//chris_isotopes_2018.csv", header=TRUE, sep=",")
-head(chris.isotopes)
+
 chris.isotopes$unq_tran[chris.isotopes$code=="RISO-MM04NP"]<-"MM04W"
-chris.isotopes$unq_plot<-paste(chris.isotopes$unq_tran, 1, sep="")
 
 chris.isotopes$s<-as.numeric(chris.isotopes$s)
 chris.isotopes$plot<-substr(chris.isotopes$unq_tran, 5, 5)
@@ -602,7 +600,7 @@ chris.isotopes$plot<-substr(chris.isotopes$unq_tran, 5, 5)
 
 chris.isotopes_noI<-chris.isotopes %>%  filter(plot!="I")
 
-chris.isotopes.tran<-chris.isotopes_noI %>% group_by(unq_plot, group) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
+chris.isotopes.tran<-chris.isotopes_noI %>% group_by(unq_tran, group) %>% summarise_if(is.numeric, mean, na.rm=TRUE)
 head(chris.isotopes.tran)
 
 chris.isotopes.tran_COL<-chris.isotopes.tran %>% filter(group=="insects_COL")
@@ -638,13 +636,13 @@ names(chris.isotopes.tran_ISO)[7]<-"cn_isopods"
 names(chris.isotopes.tran_ISO)[8]<-"s_isopods"
 
 
-by_tran_master_0m_beetles<-merge(by_tran_master_0m, chris.isotopes.tran_COL[,-2], by="unq_plot", all=TRUE)
+by_tran_master_0m_beetles<-merge(by_tran_master_0m, chris.isotopes.tran_COL[,-2], by="unq_tran", all=TRUE)
 head(by_tran_master_0m_beetles)
-by_tran_master_0m_beetles_weevils<-merge(by_tran_master_0m_beetles, chris.isotopes.tran_CUR[,-2], by="unq_plot", all=TRUE)
+by_tran_master_0m_beetles_weevils<-merge(by_tran_master_0m_beetles, chris.isotopes.tran_CUR[,-2], by="unq_tran", all=TRUE)
 head(by_tran_master_0m_beetles_weevils)
 
-by_tran_master_0m_beetles_weevils_isopods<-merge(by_tran_master_0m_beetles_weevils, chris.isotopes.tran_ISO[,-2], by="unq_plot", all=TRUE)
-head(by_tran_master_0m_beetles_weevils_isopods)
+by_tran_master_0m_beetles_weevils_isopods<-merge(by_tran_master_0m_beetles_weevils, chris.isotopes.tran_ISO[,-2], by="unq_tran", all=TRUE)
+View(by_tran_master_0m_beetles_weevils_isopods)
 
 
 #### Add in Chris' gps coordinates
@@ -663,8 +661,7 @@ chris_insects_master_simple_new_df<-chris_insects_master_simple_new_df %>% group
 
 
 head(chris_insects_master_simple_new_df)
-chris_insects_master_simple_new_df$unq_plot<-paste(chris_insects_master_simple_new_df$unq_tran, 1, sep="")
-by_tran_master_0m_final<-merge(by_tran_master_0m_beetles_weevils_isopods, chris_insects_master_simple_new_df[,-1], by="unq_plot", all.x=TRUE)
+by_tran_master_0m_final<-merge(by_tran_master_0m_beetles_weevils_isopods, chris_insects_master_simple_new_df, by="unq_tran", all.x=TRUE)
 
 # Tidying up -------------------------------------------------------------
 by_tran_master_0m_final$easting[is.na(by_tran_master_0m_final$easting)]<-0

@@ -11,67 +11,62 @@ library(ggplot2)
 
 # Owen's data read and tidy -----------------------------------------------
 
-
 # Read in Owen's data
 islands_plant<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(islands_plant)
 
+#summing across layers Owen but no T, because T is summing across layers, so need to exclude
+islands_plant_noT <- islands_plant %>%  filter(layer!= "T")
+islands_plant_sum<- islands_plant_noT %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
+#This is summed per plot across all layers per species
+head(islands_plant_sum)
+islands_plant_sum[duplicated(islands_plant_sum),]
 
-islands_plant<- islands_plant %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
+#need to read in owen's key b/c otherwise the shore_dist is wrong
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+owen_key<-owen_key %>% dplyr::distinct()
+owen_key_slim<-owen_key %>%  dplyr::select(unq_plot, shore_dist)
+owen_key_slim<-owen_key_slim %>% dplyr::distinct()
+owen_key_slim[duplicated(owen_key_slim),]
+
+
+islands_plant_filtered<-merge(islands_plant_sum, owen_key_slim, by="unq_plot", all=TRUE)
+head(islands_plant_filtered)
+islands_plant_filtered[duplicated(islands_plant_filtered),]
+
+islands_plant_filtered$unq_tran<-str_sub(islands_plant_filtered$unq_plot, end=-2)
+islands_plant_filtered$plot<-str_sub(islands_plant_filtered$unq_plot, -1, -1)
+
+islands_plant_filtered<- islands_plant_filtered %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("WE", "W", unq_tran, fixed = TRUE), gsub("WE", "E", unq_tran, fixed = TRUE))) 
 
 
 #these ones are double digits - also they are ones are that 25m and 15m (so would actually be less than plot 3)
-islands_plant$unq_tran[islands_plant$unq_plot=="CV04SN25"]<-"CV04S"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM04WE25"]<-"MM04W"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM08NS25"]<-"MM08N"
-islands_plant$unq_tran[islands_plant$unq_plot=="PR05EW25"]<-"PR05E"
-islands_plant$unq_tran[islands_plant$unq_plot=="PR06EW25"]<-"PR06E"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ02NS25"]<-"TQ02N"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ05EW25"]<-"TQ05E"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM01WE15"]<-"MM01W"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM03WE15"]<-"MM03W"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM08EW15"]<-"MM08E"
-islands_plant$unq_tran[islands_plant$unq_plot=="TQ06EW15"]<-"TQ06E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="CV04SN25"]<-"CV04S"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM04WE25"]<-"MM04W"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM08NS25"]<-"MM08N"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="PR05EW25"]<-"PR05E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="PR06EW25"]<-"PR06E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="TQ02NS25"]<-"TQ02N"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="TQ05EW25"]<-"TQ05E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM01WE15"]<-"MM01W"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM03WE15"]<-"MM03W"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM08EW15"]<-"MM08E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="TQ06EW15"]<-"TQ06E"
 
-islands_plant$unq_tran[islands_plant$unq_plot=="AD03WE3"]<-"AD03E"
-islands_plant$unq_tran[islands_plant$unq_plot=="CV14SN3"]<-"CV14N"
-islands_plant$unq_tran[islands_plant$unq_plot=="CV14EW3"]<-"CV14W"
-islands_plant$unq_tran[islands_plant$unq_plot=="MM07NS3"]<-"MM07S"
-islands_plant$unq_tran[islands_plant$unq_plot=="ST09WE3"]<-"ST09E"
-
-
-#summing across layers Owen but no T, because T is summing across layers, so need to exclude
-islands_plant_noT <- islands_plant %>%  filter(layer!= "T")
-
-islands_plant_sum<- islands_plant_noT %>%  group_by(unq_plot, species)%>% summarise(cover =sum(cover))
-#This is summed per plot across all layers per species
-head(islands_plant_sum)
-
-islands_plant_sum[duplicated(islands_plant_sum),]
-
-owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
-owen_key<-owen_key %>% dplyr::distinct()
-
-owen_key_slim<-owen_key %>%  dplyr::select(unq_plot, shore_dist)
-owen_key_slim<-owen_key_slim %>% dplyr::distinct()
-
-owen_key_slim[duplicated(owen_key_slim),]
-
-
-islands_plant_filtered<-merge(islands_plant_sum, owen_key_slim, by="unq_plot", all=TRUE)
-
-head(islands_plant_filtered)
-islands_plant_filtered[duplicated(islands_plant_filtered),]
-
-islands_plant_filtered$unq_tran<-str_sub(islands_plant_filtered$unq_plot, end=-2)
-islands_plant_filtered$unq_isl<-str_sub(islands_plant_filtered$unq_plot, 1, 4)
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="AD03WE3"]<-"AD03E"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="CV14SN3"]<-"CV14N"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="CV14EW3"]<-"CV14W"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="MM07NS3"]<-"MM07S"
+islands_plant_filtered$unq_tran[islands_plant_filtered$unq_plot=="ST09WE3"]<-"ST09E"
 
 islands_plant_filtered[duplicated(islands_plant_filtered),]
+islands_plant_filtered$unq_isl<-str_sub(islands_plant_filtered$unq_tran, 1,4)
 
 
+View(islands_plant_filtered)
 
 # Deb's data read and tidy ------------------------------------------------
 
@@ -214,7 +209,7 @@ deb_coords<-pointcount.gps[,-1]
 head(deb_coords)
 
 Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled,deb_coords,by="unq_tran", all.x = TRUE)
-head(Deb_Owen_veg_combined_complete_filled)
+View(Deb_Owen_veg_combined_complete_filled)
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names=FALSE)
 #### This is complete with no "bad" species- all are plnats, no bare ground etc.... 
