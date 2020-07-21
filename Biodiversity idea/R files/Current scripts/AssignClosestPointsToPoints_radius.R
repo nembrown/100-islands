@@ -1,17 +1,11 @@
 library(sf)
 library(raster)
 library(spData)
-library(tmap)    # for static and interactive maps
-library(leaflet) # for interactive maps
-library(mapview) # for interactive maps
 library(ggplot2) # tidyverse vis package
 library(shiny)
 library(rgdal) # spatial/shp reading
 library(viridis) # nice color palette
-library(ggmap) # ggplot functionality for maps ---> dplyr, purr is dependency
-library(ggsn) # for scale bars/north arrows in ggplots
 library(maps)
-library(mapdata)
 library(here)
 
 
@@ -34,7 +28,7 @@ by_tran_master_0m_no_na<-by_tran_master_0m_no_na[!duplicated(by_tran_master_0m_n
 df.SF_transects <- st_as_sf(by_tran_master_0m_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
 df.SF_transects_simple<-df.SF_transects[,1]
 df.SF_transects_simple_new<- df.SF_transects_simple %>% st_transform(3035) 
-#head(df.SF_transects_simple_new)
+  head(df.SF_transects_simple_new)
 
 #Followed code from here: 
 #https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
@@ -51,7 +45,7 @@ transects_beach_joined<-as.data.frame(transects_beach_joined)
 write.csv(transects_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
 
 length(unique(transects_beach_joined$unq_tran))
-#2km: 263 transects fall within 27 sites.... 
+#2km: 274 transects fall within 27 sites.... 
 #1km: 140 transects fall within 19 sites
 #500m: 67 transects fall within 16 sites
 
