@@ -16,6 +16,7 @@ library(ggplot2)
 islands_plant<-read.csv("Food web idea//Data by person//Owen's data//Complete_long_percentcover_mod.csv", header=TRUE, sep=",")
 head(islands_plant)
 
+
 islands_plant<- islands_plant %>% mutate(unq_tran= if_else(plot<4, gsub("SN", "S", unq_tran, fixed = TRUE), gsub("SN", "N", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("NS", "N", unq_tran, fixed = TRUE), gsub("NS", "S", unq_tran, fixed = TRUE))) %>% 
   mutate(unq_tran= if_else(plot<4, gsub("EW", "E", unq_tran, fixed = TRUE), gsub("EW", "W", unq_tran, fixed = TRUE))) %>% 
@@ -49,16 +50,12 @@ islands_plant_sum<- islands_plant_noT %>%  group_by(unq_plot, species)%>% summar
 #This is summed per plot across all layers per species
 head(islands_plant_sum)
 
-head(islands_plant_noT)
-islands_plant_noT_shore<-islands_plant_noT %>% dplyr::select(unq_isl, unq_plot, unq_tran, shore_dist)
-islands_plant_noT_shore<-islands_plant_noT_shore[!duplicated(islands_plant_noT_shore),]
+owen_key<-read.csv("C:Food web idea//Data by person//Owen's data//key_mod_2019.csv", header=TRUE, sep=",")
+head(owen_key)
+owen_key_slim<-owen_key %>%  dplyr::select(unq_plot, shore_dist)
+islands_plant_filtered<-merge(islands_plant_sum, owen_key_slim, by="unq_plot", all=TRUE)
 
-
-islands_plant_filtered<-merge(islands_plant_sum, islands_plant_noT_shore, by="unq_plot", all.x=TRUE)
-head(islands_plant_filtered)
-
-
-
+View(islands_plant_filtered)
 
 # Deb's data read and tidy ------------------------------------------------
 
