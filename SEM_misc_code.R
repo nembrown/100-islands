@@ -93,3 +93,58 @@ standardizedsolution(fit_human)
 # cover_model <- lm(d15n ~ log_fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area ,master_transect)
 # 
 # summary(cover_model)
+
+
+
+
+
+
+
+#think about centering variables later - if there are no interactions (currently how it's described, it shouldn't be a problem)
+# # center variables, calculate interaction terms, ignore byproducts
+# center_colmeans <- function(x) {
+#     xcenter = colMeans(x)
+#     x - rep(xcenter, rep.int(nrow(x), ncol(x)))
+# }
+# 
+# colnames.to.centre<-c("log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
+#                       "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees", "midden_feature_sem", 
+#                       "fish_feature_sem", "cult_imp_plant_richness", "d15n", "log_distance_to_any_arch", "log_distance_to_midden",
+#                       "log_distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "log_Bog_area")
+# length(colnames.to.centre)
+# colnames.to.centre[1]
+# new2.implist <- within(implist,{
+#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
+#                                 c.log_bycatch_biomass_bym3_mean<-log_bycatch_biomass_bym3_mean - mean(log_bycatch_biomass_bym3_mean)
+#                                 c.MEAN_kparea2k<-MEAN_kparea2k - mean(MEAN_kparea2k)
+#                                 c.MEAN_egarea2k<-MEAN_egarea2k - mean(MEAN_egarea2k)
+#                                 c.SLOPE_degrees<-SLOPE_degrees - mean(SLOPE_degrees)
+#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
+#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
+#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
+# #                                 
+# 
+# 
+# center_colmeans(implist[[1]])
+# 
+# new2.implist <- within(implist,{
+#     M.SES <- mean(SES)
+#     M.CognAbility <- mean(CognAbility)
+#     C.SES <- SES - M.SES
+#     C.CognAbility <- CognAbility - M.CognAbility
+#     SES.CognAbility <- C.SES * C.CognAbility
+# }, ignore=c("M.SES", "M.CognAbility"))
+# 
+# mean(colnames.to.centre)
+# 
+# implist[[1]]
+# str(implist)
+# hist(master_transec_sem_subset$d15n)
+# hist(test.df$d15n)
+# 
+# test.df<-as.data.frame(new2.implist[1])
+# head(test.df)
+
+
+
+#plot(imp)

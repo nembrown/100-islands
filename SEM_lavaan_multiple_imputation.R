@@ -1,7 +1,5 @@
 #new script to mirror SEM_lavaan but trying multiple imputation to fix the missingness problem. 
 
-# updated since taking the workshop
-
 # load libraries and data -------------------------------------------------------
 library(semTools)
 library(mitml)
@@ -13,21 +11,23 @@ library(mice)
 library(ggplot2)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 
-# # pair down the variables
-sem_variables_names<-c( "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
-                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                        "ravens", "cult_imp_plant_richness", "d15n", "log_distance_to_midden",
-                        "log_distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                        "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "northing", "easting")
+## pair down the variables
+sem_variables_names<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
+                       "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
+                       "ravens", "cult_imp_plant_richness", "d15n", "distance_to_midden",
+                       "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
+                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "northing", "easting")
 
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
-master_transec_sem_subset<-master_transec_sem_subset[complete.cases(master_transec_sem_subset$pres_otter),]
-head(master_transec_sem_subset)
-
-
-str(master_transec_sem_subset)
 master_transec_sem_subset$unq_tran<-factor(master_transec_sem_subset$unq_tran, ordered=TRUE)
 master_transec_sem_subset$unq_isl<-factor(master_transec_sem_subset$unq_isl, ordered=TRUE)
+master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, 
+                                             omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
+                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting"), 
+                                             center = TRUE, scale = FALSE)
+head(master_transec_sem_subset_centered)
+
+master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.cases(master_transec_sem_subset_centered$pres_otter), ]
 # master_transec_sem_subset$beachy_substrate<-factor(master_transec_sem_subset$beachy_substrate, ordered=TRUE)
 # master_transec_sem_subset$ravens<-factor(master_transec_sem_subset$ravens, ordered=TRUE)
 # master_transec_sem_subset$eagles<-factor(master_transec_sem_subset$eagles, ordered=TRUE)
@@ -35,79 +35,23 @@ master_transec_sem_subset$unq_isl<-factor(master_transec_sem_subset$unq_isl, ord
 # master_transec_sem_subset$pres_otter<-factor(master_transec_sem_subset$pres_otter, ordered=TRUE)
 # master_transec_sem_subset$pres_fish<-factor(master_transec_sem_subset$pres_fish, ordered=TRUE)
 
-summary(master_transec_sem_subset)
+summary(master_transec_sem_subset_centered)
 
-fml <- list( log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean +
-               SLOPE_degrees  + WAVE_EXPOSURE + beachy_substrate + slope_degrees + log_site_mean_by_tran + cult_imp_plant_richness + d15n + log_distance_to_midden +
-               log_distance_to_fish + log_MEAN_kparea2k + log_MEAN_egarea2k + pres_otter +
+fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
+               c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + c.cult_imp_plant_richness + c.d15n + c.distance_to_midden +
+               c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
                pres_marine_invert + pres_fish  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-             log_Bog_area + log_Area +  PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
+               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
 
-imp <- jomoImpute(master_transec_sem_subset, formula=fml, n.burn=5000, n.iter=250, m=20)
+imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=5000, n.iter=250, m=20)
 summary(imp)
 #problems the model sees: 
 plot(imp, trace="all", print="beta2", pos=c(1,1))
 plot(imp, trace="all", print="beta", pos=c(1,11))
-plot(imp, trace="all", print="psi", pos=c(12,3))
+plot(imp, trace="all", print="psi", pos=c(6,6))
 plot(imp, trace="all", print="sigma", pos=c(8,6))
 
 implist <- mitmlComplete(imp, "all")
-# implist <- with(implist,{
-#     df <- data.frame(as.list(environment()))
-#     df <- ... # dplyr commands
-#     df
-# })
-implist <- as.mitml.list(implist)
-
-View(implist[[1]])
-#think about centering variables later - if there are no interactions (currently how it's described, it shouldn't be a problem)
-# # center variables, calculate interaction terms, ignore byproducts
-# center_colmeans <- function(x) {
-#     xcenter = colMeans(x)
-#     x - rep(xcenter, rep.int(nrow(x), ncol(x)))
-# }
-# 
-# colnames.to.centre<-c("log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean", "MEAN_kparea2k", "MEAN_egarea2k",
-#                       "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees", "midden_feature_sem", 
-#                       "fish_feature_sem", "cult_imp_plant_richness", "d15n", "log_distance_to_any_arch", "log_distance_to_midden",
-#                       "log_distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "log_Bog_area")
-# length(colnames.to.centre)
-# colnames.to.centre[1]
-# new2.implist <- within(implist,{
-#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
-#                                 c.log_bycatch_biomass_bym3_mean<-log_bycatch_biomass_bym3_mean - mean(log_bycatch_biomass_bym3_mean)
-#                                 c.MEAN_kparea2k<-MEAN_kparea2k - mean(MEAN_kparea2k)
-#                                 c.MEAN_egarea2k<-MEAN_egarea2k - mean(MEAN_egarea2k)
-#                                 c.SLOPE_degrees<-SLOPE_degrees - mean(SLOPE_degrees)
-#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
-#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
-#                                 c.log_fish_biomass_bym3_mean<-log_fish_biomass_bym3_mean - mean(log_fish_biomass_bym3_mean)
-# #                                 
-# 
-# 
-# center_colmeans(implist[[1]])
-# 
-# new2.implist <- within(implist,{
-#     M.SES <- mean(SES)
-#     M.CognAbility <- mean(CognAbility)
-#     C.SES <- SES - M.SES
-#     C.CognAbility <- CognAbility - M.CognAbility
-#     SES.CognAbility <- C.SES * C.CognAbility
-# }, ignore=c("M.SES", "M.CognAbility"))
-# 
-# mean(colnames.to.centre)
-# 
-# implist[[1]]
-# str(implist)
-# hist(master_transec_sem_subset$d15n)
-# hist(test.df$d15n)
-# 
-# test.df<-as.data.frame(new2.implist[1])
-# head(test.df)
-
-
-
-#plot(imp)
 
 # md.pattern(master_transec_sem_subset_centered)
 # imputed_transect <- mice(master_transec_sem_subset_centered, m=5, method = 'pmm', seed = 101)
