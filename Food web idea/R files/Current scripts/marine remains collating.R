@@ -278,7 +278,7 @@ write.csv(combined_otter_sum, "C://Users//norah//Dropbox//Projects//Owen's MS//O
 combined_otter_mean_tran <- combined_otter %>% dplyr::select(unq_tran, otter_pres, marine_invert_pres, fish) %>% group_by(unq_tran) %>%  summarise_all(list(sum = sum, n_plots=length))
 head(combined_otter_mean_tran)
 
-combined_otter_mean_tran<- combined_otter_mean_tran %>% filter(otter_pres_n_plots > 8)
+# combined_otter_mean_tran<- combined_otter_mean_tran %>% filter(otter_pres_n_plots > 8)
 combined_otter_mean_tran$prop_otter<-combined_otter_mean_tran$otter_pres_sum/combined_otter_mean_tran$otter_pres_n_plots
 combined_otter_mean_tran$prop_marine_invert<-combined_otter_mean_tran$marine_invert_pres_sum/combined_otter_mean_tran$marine_invert_pres_n_plots
 combined_otter_mean_tran$prop_fish<-combined_otter_mean_tran$fish_sum/combined_otter_mean_tran$fish_n_plots
