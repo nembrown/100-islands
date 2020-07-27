@@ -122,7 +122,7 @@ fish_richness_merged_tran$habitat_cover_2km<-(fish_richness_merged_tran$sum_2km)
 
 
 write.csv(fish_richness_merged_tran, "C:Biodiversity idea//Output files//fish_richness_merged_tran.csv", row.names=FALSE)
-View(fish_richness_merged_tran)
+head(fish_richness_merged_tran)
 
 length(unique(fish_richness_merged_tran$unq_tran))
 #393 transects
@@ -155,7 +155,7 @@ names(distance_btwn_points_fish_transects)[3]<-"unq_tran"
 names(distance_btwn_points_fish_transects)[5]<-"distance_to_fish"
 
 fish_richness_merged_tran_arch<-merge(fish_richness_merged_tran_arch, distance_btwn_points_fish_transects[,c(3,5)], by="unq_tran")
-View(fish_richness_merged_tran_arch)
+head(fish_richness_merged_tran_arch)
 
 write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fish_richness_merged_tran_arch.csv", row.names=FALSE)
 
@@ -171,13 +171,13 @@ head(fish_richness_merged_tran_arch_2)
 
 ### adding marine remains from owen and chris's notes - changed away from pres_abs
 combined_otter_mean_tran<- read.csv("C:Biodiversity idea//Output files//combined_otter_mean_tran.csv")
-
-fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, combined_otter_mean_tran[,c(1, 8,9,10)], by="unq_tran", all.x=TRUE)
+head(combined_otter_mean_tran)
+fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch_2, combined_otter_mean_tran[,c(1, 8,9,10, 11, 12, 13)], by="unq_tran", all.x=TRUE)
 
 fish_richness_merged_tran_arch_2$unq_isl<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 4)
 fish_richness_merged_tran_arch_2$node<-strtrim(fish_richness_merged_tran_arch_2$unq_tran, 2)
 
-View(fish_richness_merged_tran_arch_2)
+head(fish_richness_merged_tran_arch_2)
 
 
 ##### adding in island-level characteristics to the transect file
@@ -207,22 +207,38 @@ fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_is
 fish_richness_merged_tran_arch_2$log_site_mean_by_tran <- log(fish_richness_merged_tran_arch_2$site_mean_by_tran+1)
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
-fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock+1)
+fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock)
 fish_richness_merged_tran_arch_2$log_DistW_ML<- log(fish_richness_merged_tran_arch_2$DistW_ML)
 fish_richness_merged_tran_arch_2$log_Dist_NearL<- log(fish_richness_merged_tran_arch_2$Dist_Near)
 fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merged_tran_arch_2$distance_to_midden)
+fish_richness_merged_tran_arch_2$log_distance_to_fish<- log(fish_richness_merged_tran_arch_2$distance_to_fish)
 fish_richness_merged_tran_arch_2$Bog_area<- fish_richness_merged_tran_arch_2$Bog_Vegetation + fish_richness_merged_tran_arch_2$Bog_Water 
 fish_richness_merged_tran_arch_2$log_Bog_area<- log(fish_richness_merged_tran_arch_2$Bog_area+1)
+fish_richness_merged_tran_arch_2$log_fish_biomass_bym3_mean <- log(fish_richness_merged_tran_arch_2$fish_biomass_bym3_mean+1)
+fish_richness_merged_tran_arch_2$log_bycatch_biomass_bym3_mean <- log(fish_richness_merged_tran_arch_2$bycatch_biomass_bym3_mean+1)
 
 
 
 #master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
 master_transect<-fish_richness_merged_tran_arch_2
+write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
 
 View(master_transect)
 
 
-write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
+
+
+
+
+###########################################################
+
+
+
+
+
+
+
+
 
 
 plot(master_transect$log_Area~ log(master_transect$Bog_area+1))
