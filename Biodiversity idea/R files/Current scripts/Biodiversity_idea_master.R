@@ -227,7 +227,7 @@ View(master_transect)
 
 
 
-
+hist(fish_richness_merged_tran_arch_2$Bog_area)
 
 
 ###########################################################
