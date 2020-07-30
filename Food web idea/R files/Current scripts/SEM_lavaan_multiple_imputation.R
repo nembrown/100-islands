@@ -9,6 +9,9 @@ library(semPlot)
 library(MuMIn)
 library(mice)
 library(ggplot2)
+library(mitools)
+library(Amelia)
+
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 
 ## pair down the variables
@@ -25,9 +28,13 @@ master_transec_sem_subset_centered <- stdize(master_transec_sem_subset,
                                              omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
                                                            "pres_marine_invert", "pres_fish", "eagles", "northing", "easting"), 
                                              center = TRUE, scale = FALSE)
-head(master_transec_sem_subset_centered)
+View(master_transec_sem_subset_centered)
 
 master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.cases(master_transec_sem_subset_centered$pres_otter), ]
+
+master_transec_sem_subset_centered$c.log_Bog_area[is.na(master_transec_sem_subset_centered$c.log_Bog_area)] <- -1.042483
+# master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.cases(master_transec_sem_subset_centered$c.log_Bog_area), ]
+
 # master_transec_sem_subset$beachy_substrate<-factor(master_transec_sem_subset$beachy_substrate, ordered=TRUE)
 # master_transec_sem_subset$ravens<-factor(master_transec_sem_subset$ravens, ordered=TRUE)
 # master_transec_sem_subset$eagles<-factor(master_transec_sem_subset$eagles, ordered=TRUE)
@@ -37,6 +44,9 @@ master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.
 
 summary(master_transec_sem_subset_centered)
 
+
+
+#Multiple imputation using mimtl packacge which is two levels
 fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + c.cult_imp_plant_richness + c.d15n + c.distance_to_midden +
                c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
@@ -53,22 +63,20 @@ plot(imp, trace="all", print="sigma", pos=c(8,6))
 
 implist <- mitmlComplete(imp, "all")
 
-# md.pattern(master_transec_sem_subset_centered)
-# imputed_transect <- mice(master_transec_sem_subset_centered, m=5, method = 'pmm', seed = 101)
+View(implist[[1]])
+varTable((implist[[1]]))
+#alternate way to do mult imp, which is single level.  
+
+md.pattern(master_transec_sem_subset_centered)
+imputed_transect <- mice(master_transec_sem_subset_centered, method='cart')
+
+imputed_mitools <- imputationList(implist)
 
 
+# Simple non-hierarchical model  -------------------------------------------------------
+#Could combine this with survey.design or lavSpatialcorrect to get hierachical model .... but survey deisgn is more for pyschology, diffucult to specify
 
-master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, omit.cols = c("northing", "easting","unq_tran","unq_isl", "pres_otter","pres_otter", "pres_marine_invert", "pres_fish", "ravens", "eagles"), center = TRUE, scale = FALSE)
-head(master_transec_sem_subset_centered)
-# master_transec_sem_subset_centered_slim<-master_transec_sem_subset_centered[,-c(6:7)]
-
-##3 I think I need to do this at the island levell to reduce the # of missing values.... ??
-#what about PANOrml and log_distance to neighbours .... 
-
-
-# Simple non-categorical model  -------------------------------------------------------
-
-N15_model_simple_nocat<-'
+N15_model_simple_centered<-'
           
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
         
@@ -80,13 +88,13 @@ N15_model_simple_nocat<-'
         
         eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml
 
-        c.log_site_mean_by_tran ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + c.beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees
+        c.log_site_mean_by_tran ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees
 
-        c.human_pres ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml
+        human_pres ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml
 
-        c.marine_animal_biomass_shore ~ eagles + ravens + pres_otter  + c.human_pres + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean
+        marine_animal_biomass_shore ~ eagles + ravens + pres_otter  + human_pres + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean
 
-        c.d15n ~ a1*c.log_site_mean_by_tran + h1*c.human_pres + o1*c.marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area
+        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area
 
         ### correlations not already accounted for in model
         pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
@@ -94,398 +102,123 @@ N15_model_simple_nocat<-'
 
 
         #latent variables measurement models
-        c.human_pres =~ c.log_distance_to_midden + c.log_distance_to_fish + c.cult_imp_plant_richness 
-        c.marine_animal_biomass_shore =~ pres_marine_invert + pres_fish 
-        '
-
-fit_simple_nocat <- sem(N15_model_simple_nocat, data=master_transec_sem_subset_centered, std.lv=TRUE, missing="ml.x")
-
-design<-svydesign(ids=~unq_isl, nest=TRUE, data=master_transec_sem_subset_centered)
-
-fit.adj<-lavaan.survey(lavaan.fit=fit_simple_nocat, survey.design = design, estimator="ML")
-
-summary(fit_simple_nocat, standardized=T)
-
-summary(fit.adj, standardized=T)
-
-
-
-
-N15_model_simple<-'
-          
-        log_fish_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
-        
-        log_bycatch_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
-          
-        pres_otter ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + log_Area + slope_degrees + PA_norml+ log_MEAN_kparea2k + log_MEAN_egarea2k
-          
-        ravens ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + log_Area + PA_norml
-        
-        eagles ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + log_Area + PA_norml
-
-        log_site_mean_by_tran ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE_degrees  + WAVE_EXPOSURE + beachy_substrate + log_Area + PA_norml + slope_degrees
-
-        human_pres ~ log_MEAN_kparea2k + log_MEAN_egarea2k + log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area + SLOPE_degrees + PA_norml
-
-        marine_animal_biomass_shore ~ eagles + ravens + pres_otter  + human_pres + log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean
-
-        d15n ~ a1*log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + slope_degrees + log_Bog_area
-
-        ### correlations not already accounted for in model
-        pres_marine_invert ~~ log_bycatch_biomass_bym3_mean
-        pres_fish ~~ log_fish_biomass_bym3_mean
-
-
-        #latent variables measurement models
-        human_pres =~ log_distance_to_midden + log_distance_to_fish + cult_imp_plant_richness 
+        human_pres =~ c.distance_to_midden + c.distance_to_fish + c.cult_imp_plant_richness 
         marine_animal_biomass_shore =~ pres_marine_invert + pres_fish 
         '
 
-fit_simple <- semList(N15_model_simple, dataList=implist, std.lv=TRUE)
-summary(fit_simple)
+fit_simple_centered_imp <- semList(N15_model_simple_centered, dataList=implist, std.lv=TRUE)
+#this did not work. Solution not found ... only 5 converged, no std errors
+summary(fit_simple_centered_imp)
+
+#with mice
+fit_simple_centered_mice <- semList(N15_model_simple_centered, dataList=imputed_transect, std.lv=TRUE)
+summary(fit_simple_centered_mice) #0 converged
+
+#With mice - but imputation happens in the model
+runMI(N15_model_simple_centered, master_transec_sem_subset_centered, fun = "lavaan",m=20,  miArgs= list(method='cart'),
+      miPackage = "mice", seed = 12345)
+
+master_transec_sem_subset_centered_simp <- master_transec_sem_subset_centered %>% dplyr::select(-c("unq_tran", "unq_isl", "node"))
+
+#With Amelia - but imputation happens in the model - this works with sem call instead of lavaan call
+fit.mi<-runMI(N15_model_simple_centered, master_transec_sem_subset_centered, fun = "sem",m=20, miArgs=list(idvars = c("unq_tran", "unq_isl", "node")),
+      miPackage = "Amelia", seed = 12345)
+summary(fit.mi)
+
+#
+library(Amelia)
+set.seed(12345)
+HS.amelia <- amelia(master_transec_sem_subset_centered, m = 20, idvars = c("unq_tran", "unq_isl", "node"), p2s = FALSE)
+imps <- HS.amelia$imputations
 
 
-source("C:Food web idea idea//R files//Current scripts//lavSpatialCorrectfunction.R")
+
+lavaan_fit_model<-sem(N15_model_simple_centered, meanstructure = TRUE, data=master_transec_sem_subset_centered)
 
 
+# out2 <- runMI(N15_model_simple_centered, data = imps, fun="sem")
+# out2
 
-lavSpatialCorrect(fit_simple, northing, easting)
-
-library(ape)
-
-borRes <- as.data.frame(residuals(fit_simple_nocat , "casewise"))
-
-#raw visualization of NDVI residuals
-qplot(northing, easting, data=master_transec_sem_subset_centered, color=borRes$c.d15n, size=I(5)) +
-  theme_bw(base_size=17) + 
-  scale_color_gradient("d15N Residual", low="blue", high="yellow")
+str(imps_2)
+imps_2<-imputationList(imps)
 
 
-library(ape)
-distMat <- as.matrix(dist(
-  cbind(master_transec_sem_subset_centered$northing, master_transec_sem_subset_centered$easting)))
+# Survey.design -----------------------------------------------------------
 
-distsInv <- 1/distMat
-diag(distsInv) <- 0
-mi.ndvi <- Moran.I(borRes$c.d15n, distsInv, na.rm=TRUE)
-mi.ndvi$observed
-[1] 0.08014145
-$expected
-[1] -0.001879699
-$sd
-[1] 0.003986118
-$p.value
-[1] 0
+#This doesn't work since implist can't go into survey design ... need another imputation method. 
+#Survey design doesn't seem to work with mitools either 
+design_imp_amelia<-svydesign(ids=~unq_isl, strata=~node, data=imps_2)
+design_imp_mitml<-svydesign(ids=~unq_isl, strata=~node, data=imputed_mitools)
 
-modindices(fit_simple_nocat, sort.=TRUE, minimum.value=10)
-coef(fit_simple_nocat )
+fit.adj<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_mitml, estimator="MLM")
+summary(fit.adj, standardized=T)
+parameterEstimates(fit.adj)
 
-#std.lv=TRUE, missing="ml"
-#+ PA_norml
-
-semPaths(fit_simple_nocat, whatLabels="est", intercepts="FALSE", layout="tree2")
-
-varTable(fit_simple_nocat)
-lavInspect(fit_simple_nocat, "cov.lv")
-
-library(MVN)
-source("./fitted_lavaan.R")
-dist_resid <- residuals_lavaan(fit_simple_nocat)
-mvn(dist_resid, mvnTest="mardia", univariatePlot = "qqplot")
-####### doesn't work with latent
-
-library(mvnormtest)
-fitdata <- inspect(fit_simple_nocat, "data")
-mshapiro.test(t(fitdata))
-#doesn't work with latent i dont think
+pval.pFsum(fit.adj, survey.design = design_imp)
 
 
-###############
-# implist
-str(implist)
+# Hierarchical model ------------------------------------------------------
+#demo model
+model <- '
+        level: 1
+            fw =~ y1 + y2 + y3
+            fw ~ x1 + x2 + x3
+        level: 2
+            fb =~ y1 + y2 + y3
+            fb ~ w1 + w2'
+fit <- sem(model = model, data = Demo.twolevel, cluster = "cluster")
+summary(fit)
+semPaths(fit)
 
-implist_up <- within(implist,{
-  beachy_substrate<-as.numeric(beachy_substrate)
-  # ravens<-as.numeric(ravens)
-  # eagles<-as.numeric(eagles)
-  # pres_marine_invert<-as.numeric(pres_marine_invert)
-  # pres_otter<-as.numeric(pres_otter)
-  # pres_fish<-as.numeric(pres_fish)
-})
-
-
-N15_model_hierarch<-'
+N15_model_hierarch_lvl<-'
         
         #transect level (between) only transect level stuff
         level: 1  
         
-        log_fish_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
+        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
         
-        log_bycatch_biomass_bym3_mean ~ log_MEAN_kparea2k + log_MEAN_egarea2k
+        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
           
-        pres_otter ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + slope_degrees +  log_MEAN_kparea2k + log_MEAN_egarea2k
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.slope_degrees +  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
           
-        ravens ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean 
+        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
         
-        eagles ~  log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean 
+        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
 
-        log_site_mean_by_tran ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE_degrees  + WAVE_EXPOSURE + beachy_substrate + slope_degrees
+        c.log_site_mean_by_tran ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees
 
-        human_pres_trans ~ log_MEAN_kparea2k + log_MEAN_egarea2k + log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean  + WAVE_EXPOSURE  + SLOPE_degrees 
+        human_pres_trans ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE  + c.SLOPE_degrees 
 
-        marine_animal_biomass_shore_trans ~ eagles + ravens + pres_otter  + human_pres_trans + log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean
+        marine_animal_biomass_shore_trans ~ eagles + ravens + pres_otter  + human_pres_trans + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean
 
-        d15n ~ a1*log_site_mean_by_tran + h1*human_pres_trans + o1*marine_animal_biomass_shore_trans + slope_degrees
+        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres_trans + o1*marine_animal_biomass_shore_trans + c.slope_degrees
 
         ### correlations not already accounted for in model
-        pres_marine_invert ~~ log_bycatch_biomass_bym3_mean
-        pres_fish ~~ log_fish_biomass_bym3_mean
+        pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
+        pres_fish ~~ c.log_fish_biomass_bym3_mean
 
 
         #latent variables measurement models
-        human_pres_trans =~ log_distance_to_midden + log_distance_to_fish + cult_imp_plant_richness 
+        human_pres_trans =~ c.distance_to_midden + c.distance_to_fish + c.cult_imp_plant_richness 
         marine_animal_biomass_shore_trans =~ pres_marine_invert + pres_fish 
         
         #island level (within)
         level: 2
         
-        pres_otter ~   log_Area + PA_norml
-        ravens ~   log_Area + PA_norml
-        eagles ~   log_Area + PA_norml
-        log_site_mean_by_tran ~ log_Area + PA_norml 
-        d15n ~  log_Bog_area
+        pres_otter ~   c.log_Area + c.PA_norml
+        ravens ~   c.log_Area + c.PA_norml
+        eagles ~   c.log_Area + c.PA_norml
+        c.log_site_mean_by_tran ~ c.log_Area + c.PA_norml 
+        c.d15n ~  c.log_Bog_area
         
         '
 
-fit_simple_hierarch <- sem(N15_model_hierarch, data=master_transec_sem_subset, cluster = "unq_isl", missing="FIML")
 
-# optim.method = "em"
+fit_simple_hierarch_imp <- semList(N15_model_hierarch_lvl, dataList=implist, cluster = "unq_isl")
+summary(fit_simple_hierarch_imp )
+#does not work. 0/20 imputed lists converged. 
+
+
+fit_simple_hierarch_mice <- semList(N15_model_hierarch, dataList=imputed_transect, cluster = "unq_isl")
+summary(fit_simple_hierarch_mice ) #0/21 datasets converged.
 warnings()
-
-summary(fit_simple_hierarch)
-modindices(fit_simple_nocat, sort.=TRUE, minimum.value=10)
-
-diag(1,5)
-diag(1,3)
-
-#####
-
-
-N15_model_simple_nocat_alt<-'
-          
-          human_pres ~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + log_DistW_ML + Neighb_250 + beachy_substrate 
-
-          marine_animal_biomass_shore ~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + ravens + otter_pres_all 
-
-          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + Neighb_250
-          
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_fish_biomass_bym3_mean
-          
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_bycatch_biomass_bym3_mean
- 
-          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
-
-
-        #latent variables measurement models
-        human_pres =~ log_distance_to_midden  + cult_imp_plant_richness 
-        algae_biomass_shore =~ log_site_mean_by_tran + seaweed_all
-        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
-        '
-
-fit_simple_nocat_alt <- sem(N15_model_simple_nocat_alt, data=master_transect, missing="ml.x", std.lv=TRUE)
-summary(fit_simple_nocat_alt, fit.measures=TRUE)
-varTable(fit_simple_nocat_alt)
-
-modI<-modificationIndices(fit_simple_nocat_alt, standardized=F)
-modI[modI$mi<3,]
-
-
-# Simple full model -------------------------------------------------------
-
-N15_model_simple<-'
-          
-          human_pres ~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
-
-          marine_animal_biomass_shore ~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
-
-          algae_biomass_shore ~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
-          
-          d15n ~ a1*algae_biomass_shore + h1*human_pres + o1*marine_animal_biomass_shore
-
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_fish_biomass_bym3_mean
-
-          log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_bycatch_biomass_bym3_mean
-
-
-        #latent variables measurement models
-        human_pres =~ midden_feature_sem + fish_feature_sem + cult_imp_plant_richness
-        algae_biomass_shore =~ log_site_mean_by_tran + seaweed_all
-        marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all
-        '
-
-fit_simple <- sem(N15_model_simple, data=master_transect, missing="pairwise", fixed.x=FALSE, conditional.x=FALSE)
-summary(fit_simple, fit.measures=TRUE)
-varTable(fit_simple)
-
-
-######################## 
-N15_model_composite<-'#latent variables as responses
-
-            #composite
-            
-            human_pres <~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean  + WAVE_EXPOSURE + log_Area
-            
-            marine_animal_biomass_shore <~ log_fish_biomass_bym3_mean + log_bycatch_biomass_bym3_mean + ravens + otter_pres_all  + WAVE_EXPOSURE + human_pres
-            
-            algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate
-            
-            
-            
-           # algae_biomass_shore + human_pres + marine_animal_biomass_shore ~ d15n
-            
-            # log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_fish_biomass_bym3_mean
-            # 
-            # log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_bycatch_biomass_bym3_mean
-
-
-            #correlations
-           # log_fish_biomass_bym3_mean ~~ log_bycatch_biomass_bym3_mean
-
-            
-            #latent variables measurement models
-            human_pres =~ midden_feature_sem + fish_feature_sem + cult_imp_plant_richness + d15n
-            algae_biomass_shore =~ log_site_mean_by_tran + seaweed_all + d15n
-            marine_animal_biomass_shore =~ marine_invert_pres_all + fish_all + d15n
-                                                '
-
-fit2 <- sem(N15_model_novector2, data=master_transect,missing="ML")
-summary(fit2, fit.measures=TRUE)
-
-
-fit4 <- sem(N15_model_novector2, data=master_transect,estimator = "PML",missing = "available.cases",std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
-
-fit5 <- sem(N15_model_composite, data=master_transect,missing="pairwise", std.lv=TRUE)
-summary(fit5)
-
-
-# ordered=c("fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem"),
-
-#note: otter_pres can't be ordered bc it is exogenous.... 
-#only order the endogenous (i.e. arrow going into) variables
-
-#missing="pairwise", std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE
-#stdv.lvn If TRUE, the metric of each latent variable is determined by fixing their variances to 1.0. 
-#If FALSE, the metric of each latent variable is determined by fixing the factor loading 
-#of the first indicator to 1.0. If there are multiple groups, std.lv = TRUE and "loadings" 
-#is included in the group.label argument, then only the latent variances i of the first group 
-#will be fixed to 1.0, while the latent variances of other groups are set free.
-
-
-
-
-summary(fit4)
-varTable(fit5)
-lavTables(fit4)
-print(modindices(fit3))
-
-lavInspect(fit3, "cov.lv")
-
-head(master_transect)
-
-
-
-# Piecewise fitting -------------------------------------------------------
-
-#Algal model only
-
-N15_model_algae_only<-'#latent variables as responses
-            
-            algae_biomass_shore <~ log_MEAN_kparea2k + log_MEAN_egarea2k + SLOPE  + WAVE_EXPOSURE + beachy_substrate + slope 
-            a1*algae_biomass_shore ~ d15n
-
-            
-           #latent variables measurement models
-            algae_biomass_shore =~ log_site_mean_by_tran + seaweed_all'
-
-
-fit_algae <- sem(N15_model_algae_only, data=master_transect)
-summary(fit_algae, fit.measures=TRUE)
-varTable(fit_algae)
-
-# fit_algae_PML<-sem(N15_model_algae_only, data=master_transect,estimator = "PML",missing = "available.cases",std.lv=TRUE, fixed.x=FALSE, conditional.x=FALSE, test = "none")
-# summary(fit_algae_PML, fit.measures=TRUE)
-
-fit_algae_pairwise <- sem(N15_model_algae_only, data=master_transect,missing="pairwise", std.lv=TRUE)
-summary(fit_algae_pairwise, fit.measures=TRUE)
-
-
-#This runs, and gives SE estimates so that is good
-#The errors have to do with the variance/covariance matrix - can run "ridge" to help with this
-
-################# marine animal biomass
-N15_model_animal<-'#latent variables as responses
-
-            log_fish_biomass_bym3_mean + fish_bycatch_biomass + ravens  + WAVE_EXPOSURE  ~ marine_animal_biomass_shore
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_fish_biomass_bym3_mean
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_bycatch_biomass
-            
-            #correlations
-            # log_fish_biomass_bym3_mean ~~ fish_bycatch_biomass
-            # log_MEAN_kparea2k ~~ log_MEAN_egarea2k
-
-            
-            #latent variables measurement models
-            marine_animal_biomass_shore =~ d15n
-                                                '
-
-fit_animal <- sem(N15_model_animal, data=master_transect,  missing = "ML")
-summary(fit_animal, fit.measures=TRUE)
-
-### This model also runs although has some problems... 
-#it assumed marine nimal biomass IS 1:1 with d15n, because we have no other estimator
-#same errors as above.... 
-
-
-##### Human model
-N15_model_human<-'#latent variables as responses
-
-            human_pres <~ log_fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ log_fish_biomass_bym3_mean
-            
-            log_MEAN_kparea2k + log_MEAN_egarea2k ~ fish_bycatch_biomass
-            
-            #correlations
-             #log_fish_biomass_bym3_mean ~~ fish_bycatch_biomass
-
-            
-            #latent variables measurement models
-            human_pres =~ midden_feature_sem + fish_feature_sem + cult_imp_plant_richness + d15n
-                                                '
-
-fit_human <- sem(N15_model_human, data=master_transect,  std.lv=TRUE, std.ov=TRUE, missing="pairwise")
-summary(fit_human, standardize=T, rsq=T)
-coef(fit_human, standardize=T )
-
-lavaanify(N15_model_human)
-standardizedsolution(fit_human)
-
-?sem
-# 
-# #getting composite scores from fixing first loading to 1
-# 
-# comp_formula2 <- '
-# human_pres <~ 0.16*log_fish_biomass_bym3_mean + -19*fish_bycatch_biomass  + 0.40*WAVE_EXPOSURE + -0.40*log_Area
-# 
-# human_pres ~ d15n
-# '
-# 
-# comp_model2 <- sem(comp_formula2, data=master_transect, fixed.x=F)
-# 
-# 
-# 
-# cover_model <- lm(d15n ~ log_fish_biomass_bym3_mean + fish_bycatch_biomass  + WAVE_EXPOSURE + log_Area ,master_transect)
-# 
-# summary(cover_model)
