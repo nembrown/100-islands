@@ -1,3 +1,84 @@
+
+# Hierarchical model ------------------------------------------------------
+#demo model
+model <- '
+        level: 1
+            fw =~ y1 + y2 + y3
+            fw ~ x1 + x2 + x3
+        level: 2
+            fb =~ y1 + y2 + y3
+            fb ~ w1 + w2'
+fit <- sem(model = model, data = Demo.twolevel, cluster = "cluster")
+summary(fit)
+semPaths(fit)
+
+N15_model_hierarch_lvl<-'
+        
+        #transect level (between) only transect level stuff
+        level: 1  
+        
+        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+        
+        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+          
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.slope_degrees +  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+          
+        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
+        
+        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
+
+        c.log_site_mean_by_tran ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees
+
+        human_pres_trans ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE  + c.SLOPE_degrees 
+
+        marine_animal_biomass_shore_trans ~ eagles + ravens + pres_otter  + human_pres_trans + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean
+
+        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres_trans + o1*marine_animal_biomass_shore_trans + c.slope_degrees
+
+        ### correlations not already accounted for in model
+        pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
+        pres_fish ~~ c.log_fish_biomass_bym3_mean
+
+
+        #latent variables measurement models
+        human_pres_trans =~ c.distance_to_midden + c.distance_to_fish + c.cult_imp_plant_richness 
+        marine_animal_biomass_shore_trans =~ pres_marine_invert + pres_fish 
+        
+        #island level (within)
+        level: 2
+        
+        pres_otter ~   c.log_Area + c.PA_norml
+        ravens ~   c.log_Area + c.PA_norml
+        eagles ~   c.log_Area + c.PA_norml
+        c.log_site_mean_by_tran ~ c.log_Area + c.PA_norml 
+        c.d15n ~  c.log_Bog_area
+        
+        '
+
+
+fit_simple_hierarch_imp <- semList(N15_model_hierarch_lvl, dataList=implist, cluster = "unq_isl")
+summary(fit_simple_hierarch_imp )
+#does not work. 0/20 imputed lists converged. 
+
+
+fit_simple_hierarch_mice <- semList(N15_model_hierarch, dataList=imputed_transect, cluster = "unq_isl")
+summary(fit_simple_hierarch_mice ) #0/21 datasets converged.
+warnings()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Piecewise fitting -------------------------------------------------------
 
 #Algal model only
