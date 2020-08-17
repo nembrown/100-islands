@@ -219,6 +219,7 @@ fish_richness_merged_tran_arch_2$log_bycatch_biomass_bym3_mean <- log(fish_richn
 
 
 
+
 #master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")] <- lapply(master_transect[,c("seaweed_all", "fish_all", "marine_invert_pres_all","midden_feature_sem","fish_feature_sem")], ordered)
 master_transect<-fish_richness_merged_tran_arch_2
 write.csv(master_transect, "C:Biodiversity idea//Output files//master_transect.csv", row.names=FALSE)
