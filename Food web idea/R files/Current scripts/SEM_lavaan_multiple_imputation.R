@@ -17,16 +17,18 @@ master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.cs
 ## pair down the variables
 sem_variables_names<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                       "ravens", "cult_imp_plant_richness", "d15n", "distance_to_midden",
+                       "ravens", "cult_imp_plant_prop", "d15n", "distance_to_midden",
                        "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "northing", "easting")
+                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area")
+
+#, "log_MEAN_rockarea2000"
 
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
 master_transec_sem_subset$unq_tran<-factor(master_transec_sem_subset$unq_tran, ordered=TRUE)
 master_transec_sem_subset$unq_isl<-factor(master_transec_sem_subset$unq_isl, ordered=TRUE)
 master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, 
                                              omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
-                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting"), 
+                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "cult_imp_plant_prop"), 
                                              center = TRUE, scale = FALSE)
 
 
@@ -50,33 +52,44 @@ md.pattern(master_transec_sem_subset_centered)
 
 N15_model_simple_centered<-'
           
-        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k 
         
-        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k 
           
-        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml+ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml
           
         ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml
         
         eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml
 
-        c.log_site_mean_by_tran ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees
+        c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees
 
-        human_pres ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml
+        human_pres ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k  + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml + beachy_substrate
 
-        marine_animal_biomass_shore ~ eagles + ravens + pres_otter  + human_pres + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean
+        marine_animal_biomass_shore ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
 
-        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area
+        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles
 
-        ### correlations not already accounted for in model
-        pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
-        pres_fish ~~ c.log_fish_biomass_bym3_mean
-
-
+        c.log_Bog_area ~ c.log_Area + c.slope_degrees
+        
         #latent variables measurement models
-        human_pres =~ c.distance_to_midden + c.distance_to_fish + c.cult_imp_plant_richness 
+        human_pres =~ c.distance_to_midden + c.distance_to_fish + cult_imp_plant_prop 
         marine_animal_biomass_shore =~ pres_marine_invert + pres_fish 
+        
+        ### error covariances not already accounted for in model
+        c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean
+        pres_marine_invert ~~ c.distance_to_midden
+        pres_fish ~~ c.distance_to_fish
+
         '
+
+
+### error covariances not already accounted for in model between endogenous and exogenous
+pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
+pres_fish ~~ c.log_fish_biomass_bym3_mean
+
+
+
 
 
 # Multiple imputation -----------------------------------------------------
@@ -87,10 +100,11 @@ N15_model_simple_centered<-'
 #OPTION 1 Multiple imputation using mimtl packacge which is two levels - 
 #this is important for the log_Bog_area variable whic is at level 2 (island level) but has missing values) 
 fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
-               c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + c.cult_imp_plant_richness + c.d15n + c.distance_to_midden +
+               c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + cult_imp_plant_prop + 
+               c.d15n + c.distance_to_midden +
                c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
                pres_marine_invert + pres_fish  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-             c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
+               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
 
 
 imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=5000, n.iter=250, m=20)
@@ -136,8 +150,20 @@ summary(fit.mi.amelia)
 # Running model and adding survey design ----------------------------------
 
 #run basic empty model then update with survey design
-lavaan_fit_model<-sem(N15_model_simple_centered, meanstructure = TRUE, data=master_transec_sem_subset_centered, std.lv=TRUE)
+lavaan_fit_model<-sem(N15_model_simple_centered, data=master_transec_sem_subset_centered)
+summary(lavaan_fit_model)
 
+varTable(lavaan_fit_model)
+eigen(inspect(lavaan_fit_model, "cov.lv"))$values 
+
+str(master_transec_sem_subset_centered)
+imps_str<-as.data.frame(imps[[1]])
+imps_cov<-cov(imps_str[,-c(1,2,14)])
+View(imps_cov)
+
+imps_cov<-as.matrix(imps_cov)
+det(imps_cov)
+solve(imps_cov)
 
 # Survey.design with mitml and amelia - mice wasn't working 
 design_imp_amelia<-svydesign(ids=~unq_isl, strata=~node, data=imps_amelia)
@@ -145,8 +171,26 @@ design_imp_mitml<-svydesign(ids=~unq_isl, strata=~node, data=imputed_mitml)
 
 fit.adj.amelia<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_amelia, estimator="MLM")
 summary(fit.adj.amelia, standardized=T)
-parameterEstimates(fit.adj.amelia)
-pval.pFsum(fit.adj, survey.design = design_imp)
 
 fit.adj.mitml<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_mitml, estimator="MLM")
 summary(fit.adj.mitml, standardized=T)
+
+
+standardizedSolution(fit.adj.mitml)
+
+#use mitml because better adjustment - lower chi
+
+#sometimes only amelia works.... 
+
+plyr::arrange(modificationIndices(fit.adj.mitml),mi, decreasing=TRUE)
+
+mod.am<-as.data.frame(modificationIndices(fit.adj.mitml))
+str(mod.am)
+mi_table<-plyr::arrange(mod.am, mi, decreasing=TRUE)
+mi_table
+
+mi_table2<-arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
+mi_table2
+
+mi_table3<-arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
+mi_table3
