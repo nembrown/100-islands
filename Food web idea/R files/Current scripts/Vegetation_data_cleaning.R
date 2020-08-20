@@ -66,7 +66,7 @@ islands_plant_filtered[duplicated(islands_plant_filtered),]
 islands_plant_filtered$unq_isl<-str_sub(islands_plant_filtered$unq_tran, 1,4)
 
 
-View(islands_plant_filtered)
+head(islands_plant_filtered)
 
 # Deb's data read and tidy ------------------------------------------------
 
@@ -117,7 +117,7 @@ Deb_Owen_veg_combined<-rbind(islands_plant_filtered, veg1x1_Deb_mod_interior_siz
 
 
 
-View(Deb_Owen_veg_combined)
+head(Deb_Owen_veg_combined)
 length(unique(Deb_Owen_veg_combined$unq_isl))
 #99
 
@@ -174,7 +174,7 @@ longform_plant_percentcover2$unknown_monocot<-longform_plant_percentcover2$'unk 
 longform_plant_percentcover_species<-longform_plant_percentcover2[, ! colnames(longform_plant_percentcover2) %in% not_species_names]
 head(longform_plant_percentcover_species)
 
-longform_plant_percentcover_species_long<-longform_plant_percentcover_species %>% group_by(unq_plot) %>% gather(species, cover, 6:152)
+longform_plant_percentcover_species_long<-longform_plant_percentcover_species %>% group_by(unq_plot) %>% gather(species, cover, 6:153)
 head(longform_plant_percentcover_species_long)
 #lots of Nas but we will deal with thme next
 
@@ -209,7 +209,7 @@ deb_coords<-pointcount.gps[,-1]
 head(deb_coords)
 
 Deb_Owen_veg_combined_complete_filled<-merge(Deb_Owen_veg_combined_complete_filled,deb_coords,by="unq_tran", all.x = TRUE)
-View(Deb_Owen_veg_combined_complete_filled)
+head(Deb_Owen_veg_combined_complete_filled)
 
 write.csv(Deb_Owen_veg_combined_complete_filled, "Food web idea//Data by person//Kalina.data/Deb_Owen_veg_combined_complete_filled.csv", row.names=FALSE)
 #### This is complete with no "bad" species- all are plnats, no bare ground etc.... 

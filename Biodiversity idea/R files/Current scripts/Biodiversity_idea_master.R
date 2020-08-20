@@ -165,7 +165,7 @@ write.csv(fish_richness_merged_tran_arch, "C:Biodiversity idea//Output files//fi
 plant_data_cult_richness<- read.csv("C:Biodiversity idea//Output files//plant_data_cult_richness.csv")
 head(plant_data_cult_richness)
 
-fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch, plant_data_cult_richness, all.x=TRUE)
+fish_richness_merged_tran_arch_2<-merge(fish_richness_merged_tran_arch, plant_data_cult_richness[,c(1,4)], all.x=TRUE)
 head(fish_richness_merged_tran_arch_2)
 
 
@@ -207,6 +207,7 @@ fish_richness_merged_tran_arch_2 <-merge(fish_richness_merged_tran_arch_2, by_is
 fish_richness_merged_tran_arch_2$log_site_mean_by_tran <- log(fish_richness_merged_tran_arch_2$site_mean_by_tran+1)
 fish_richness_merged_tran_arch_2$log_MEAN_kparea2k <- log(fish_richness_merged_tran_arch_2$MEAN_kparea2k+1)
 fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_tran_arch_2$MEAN_egarea2k+1)
+fish_richness_merged_tran_arch_2$log_MEAN_rockarea2000 <- log(fish_richness_merged_tran_arch_2$MEAN_rockarea2000+1)
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock)
 fish_richness_merged_tran_arch_2$log_DistW_ML<- log(fish_richness_merged_tran_arch_2$DistW_ML)
 fish_richness_merged_tran_arch_2$log_Dist_NearL<- log(fish_richness_merged_tran_arch_2$Dist_Near)
