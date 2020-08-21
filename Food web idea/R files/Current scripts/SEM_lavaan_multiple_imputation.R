@@ -12,6 +12,7 @@ library(ggplot2)
 library(mitools)
 library(Amelia)
 library(lavaanPlot)
+library(tidySEM)
 
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 
@@ -202,7 +203,7 @@ mi_table3
 #semplot
 
 semPaths(fit.adj.mitml, what="std",  intercepts=FALSE, residuals=FALSE,
-         groups=grps, layout="circle2", nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, exoVar = FALSE, label.cex=1, title=TRUE)
+         groups=grps, layout=lay,exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4)
 
 
 grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
@@ -211,6 +212,20 @@ grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_M
            Humans=c("human_pres","cult_imp_plant_prop", "c.distance_to_midden","c.distance_to_fish"),
            Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
            outcome=c("c.d15n"))
+
+nodelabels<-c("c.log_MEAN_rockarea2000"="Fucus","c.log_site_mean_by_tran"="Wrack", "c.log_MEAN_kparea2k"="Kelp", "c.log_MEAN_egarea2k"="eelgrass",
+"c.PA_norml" = "wigglyness", "c.SLOPE_degrees"="beach_slope", "c.log_Area"="Isl_Area", "c.WAVE_EXPOSURE"="Exposure", "c.slope_degrees"="land_slope","c.log_Bog_area"="Bog_area", "c.log_Dist_Near"="Nearest_neighb",
+"marine_animal_biomass_shore"="marine_debris","pres_otter"="otters", "pres_marine_invert"="marine_inverts", "pres_fish"="fish_shore", 
+"cult_imp_plant_prop"="cultural_plants", "c.distance_to_midden"="midden","c.distance_to_fish"="fish_trap",
+"c.log_fish_biomass_bym3_mean"="fish_biomass", "c.log_bycatch_biomass_bym3_mean"="invert_biomass","c.d15n"="d15N_soil", "eagles"="eagles","ravens"="ravens", "elevation_max"="isl_elevation", "human_pres"="human_pres", "beachy_substrate"="beach")
+
+nodelabels<-c("", "", "", "", "", "", "d15n", "","", "", "",
+  "wrack", "", "", "marine_debris", "", "", "", "human_pres", "", "","",
+  "", "", "",  "pres_marine_invert", "pres_fish","", "", "","cultural_plants", "midden","fish_trap",
+  "","", "", "eagles","ravens" ,"otter","","","","","", 
+  "","","","fish_biomass", "bycatch_biomass","","","Bog_area","","","",
+  "fucus", "kelp", "eelgrass", "PA_norml", "beach_slope", "Area", "WAVE_EXPOSURE", "beach", "slope_terr","Nearest_neighb", "elevation_max")
+
 
 
 matrix_nodes<-cbind(c(-1,-1,0,0,-1,1), c(1,0,-1,1,-1,0))
@@ -222,7 +237,19 @@ matrix_2<-c(1,0,0,0,0,2,0,4,0,6,5,0,3,0,0)
 matrix_2<-c("Algae",0,0,0,0,"Islchar",0,"Humans",0,"outcome","Fish",0,"Animalvect",0,0)
 
 ###lavaan plot
-lavaanPlot(model = fit.adj.mitml, labels = labels, graph_otions=list(rankdir=LR),
+lavaanPlot(model = fit.adj.mitml,
            node_options = list(shape = "box", fontname = "Helvetica"), edge_options = list(color = "grey"), coefs = TRUE)
 
 ?lavaanPlot
+
+####tidy SEM
+
+graph_sem(model=fit.adj.mitml, layout=lay)
+
+lay<-get_layout("", "", "", "", "", "", "c.d15n", "","", "", "",
+                "c.log_site_mean_by_tran", "", "", "marine_animal_biomass_shore", "", "", "", "human_pres", "", "","",
+                "", "", "",  "pres_marine_invert", "pres_fish","", "", "","cult_imp_plant_prop", "c.distance_to_midden","c.distance_to_fish",
+                "","", "", "eagles","ravens" ,"pres_otter","","","","","", 
+                "","","","c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean","","","c.log_Bog_area","","","",
+                "c.log_MEAN_rockarea2000", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k", "c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Dist_Near", "elevation_max", rows=6)
+
