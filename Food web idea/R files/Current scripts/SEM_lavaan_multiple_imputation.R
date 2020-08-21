@@ -11,15 +11,17 @@ library(mice)
 library(ggplot2)
 library(mitools)
 library(Amelia)
+library(lavaanPlot)
 
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 
+head(master_transect)
 ## pair down the variables
 sem_variables_names<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
                        "ravens", "cult_imp_plant_prop", "d15n", "distance_to_midden",
                        "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area")
+                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max")
 
 #, "log_MEAN_rockarea2000"
 
@@ -28,7 +30,7 @@ master_transec_sem_subset$unq_tran<-factor(master_transec_sem_subset$unq_tran, o
 master_transec_sem_subset$unq_isl<-factor(master_transec_sem_subset$unq_isl, ordered=TRUE)
 master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, 
                                              omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
-                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "cult_imp_plant_prop"), 
+                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "cult_imp_plant_prop", "elevation_max"), 
                                              center = TRUE, scale = FALSE)
 
 
@@ -52,23 +54,23 @@ md.pattern(master_transec_sem_subset_centered)
 
 N15_model_simple_centered<-'
           
-        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k 
+        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         
-        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k 
+        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
           
-        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near
           
         ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml
         
         eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml
 
-        c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees
+        c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
-        human_pres ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k  + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml + beachy_substrate
+        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml + beachy_substrate + elevation_max
 
         marine_animal_biomass_shore ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
 
-        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles
+        c.d15n ~ a1*c.log_site_mean_by_tran + h1*human_pres + o1*marine_animal_biomass_shore + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max
 
         c.log_Bog_area ~ c.log_Area + c.slope_degrees
         
@@ -103,8 +105,8 @@ fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + cult_imp_plant_prop + 
                c.d15n + c.distance_to_midden +
                c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
-               pres_marine_invert + pres_fish  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles  ~ 1 )                                        # Level 2
+               pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000  ~ 1 + (1|unq_isl) ,                                                 # Level 1
+               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max ~ 1 )                          # Level 2
 
 
 imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=5000, n.iter=250, m=20)
@@ -150,7 +152,7 @@ summary(fit.mi.amelia)
 # Running model and adding survey design ----------------------------------
 
 #run basic empty model then update with survey design
-lavaan_fit_model<-sem(N15_model_simple_centered, data=master_transec_sem_subset_centered)
+lavaan_fit_model<-sem(N15_model_simple_centered, data=master_transec_sem_subset_centered, std.lv=TRUE)
 summary(lavaan_fit_model)
 
 varTable(lavaan_fit_model)
@@ -169,12 +171,13 @@ solve(imps_cov)
 design_imp_amelia<-svydesign(ids=~unq_isl, strata=~node, data=imps_amelia)
 design_imp_mitml<-svydesign(ids=~unq_isl, strata=~node, data=imputed_mitml)
 
-fit.adj.amelia<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_amelia, estimator="MLM")
+fit.adj.amelia<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_amelia, estimator="MLMVS")
 summary(fit.adj.amelia, standardized=T)
 
-fit.adj.mitml<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_mitml, estimator="MLM")
+fit.adj.mitml<-lavaan.survey(lavaan.fit=lavaan_fit_model, survey.design = design_imp_mitml, estimator="MLMVS")
 summary(fit.adj.mitml, standardized=T)
 
+inspect(fit.adj.mitml, 'coverage')
 
 standardizedSolution(fit.adj.mitml)
 
@@ -182,9 +185,9 @@ standardizedSolution(fit.adj.mitml)
 
 #sometimes only amelia works.... 
 
-plyr::arrange(modificationIndices(fit.adj.mitml),mi, decreasing=TRUE)
+plyr::arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
 
-mod.am<-as.data.frame(modificationIndices(fit.adj.mitml))
+mod.am<-as.data.frame(modificationIndices(fit.adj.amelia))
 str(mod.am)
 mi_table<-plyr::arrange(mod.am, mi, decreasing=TRUE)
 mi_table
@@ -194,3 +197,32 @@ mi_table2
 
 mi_table3<-arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
 mi_table3
+
+
+#semplot
+
+semPaths(fit.adj.mitml, what="std",  intercepts=FALSE, residuals=FALSE,
+         groups=grps, layout="circle2", nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, exoVar = FALSE, label.cex=1, title=TRUE)
+
+
+grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
+           Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max"),
+           Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "eagles","ravens" ),
+           Humans=c("human_pres","cult_imp_plant_prop", "c.distance_to_midden","c.distance_to_fish"),
+           Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
+           outcome=c("c.d15n"))
+
+
+matrix_nodes<-cbind(c(-1,-1,0,0,-1,1), c(1,0,-1,1,-1,0))
+rownames(matrix_nodes)<-c("Algae", "Islchar", "Animalvect", "Humans", "Fish", "outcome")
+colnames(matrix_nodes)<-c("x", "y")
+
+matrix_2<-c(1,0,0,0,0,2,0,4,0,6,5,0,3,0,0)
+
+matrix_2<-c("Algae",0,0,0,0,"Islchar",0,"Humans",0,"outcome","Fish",0,"Animalvect",0,0)
+
+###lavaan plot
+lavaanPlot(model = fit.adj.mitml, labels = labels, graph_otions=list(rankdir=LR),
+           node_options = list(shape = "box", fontname = "Helvetica"), edge_options = list(color = "grey"), coefs = TRUE)
+
+?lavaanPlot
