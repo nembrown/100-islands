@@ -17,24 +17,29 @@ library(tidySEM)
 master_transect<-read.csv("C:Biodiversity idea//Output files//master_transect.csv")
 
 head(master_transect)
+
+
 ## pair down the variables
 sem_variables_names<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
                        "ravens", "cult_imp_plant_prop", "d15n", "distance_to_midden",
                        "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max")
+                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
+                       "slope_isl", "CHM_mean_height")
 
-#, "log_MEAN_rockarea2000"
+
 
 master_transec_sem_subset<-master_transect[, colnames(master_transect) %in% sem_variables_names]
 master_transec_sem_subset$unq_tran<-factor(master_transec_sem_subset$unq_tran, ordered=TRUE)
 master_transec_sem_subset$unq_isl<-factor(master_transec_sem_subset$unq_isl, ordered=TRUE)
+master_transec_sem_subset$node<-factor(master_transec_sem_subset$node)
+
 master_transec_sem_subset_centered <- stdize(master_transec_sem_subset, 
                                              omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
                                                            "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "cult_imp_plant_prop", "elevation_max"), 
                                              center = TRUE, scale = FALSE)
 
-
+head(master_transec_sem_subset_centered)
 # master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.cases(master_transec_sem_subset_centered$pres_otter), ]
 # master_transec_sem_subset_centered<-master_transec_sem_subset_centered[complete.cases(master_transec_sem_subset_centered$c.log_Bog_area), ]
 
@@ -67,7 +72,7 @@ N15_model_simple_centered<-'
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
-        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.SLOPE_degrees + c.PA_norml + beachy_substrate + elevation_max
+        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max
 
         marine_animal_biomass_shore ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
 
@@ -83,17 +88,45 @@ N15_model_simple_centered<-'
         c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean
         pres_marine_invert ~~ c.distance_to_midden
         pres_fish ~~ c.distance_to_fish
+ 
+                                                    '
 
-        '
+N15_model_simple_centered_alt<-'
+          
+        c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
+        
+        c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
+          
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees
+          
+        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.CHM_mean_height
+        
+        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.CHM_mean_height
+
+        c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
+
+        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max
+
+        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean 
+
+        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean 
+
+        c.d15n ~ w1*c.log_site_mean_by_tran + h1*human_pres + pres_marine_invert + pres_fish + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl  + c.CHM_mean_height
+
+        #latent variables measurement models
+        human_pres =~ c.distance_to_midden + c.distance_to_fish + cult_imp_plant_prop 
+
+        ### error covariances not already accounted for in model
+        c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean
+        pres_marine_invert ~~ c.distance_to_midden
+        pres_fish ~~ c.distance_to_fish
+        pres_marine_invert ~~ c.log_site_mean_by_tran
+        pres_fish  ~~ c.log_site_mean_by_tran
+                                                    '
 
 
-### error covariances not already accounted for in model between endogenous and exogenous
-pres_marine_invert ~~ c.log_bycatch_biomass_bym3_mean
-pres_fish ~~ c.log_fish_biomass_bym3_mean
-
-
-
-
+#        c.log_bycatch_biomass_bym3_mean ~~ pres_marine_invert
+#c.log_fish_biomass_bym3_mean ~~ pres_fish  
 
 # Multiple imputation -----------------------------------------------------
 # We need to use multiple imputation because the methods to understand our multi-level data dont accept missing data
@@ -107,7 +140,7 @@ fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.d15n + c.distance_to_midden +
                c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
                pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max ~ 1 )                          # Level 2
+               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height ~ 1 )                          # Level 2
 
 
 imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=5000, n.iter=250, m=20)
@@ -153,7 +186,7 @@ summary(fit.mi.amelia)
 # Running model and adding survey design ----------------------------------
 
 #run basic empty model then update with survey design
-lavaan_fit_model<-sem(N15_model_simple_centered, data=master_transec_sem_subset_centered, std.lv=TRUE)
+lavaan_fit_model<-sem(N15_model_simple_centered_alt, data=master_transec_sem_subset_centered, std.lv=TRUE)
 summary(lavaan_fit_model)
 
 varTable(lavaan_fit_model)
@@ -202,12 +235,13 @@ mi_table3
 
 #semplot
 
-semPaths(fit.adj.mitml, what="std",  intercepts=FALSE, residuals=FALSE,
-         groups=grps, layout=lay,exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4)
+semPaths(fit.adj.amelia, what="std",  intercepts=FALSE, residuals=FALSE,
+         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
+         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2)
 
 
 grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
-           Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max"),
+           Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max",   "c.slope_isl", "c.CHM_mean_height"),
            Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "eagles","ravens" ),
            Humans=c("human_pres","cult_imp_plant_prop", "c.distance_to_midden","c.distance_to_fish"),
            Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
@@ -244,7 +278,7 @@ lavaanPlot(model = fit.adj.mitml,
 
 ####tidy SEM
 
-graph_sem(model=fit.adj.mitml, layout=lay)
+graph_sem(model=fit.adj.amelia, layout=lay_alt)
 
 lay<-get_layout("", "", "", "", "", "", "c.d15n", "","", "", "",
                 "c.log_site_mean_by_tran", "", "", "marine_animal_biomass_shore", "", "", "", "human_pres", "", "","",
@@ -252,4 +286,13 @@ lay<-get_layout("", "", "", "", "", "", "c.d15n", "","", "", "",
                 "","", "", "eagles","ravens" ,"pres_otter","","","","","", 
                 "","","","c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean","","","c.log_Bog_area","","","",
                 "c.log_MEAN_rockarea2000", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k", "c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Dist_Near", "elevation_max", rows=6)
+
+lay_alt<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","", "","","","","","", "c.d15n", "","", "", "","","", "","","","","", "","",
+                "c.log_site_mean_by_tran","","", "","","","","", "","", "pres_marine_invert","","","","","","", "pres_fish", "","", "","","","", "","","","","","","","human_pres", "", "","","","","","","","", "","","","","","","",
+                "","", "","","","", "eagles","","","","","","","ravens" ,"","","","","","","pres_otter","","","","","","","","cult_imp_plant_prop","","","", "c.distance_to_midden","","","","c.distance_to_fish","","","","","","","","","", 
+                "","","","","","","","","c.log_fish_biomass_bym3_mean","","","","","","","","","","", "c.log_bycatch_biomass_bym3_mean","","","","","","","","","","","","","","","","","", "","","","","","","","","",
+                "c.log_MEAN_rockarea2000","","","", "","","c.log_MEAN_kparea2k","","","", "","","c.log_MEAN_egarea2k","","", "","","","","","","","","","","","","","c.SLOPE_degrees","c.WAVE_EXPOSURE", "beachy_substrate","","","","","","","", "c.slope_degrees","","c.PA_norml","c.log_Area",  "c.log_Dist_Near", "elevation_max",  "c.slope_isl", "c.CHM_mean_height","c.log_Bog_area", rows=5)
+
+
+ 
 
