@@ -170,8 +170,9 @@ island_data_wiebe<-read.csv("C:Food web idea//Data by person//Pat.data//Islands_
 head(island_data_wiebe)
 
 names(island_data_wiebe)[1]<-"unq_isl"
+names(island_data_wiebe)[19]<-"slope_isl"
 
-habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,17,18,19)])
+habitat_class<-merge(habitat_class, island_data_wiebe[,c(1,15, 17,18,19)])
 
 habitat_soil_by_isl<-merge(soil_owen_deb_by_isl, habitat_class, by="unq_isl", all=TRUE)
 head(habitat_soil_by_isl)
@@ -403,6 +404,9 @@ names(baea.isls) <- c("unq_isl", "eagles")
 #head(baea.isls)
 
 by_isl_master <- merge(by_isl_master, baea.isls, all = TRUE)
+
+by_isl_master$ravens[is.na(by_isl_master$ravens)]<-0
+by_isl_master$eagles[is.na(by_isl_master$eagles)]<-0
 
 head(by_isl_master)
 length(by_isl_master$unq_isl)
