@@ -183,7 +183,7 @@ head(fish_richness_merged_tran_arch_2)
 ##### adding in island-level characteristics to the transect file
 #head(fish_richness_merged_tran_arch)
 
-by_isl_master<-read.csv("C:Food web idea//Data by person//Owen's data//by_isl_master.csv")
+by_isl_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_isl_master.csv")
 head(by_isl_master)
 by_isl_master_col_names_tran<-c("unq_isl",
                                 "Area",
@@ -195,7 +195,7 @@ by_isl_master_col_names_tran<-c("unq_isl",
                                 "DistW_ML", 
                                 "Dist_Near", 
                                 "habitat_het", "elevation_max", "elevation_mean", 
-                                "slope_mean", "NDVI_mean", "Neighb_250", "Bog_Water", "Bog_Vegetation")
+                                "slope_isl", "CHM_mean_height","NDVI_mean", "Neighb_250", "Bog_Water", "Bog_Vegetation")
 
 by_isl_master_subset_tran<-by_isl_master[,colnames(by_isl_master) %in% by_isl_master_col_names_tran]
 head(by_isl_master_subset_tran)
@@ -210,7 +210,7 @@ fish_richness_merged_tran_arch_2$log_MEAN_egarea2k <- log(fish_richness_merged_t
 fish_richness_merged_tran_arch_2$log_MEAN_rockarea2000 <- log(fish_richness_merged_tran_arch_2$MEAN_rockarea2000+1)
 fish_richness_merged_tran_arch_2$log_Rock<- log(fish_richness_merged_tran_arch_2$Rock)
 fish_richness_merged_tran_arch_2$log_DistW_ML<- log(fish_richness_merged_tran_arch_2$DistW_ML)
-fish_richness_merged_tran_arch_2$log_Dist_NearL<- log(fish_richness_merged_tran_arch_2$Dist_Near)
+fish_richness_merged_tran_arch_2$log_Dist_Near<- log(fish_richness_merged_tran_arch_2$Dist_Near)
 fish_richness_merged_tran_arch_2$log_distance_to_midden<- log(fish_richness_merged_tran_arch_2$distance_to_midden)
 fish_richness_merged_tran_arch_2$log_distance_to_fish<- log(fish_richness_merged_tran_arch_2$distance_to_fish)
 fish_richness_merged_tran_arch_2$Bog_area<- fish_richness_merged_tran_arch_2$Bog_Vegetation + fish_richness_merged_tran_arch_2$Bog_Water 
@@ -229,9 +229,9 @@ View(master_transect)
 
 
 
-hist(fish_richness_merged_tran_arch_2$Bog_area)
+hist(fish_richness_merged_tran_arch_2$plot_cc)
 
-
+master_transect$slope_isl
 ###########################################################
 
 
