@@ -99,30 +99,91 @@ N15_model_simple_centered_alt<-'
           
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees
           
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.CHM_mean_height
+        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max 
         
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.CHM_mean_height
+        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max 
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
-        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max
+        human_pres ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max + c.log_site_mean_by_tran
 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean 
+        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + human_pres
 
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean 
+        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + human_pres
 
-        c.d15n ~ w1*c.log_site_mean_by_tran + h1*human_pres + pres_marine_invert + pres_fish + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl  + c.CHM_mean_height
+        c.d15n ~ w1*c.log_site_mean_by_tran + h1*human_pres + pres_marine_invert + pres_fish + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl
 
+        c.log_Bog_area ~ c.log_Area + elevation_max + c.PA_norml + c.slope_isl
+        
         #latent variables measurement models
         human_pres =~ c.distance_to_midden + c.distance_to_fish + cult_imp_plant_prop 
 
-        ### error covariances not already accounted for in model
-        c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean
-        pres_marine_invert ~~ c.distance_to_midden
-        pres_fish ~~ c.distance_to_fish
-        pres_marine_invert ~~ c.log_site_mean_by_tran
-        pres_fish  ~~ c.log_site_mean_by_tran
-                                                    '
+        ### error covariances not already accounted for in model (i.e. a similar processes underlying variables)
+        #kelp/habitat/ocean process affects all of these:
+        c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean 
+        
+        #I think the wrack process would also affect the marine debris that gets on shore 
+        c.log_site_mean_by_tran ~~ pres_marine_invert + pres_fish
+        
+        #similar drivers affect similar animal vectors
+        eagles ~~ ravens 
+        
+        #suggested by MI incides -- consistent with theory - these should be correlated if these are cause of human
+        #c.distance_to_midden ~~ c.log_bycatch_biomass_bym3_mean
+        #c.distance_to_fish ~~ c.log_fish_biomass_bym3_mean
+    '
+
+
+#MI:
+#wrack causes humans 
+
+
+####need to add in ~~ between fish trap and fish ... etc ... but not sure if that' sokayu?? 
+
+
+
+# 
+# ### Composite
+# N15_model_simple_centered_composite<-'
+#           
+#         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
+#         
+#         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
+#           
+#         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + isl_char + habitat_char + shore_char
+#           
+#         ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + pres_otter + isl_char + veg_char + habitat_char
+#         
+#         eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + pres_otter + isl_char + veg_char + habitat_char
+#         
+#         c.log_site_mean_by_tran ~  c.log_Area + c.PA_norml + habitat_char + shore_char
+# 
+#         human_pres ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + isl_char + habitat_char + shore_char
+# 
+#         pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean 
+# 
+#         pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean 
+# 
+#         c.d15n ~ w1*c.log_site_mean_by_tran + h1*human_pres + pres_marine_invert + pres_fish + c.slope_degrees + c.log_Bog_area + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl  + c.CHM_mean_height
+# 
+#         veg_char ~ pres_otter + c.log_Area + elevation_max
+#         
+#         #latent variables measurement models
+#         human_pres =~ c.distance_to_midden + c.distance_to_fish + cult_imp_plant_prop 
+#         
+#         #composite models
+#         isl_char <~ c.slope_isl + elevation_max +  c.log_Area + c.PA_norml + c.log_Dist_Near
+#         veg_char <~  c.CHM_mean_height + c.log_Bog_area 
+#         habitat_char <~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
+#         shore_char <~ c.slope_degrees + c.WAVE_EXPOSURE + beachy_substrate + c.SLOPE_degrees
+#         
+# 
+#         ### error covariances not already accounted for in model
+#         c.log_bycatch_biomass_bym3_mean ~~ c.log_fish_biomass_bym3_mean
+#         pres_marine_invert ~~ c.log_site_mean_by_tran
+#         pres_fish  ~~ c.log_site_mean_by_tran
+#         human_pres ~~ c.log_bycatch_biomass_bym3_mean + c.log_fish_biomass_bym3_mean
+                                                    # '
 
 
 #        c.log_bycatch_biomass_bym3_mean ~~ pres_marine_invert
@@ -135,6 +196,8 @@ N15_model_simple_centered_alt<-'
 # Option 1 mitml ----------------------------------------------------------
 #OPTION 1 Multiple imputation using mimtl packacge which is two levels - 
 #this is important for the log_Bog_area variable whic is at level 2 (island level) but has missing values) 
+
+
 fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + cult_imp_plant_prop + 
                c.d15n + c.distance_to_midden +
@@ -143,14 +206,14 @@ fml <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height ~ 1 )                          # Level 2
 
 
-imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=5000, n.iter=250, m=20)
+imp <- jomoImpute(master_transec_sem_subset_centered, formula=fml, n.burn=500, n.iter=500, m=20)
 summary(imp)
 
 #problems the model sees: 
-plot(imp, trace="all", print="beta2", pos=c(1,1))
-plot(imp, trace="all", print="beta", pos=c(1,11))
-plot(imp, trace="all", print="psi", pos=c(6,6))
-plot(imp, trace="all", print="sigma", pos=c(8,6))
+plot(imp, trace="all", print="beta2", pos=c(1,7))
+plot(imp, trace="all", print="beta", pos=c(1,10))
+plot(imp, trace="all", print="psi", pos=c(24,6))
+plot(imp, trace="all", print="sigma", pos=c(4,2))
 
 implist <- mitmlComplete(imp, "all")
 #get it to talk to survey.design
@@ -214,12 +277,17 @@ summary(fit.adj.mitml, standardized=T)
 inspect(fit.adj.mitml, 'coverage')
 
 standardizedSolution(fit.adj.mitml)
-
+rSquared = inspect(fit.adj.mitml, "rsquare")
+xVar = rSquared[1:(length(rSquared) - 1)]
+# which should be excluded?
+names(xVar[xVar < (mean(xVar) - (2 * sd(xVar)))])
+# returns
+character(0)
 #use mitml because better adjustment - lower chi
 
 #sometimes only amelia works.... 
 
-plyr::arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
+plyr::arrange(modificationIndices(fit.adj.mitml),mi, decreasing=TRUE)
 
 mod.am<-as.data.frame(modificationIndices(fit.adj.amelia))
 str(mod.am)
@@ -232,13 +300,13 @@ mi_table2
 mi_table3<-arrange(modificationIndices(fit.adj.amelia),mi, decreasing=TRUE)
 mi_table3
 
+fitMeasures(fit.adj.amelia, c("cfi","rmsea","srmr"))
+
+fitMeasures(fit.adj.mitml)
+
+#######
 
 #semplot
-
-semPaths(fit.adj.amelia, what="std",  intercepts=FALSE, residuals=FALSE,
-         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
-         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2)
-
 
 grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
            Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max",   "c.slope_isl", "c.CHM_mean_height"),
@@ -247,34 +315,76 @@ grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_M
            Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
            outcome=c("c.d15n"))
 
-nodelabels<-c("c.log_MEAN_rockarea2000"="Fucus","c.log_site_mean_by_tran"="Wrack", "c.log_MEAN_kparea2k"="Kelp", "c.log_MEAN_egarea2k"="eelgrass",
-"c.PA_norml" = "wigglyness", "c.SLOPE_degrees"="beach_slope", "c.log_Area"="Isl_Area", "c.WAVE_EXPOSURE"="Exposure", "c.slope_degrees"="land_slope","c.log_Bog_area"="Bog_area", "c.log_Dist_Near"="Nearest_neighb",
-"marine_animal_biomass_shore"="marine_debris","pres_otter"="otters", "pres_marine_invert"="marine_inverts", "pres_fish"="fish_shore", 
-"cult_imp_plant_prop"="cultural_plants", "c.distance_to_midden"="midden","c.distance_to_fish"="fish_trap",
-"c.log_fish_biomass_bym3_mean"="fish_biomass", "c.log_bycatch_biomass_bym3_mean"="invert_biomass","c.d15n"="d15N_soil", "eagles"="eagles","ravens"="ravens", "elevation_max"="isl_elevation", "human_pres"="human_pres", "beachy_substrate"="beach")
+#5152E0 #266DB8 #00A4EE #0AA5E2 #35CBBF #51C5B4 #A9BE93 #C2B3A2 #F78FB2 #F186AA #EC6D98
 
-nodelabels<-c("", "", "", "", "", "", "d15n", "","", "", "",
-  "wrack", "", "", "marine_debris", "", "", "", "human_pres", "", "","",
-  "", "", "",  "pres_marine_invert", "pres_fish","", "", "","cultural_plants", "midden","fish_trap",
-  "","", "", "eagles","ravens" ,"otter","","","","","", 
-  "","","","fish_biomass", "bycatch_biomass","","","Bog_area","","","",
-  "fucus", "kelp", "eelgrass", "PA_norml", "beach_slope", "Area", "WAVE_EXPOSURE", "beach", "slope_terr","Nearest_neighb", "elevation_max")
+colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
+
+nodelab<-c("midden", "fish\ntrap", "cultural\nplants", "fish", "marine\ninvert","wrack", "shell", "fish\nbones", "d15N\nsoil","otter", "ravens", "eagles",  
+           "Bog\narea", "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "wiggly", "neighb",  "elevation", "wave\nexposure","beach\nslope",
+           "island\nslope", "human\nimpact")
+
+lay_names<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","d15N\nsoil",  "","","","","", "","", "", "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                    "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","human\nimpact", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","",
+                    "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","fish\ntrap","","","","","", "midden","","","","","","cultural\nplants","","","","","","","","","","","","","", "","","","","","","","",
+                    "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Bog\narea","","","","","",
+                    "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","wiggly","","","","","","Area","","","", "","", "neighb","","","","","", "elevation", "","","","","", "island\nslope","","","","","","", rows=5)
+
+semPaths(fit.adj.mitml, what="std",  layout=lay_names, intercepts=FALSE, residuals=FALSE,
+         groups=grps, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab, legend=FALSE)
+
+semPaths(fit.adj.mitml, what="path",  layout=lay_names, intercepts=FALSE, residuals=FALSE,
+         groups=grps, exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4,  nodeLabels = nodelab, legend=FALSE)
 
 
+#############################
+lavaan::parameterEstimates(fit.adj.mitml) %>% dplyr::filter(!is.na(pvalue)) %>% arrange((pvalue)) %>% mutate_if("is.numeric","round",3) %>% dplyr::select(-ci.lower,-ci.upper,-z)
+parameterEstimates(fit.adj.mitml)
+pvalue_cutoff <- 0.10
+obj <- semPlot:::semPlotModel(fit.adj.mitml)
 
-matrix_nodes<-cbind(c(-1,-1,0,0,-1,1), c(1,0,-1,1,-1,0))
-rownames(matrix_nodes)<-c("Algae", "Islchar", "Animalvect", "Humans", "Fish", "outcome")
-colnames(matrix_nodes)<-c("x", "y")
 
-matrix_2<-c(1,0,0,0,0,2,0,4,0,6,5,0,3,0,0)
+# save a copy of the original, so we can compare it later and be sure we removed only what we intended to remove
+original_Pars <- obj@Pars
 
-matrix_2<-c("Algae",0,0,0,0,"Islchar",0,"Humans",0,"outcome","Fish",0,"Animalvect",0,0)
+check_Pars <- obj@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
+keep_Pars <- obj@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
+test_against <- lavaan::parameterEstimates(fit.adj.mitml) %>% dplyr::filter(pvalue < pvalue_cutoff)
+test_against_rev <- test_against %>% rename(rhs2 = lhs,   # for some reason, the rhs and lhs are reversed in the standardizedSolution() output, for some of the values
+                                            lhs = rhs) %>% # I'll have to reverse it myself, and test against both orders
+  rename(rhs = rhs2)
+checked_Pars <-
+  check_Pars %>% semi_join(test_against, by = c("lhs", "rhs")) %>% bind_rows(
+    check_Pars %>% semi_join(test_against_rev, by = c("lhs", "rhs"))
+  )
 
-###lavaan plot
-lavaanPlot(model = fit.adj.mitml,
-           node_options = list(shape = "box", fontname = "Helvetica"), edge_options = list(color = "grey"), coefs = TRUE)
+obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
 
-?lavaanPlot
+#let's verify by looking at the list of the edges we removed from the object
+anti_join(original_Pars,obj@Pars)
+#> Joining, by = c("label", "lhs", "edge", "rhs", "est", "std", "group", "fixed", "par")
+#>   label  lhs edge rhs        est        std group fixed par
+#> 1       gear   ~> mpg  0.1582792  0.0218978       FALSE   2
+#> 2        cyl   ~> mpg -0.4956938 -0.1660012       FALSE   3
+
+# great, let's plot
+semPlot::semPaths(obj, "std",fade = F, residuals = F, intercepts=FALSE, nodeLabels = nodelab, layout=lay_names)
+
+
+semPlot::semPaths(fit.adj.mitml, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:26)
+
+?semPlot::semPaths
+
+semPaths(obj, what="std",  intercepts=FALSE, residuals=TRUE,
+         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
+         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2)
+
+semPaths(fit.adj.mitml, what="path",   residuals=FALSE,
+         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
+         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2, intercepts=FALSE)
+
+?semPaths
+
+
 
 ####tidy SEM
 
@@ -288,11 +398,13 @@ lay<-get_layout("", "", "", "", "", "", "c.d15n", "","", "", "",
                 "c.log_MEAN_rockarea2000", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k", "c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Dist_Near", "elevation_max", rows=6)
 
 lay_alt<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","", "","","","","","", "c.d15n", "","", "", "","","", "","","","","", "","",
-                "c.log_site_mean_by_tran","","", "","","","","", "","", "pres_marine_invert","","","","","","", "pres_fish", "","", "","","","", "","","","","","","","human_pres", "", "","","","","","","","", "","","","","","","",
-                "","", "","","","", "eagles","","","","","","","ravens" ,"","","","","","","pres_otter","","","","","","","","cult_imp_plant_prop","","","", "c.distance_to_midden","","","","c.distance_to_fish","","","","","","","","","", 
-                "","","","","","","","","c.log_fish_biomass_bym3_mean","","","","","","","","","","", "c.log_bycatch_biomass_bym3_mean","","","","","","","","","","","","","","","","","", "","","","","","","","","",
-                "c.log_MEAN_rockarea2000","","","", "","","c.log_MEAN_kparea2k","","","", "","","c.log_MEAN_egarea2k","","", "","","","","","","","","","","","","","c.SLOPE_degrees","c.WAVE_EXPOSURE", "beachy_substrate","","","","","","","", "c.slope_degrees","","c.PA_norml","c.log_Area",  "c.log_Dist_Near", "elevation_max",  "c.slope_isl", "c.CHM_mean_height","c.log_Bog_area", rows=5)
+                    "c.log_site_mean_by_tran","","", "","","","","", "","", "pres_marine_invert","","","","","","", "pres_fish", "","", "","","","", "","","","","","","","human_pres", "", "","","","","","","","", "","","","","","","",
+                    "","", "","","","", "eagles","","","","","","","ravens" ,"","","","","","","pres_otter","","","","","","","","cult_imp_plant_prop","","","", "c.distance_to_midden","","","","c.distance_to_fish","","","","","","","","","", 
+                    "","","","","","","","","c.log_fish_biomass_bym3_mean","","","","","","","","","","", "c.log_bycatch_biomass_bym3_mean","","","","","","","","","","","","","","","","","", "","","","","","","","","",
+                    "c.log_MEAN_rockarea2000","","","", "","","c.log_MEAN_kparea2k","","","", "","","c.log_MEAN_egarea2k","","", "","","","","","","","","","","","","","c.SLOPE_degrees","c.WAVE_EXPOSURE", "beachy_substrate","","","","","","","", "c.slope_degrees","","c.PA_norml","c.log_Area",  "c.log_Dist_Near", "elevation_max",  "c.slope_isl","", "c.log_Bog_area", rows=5)
 
+###lavaan plot
+lavaanPlot(model = fit.adj.mitml,
+           node_options = list(shape = "box", fontname = "Helvetica"), edge_options = list(color = "grey"), coefs = TRUE)
 
- 
 
