@@ -22,8 +22,8 @@ head(master_transect)
 ## pair down the variables
 sem_variables_names_veg<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                       "ravens", "cult_imp_plant_prop", "d15n", "distance_to_midden",
-                       "distance_to_fish", "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
+                       "ravens",  "d15n", "distance_to_midden",
+                       "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
                        "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
                        "slope_isl", "CHM_mean_height", "habitat_het", "NDVI_mean")
 
@@ -36,19 +36,10 @@ master_transec_sem_subset_veg$node<-factor(master_transec_sem_subset_veg$node)
 
 master_transec_sem_subset_veg_centered <- stdize(master_transec_sem_subset_veg, 
                                              omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
-                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "cult_imp_plant_prop", "elevation_max"), 
+                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "elevation_max"), 
                                              center = TRUE, scale = FALSE)
 
 head(master_transec_sem_subset_veg_centered)
-# master_transec_sem_subset_veg_centered<-master_transec_sem_subset_veg_centered[complete.cases(master_transec_sem_subset_veg_centered$pres_otter), ]
-# master_transec_sem_subset_veg_centered<-master_transec_sem_subset_veg_centered[complete.cases(master_transec_sem_subset_veg_centered$c.log_Bog_area), ]
-
-# master_transec_sem_subset_veg$beachy_substrate<-factor(master_transec_sem_subset_veg$beachy_substrate, ordered=TRUE)
-# master_transec_sem_subset_veg$ravens<-factor(master_transec_sem_subset_veg$ravens, ordered=TRUE)
-# master_transec_sem_subset_veg$eagles<-factor(master_transec_sem_subset_veg$eagles, ordered=TRUE)
-# master_transec_sem_subset_veg$pres_marine_invert<-factor(master_transec_sem_subset_veg$pres_marine_invert, ordered=TRUE)
-# master_transec_sem_subset_veg$pres_otter<-factor(master_transec_sem_subset_veg$pres_otter, ordered=TRUE)
-# master_transec_sem_subset_veg $pres_fish<-factor(master_transec_sem_subset_veg$pres_fish, ordered=TRUE)
 
 #see structure of the data, which variables have missing data
 summary(master_transec_sem_subset_veg_centered)
@@ -65,7 +56,7 @@ N15_model_simple_centered_alt_veg<-'
         
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
           
-        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees
+        pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE
           
         ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         
@@ -83,7 +74,7 @@ N15_model_simple_centered_alt_veg<-'
 
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 
-            '
+'
 
 
 
@@ -116,20 +107,19 @@ N15_model_simple_centered_alt_veg<-'
 
 
 fml.veg <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
-               c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran + cult_imp_plant_prop + 
-               c.d15n + c.distance_to_midden +
-               c.distance_to_fish + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
+               c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran  + 
+               c.d15n + c.distance_to_midden + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
                pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000  ~ 1 + (1|unq_isl) ,                                                 # Level 1
                c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height + c.habitat_het + c.NDVI_mean ~ 1 )                          # Level 2
 
 
-imp.veg <- jomoImpute(master_transec_sem_subset_veg_centered, formula=fml.veg, n.burn=500, n.iter=250, m=20)
+imp.veg <- jomoImpute(master_transec_sem_subset_veg_centered, formula=fml.veg, n.burn=500, n.iter=1000, m=20)
 summary(imp.veg)
 
 #problems the model sees: 
 plot(imp.veg, trace="all", print="beta2", pos=c(1,7))
-plot(imp.veg, trace="all", print="beta", pos=c(1,10))
-plot(imp.veg, trace="all", print="psi", pos=c(24,6))
+plot(imp.veg, trace="all", print="beta", pos=c(1,11))
+plot(imp.veg, trace="all", print="psi", pos=c(17,6))
 plot(imp.veg, trace="all", print="sigma", pos=c(4,2))
 
 implist_veg <- mitmlComplete(imp.veg, "all")
@@ -206,15 +196,15 @@ grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_M
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
 
-nodelab_veg<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "midden","shell", "fish\nbones", "d15N\nsoil", "canopy", 
-            "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "wiggly", "neighb","beach\nslope",  "elevation", 
-            "wave\nexposure","island\nslope","Bog\narea","NDVI")
+nodelab_veg<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "midden","shell", "fish\nbones", "d15N\nsoil", "canopy\nheight", 
+            "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "wiggly", "neighb","beach\nslope",  "wave\nexposure","elevation", 
+            "island\nslope","Bog\narea","NDVI")
 
-lay_names_veg<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","d15N\nsoil",  "","","","","", "","", "", "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                      "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","",
-                      "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "midden","","","","","","","","","","","","","","","","","","","", "","","","","","","","",
-                      "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy","","","","","","","","Bog\narea","","","","","",
-                      "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","NDVI","","","","","","wiggly","","","","","","Area","","","", "","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
+lay_names_veg<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","d15N\nsoil",   "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                      "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                      "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "midden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
+                      "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
+                      "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","NDVI","","","","","","wiggly","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
 
 semPaths(fit.adj.mitml.veg, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FALSE,
          groups=grps, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_veg, legend=FALSE)
