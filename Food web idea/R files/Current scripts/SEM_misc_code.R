@@ -229,3 +229,82 @@ standardizedsolution(fit_human)
 
 
 #plot(imp)
+
+
+
+#####
+#############################
+##code for showing only significant paths ... doesn't seem to work all that well?? Gets the order of variables wrong. 
+
+lavaan::parameterEstimates(fit.adj.mitml.veg) %>% dplyr::filter(!is.na(pvalue)) %>% arrange((pvalue)) %>% mutate_if("is.numeric","round",3) %>% dplyr::select(-ci.lower,-ci.upper,-z)
+parameterEstimates(fit.adj.mitml.veg)
+pvalue_cutoff <- 0.10
+obj <- semPlot:::semPlotModel(fit.adj.mitml.veg)
+
+
+# save a copy of the original, so we can compare it later and be sure we removed only what we intended to remove
+original_Pars <- obj@Pars
+
+check_Pars <- obj@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
+keep_Pars <- obj@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
+test_against <- lavaan::parameterEstimates(fit.adj.mitml.veg) %>% dplyr::filter(pvalue < pvalue_cutoff)
+test_against_rev <- test_against %>% rename(rhs2 = lhs,   # for some reason, the rhs and lhs are reversed in the standardizedSolution() output, for some of the values
+                                            lhs = rhs) %>% # I'll have to reverse it myself, and test against both orders
+        rename(rhs = rhs2)
+checked_Pars <-
+        check_Pars %>% semi_join(test_against, by = c("lhs", "rhs")) %>% bind_rows(
+                check_Pars %>% semi_join(test_against_rev, by = c("lhs", "rhs"))
+        )
+
+obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
+
+#let's verify by looking at the list of the edges we removed from the object
+anti_join(original_Pars,obj@Pars)
+#> Joining, by = c("label", "lhs", "edge", "rhs", "est", "std", "group", "fixed", "par")
+#>   label  lhs edge rhs        est        std group fixed par
+#> 1       gear   ~> mpg  0.1582792  0.0218978       FALSE   2
+#> 2        cyl   ~> mpg -0.4956938 -0.1660012       FALSE   3
+
+# great, let's plot
+semPlot::semPaths(obj, "std",fade = F, residuals = F, intercepts=FALSE, nodeLabels = nodelab, layout=lay_names)
+
+
+semPlot::semPaths(fit.adj.mitml.veg, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:25)
+semPlot::semPaths(fit.adj.mitml.veg, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0)
+
+?semPlot::semPaths
+
+semPaths(obj, what="std",  intercepts=FALSE, residuals=TRUE,
+         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
+         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2)
+
+semPaths(fit.adj.mitml.veg, what="path",   residuals=FALSE,
+         groups=grps, layout=lay_alt, nCharNodes=0,  layoutSplit=TRUE, reorder=TRUE, 
+         exoVar = FALSE,  pastel=TRUE, rainbowStart = 0.4, label.cex=2, intercepts=FALSE)
+
+
+
+
+####tidy SEM
+
+graph_sem(model=fit.adj.amelia.veg, layout=lay_alt)
+
+lay<-get_layout("", "", "", "", "", "", "c.d15n", "","", "", "",
+                "c.log_site_mean_by_tran", "", "", "marine_animal_biomass_shore", "", "", "", "human_pres", "", "","",
+                "", "", "",  "pres_marine_invert", "pres_fish","", "", "","cult_imp_plant_prop", "c.distance_to_midden","c.distance_to_fish",
+                "","", "", "eagles","ravens" ,"pres_otter","","","","","", 
+                "","","","c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean","","","c.log_Bog_area","","","",
+                "c.log_MEAN_rockarea2000", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k", "c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Dist_Near", "elevation_max", rows=6)
+
+lay_alt<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","", "","","","","","", "c.d15n", "","", "", "","","", "","","","","", "","",
+                    "c.log_site_mean_by_tran","","", "","","","","", "","", "pres_marine_invert","","","","","","", "pres_fish", "","", "","","","", "","","","","","","","human_pres", "", "","","","","","","","", "","","","","","","",
+                    "","", "","","","", "eagles","","","","","","","ravens" ,"","","","","","","pres_otter","","","","","","","","cult_imp_plant_prop","","","", "c.distance_to_midden","","","","c.distance_to_fish","","","","","","","","","", 
+                    "","","","","","","","","c.log_fish_biomass_bym3_mean","","","","","","","","","","", "c.log_bycatch_biomass_bym3_mean","","","","","","","","","","","","","","","","","", "","","","","","","","","",
+                    "c.log_MEAN_rockarea2000","","","", "","","c.log_MEAN_kparea2k","","","", "","","c.log_MEAN_egarea2k","","", "","","","","","","","","","","","","","c.SLOPE_degrees","c.WAVE_EXPOSURE", "beachy_substrate","","","","","","","", "c.slope_degrees","","c.PA_norml","c.log_Area",  "c.log_Dist_Near", "elevation_max",  "c.slope_isl","", "c.log_Bog_area", rows=5)
+
+###lavaan plot
+lavaanPlot(model = fit.adj.mitml.veg,
+           node_options = list(shape = "box", fontname = "Helvetica"), edge_options = list(color = "grey"), coefs = TRUE)
+
+
+
