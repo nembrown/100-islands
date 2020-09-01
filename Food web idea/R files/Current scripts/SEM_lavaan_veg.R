@@ -83,7 +83,7 @@ N15_model_simple_centered_alt_veg<-'
 #OPTION 1 Multiple imputation using mimtl packacge which is two levels - 
 #this is important for the log_Bog_area variable whic is at level 2 (island level) but has missing values) 
 
-
+#this is run the first time, but can also load it 
 fml.veg <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran  + 
                c.d15n + c.distance_to_midden + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
@@ -93,6 +93,10 @@ fml.veg <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean 
 
 imp.veg <- jomoImpute(master_transec_sem_subset_veg_centered, formula=fml.veg, n.burn=500, n.iter=1000, m=20)
 summary(imp.veg)
+write.mitml(imp.veg, "C:Food web idea//Data by person//Norah.data/imp.veg")
+
+#load it 
+imp.veg <- read.mitml("C:Food web idea//Data by person//Norah.data/imp.veg")
 
 #problems the model sees: 
 plot(imp.veg, trace="all", print="beta2", pos=c(1,7))
