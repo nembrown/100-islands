@@ -268,7 +268,7 @@ anti_join(original_Pars,obj@Pars)
 # great, let's plot
 semPlot::semPaths(obj, "std",fade = F, residuals = F, intercepts=FALSE, nodeLabels = nodelab, layout=lay_names)
 
-
+### how to figure out the order of the variables that the model sees
 semPlot::semPaths(fit.adj.mitml.veg, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:25)
 semPlot::semPaths(fit.adj.mitml.veg, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0)
 
