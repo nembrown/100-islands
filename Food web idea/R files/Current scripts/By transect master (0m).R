@@ -7,12 +7,10 @@ library(ggplot2)
 library(car)
 library(fitdistrplus)
 library(tidyverse)
-
 library(purrr)
 library(ggcorrplot)
 library(corrr)
 library(PerformanceAnalytics)
-
 library(vegan)
 library(betapart)
 library(bipartite)
@@ -132,15 +130,19 @@ soil_s_owen<-soil_s %>% filter(person=="Owen")
 soil_merge_s<-merge(soil_merge, soil_s_owen[,-3], by="unq_plot", all = TRUE)
 head(soil_merge_s)
 
+soil_merge_40m <- soil_merge_s %>% filter(shore_dist == 40)
+head(soil_merge_40m)
+soil_merge_40m<-soil_merge_40m[,c(7,13)]
+names(soil_merge_40m)[1]<-"d15n_40m"
+  
+  
 soil_merge_0m <- soil_merge_s %>% filter(shore_dist == 0)
 soil_merge_0m<-soil_merge_0m %>% dplyr::select(-c("note", "year", "pc1", "plant.richness", "fs_pc1", "shore_dist", "node"))
-
-duplicated(soil_merge_0m)
 
 
 write.csv(soil_merge_0m, "C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv", row.names=FALSE)
 
-
+head(soil_merge_0m)
 # Adding plant cover and richnes sshoreline -----------------------------------------
 
 #this loads data from "Habitation data" R script
@@ -152,21 +154,21 @@ longform_plant_percentcover_owen <- longform_plant_percentcover %>% filter(perso
 longform_plant_percentcover_owen_0m<-longform_plant_percentcover_owen %>% filter(shore_dist=="0")
 head(longform_plant_percentcover_owen_0m)
 
-longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:8)] %>% 
+longform_plant_percentcover2_tran_0m <- longform_plant_percentcover_owen_0m[,c(1:7)] %>% 
                                        group_by(unq_plot,species) %>% 
                                        spread(species, cover)%>%  replace(is.na(.), 0)
 
 head(longform_plant_percentcover2_tran_0m)
-
+options(max.print=100)
 
 longform_plant_percentcover_owen_0m_shrub<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="shrub")
 longform_plant_percentcover_owen_0m_herb<- longform_plant_percentcover_owen_0m %>% filter(herb_shrub=="herb")
 
-longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub[,c(1:8)] %>% 
+longform_plant_percentcover2_tran_0m_shrub <- longform_plant_percentcover_owen_0m_shrub[,c(1:7)] %>% 
   group_by(unq_plot,species) %>% 
   spread(species, cover)%>%  replace(is.na(.), 0)
 
-longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb[,c(1:8)] %>% 
+longform_plant_percentcover2_tran_0m_herb <- longform_plant_percentcover_owen_0m_herb[,c(1:7)] %>% 
   group_by(unq_plot,species) %>% 
   spread(species, cover)%>%  replace(is.na(.), 0)
 
@@ -177,7 +179,7 @@ which( colnames(longform_plant_percentcover2_tran_0m)=="gash" )
 which( colnames(longform_plant_percentcover2_tran_0m)=="midi" )
 
 
-longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(2,42,57)]
+longform_plant_percentcover3_tran_0m<-longform_plant_percentcover2_tran_0m[,c(2,41,56)]
 head(longform_plant_percentcover3_tran_0m)
 longform_plant_percentcover3_tran_0m$plant_richness<-specnumber(longform_plant_percentcover_species_tran_0m[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$plant_shannon.diversity<-diversity(longform_plant_percentcover_species_tran_0m[,-c(1:5)], index="shannon")
@@ -189,12 +191,25 @@ longform_plant_percentcover3_tran_0m$shrub_cover<-rowSums(longform_plant_percent
 longform_plant_percentcover3_tran_0m$herb_richness<-specnumber(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)])
 longform_plant_percentcover3_tran_0m$herb_cover<-rowSums(longform_plant_percentcover2_tran_0m_herb[,-c(1:5)], na.rm=TRUE)
 
+#### 40 m add in
+longform_plant_percentcover_owen_40m<-longform_plant_percentcover_owen %>% filter(shore_dist=="40")
+head(longform_plant_percentcover_owen_40m)
+longform_plant_percentcover2_tran_40m <- longform_plant_percentcover_owen_40m[,c(1:7)] %>% 
+  group_by(unq_plot,species) %>% 
+  spread(species, cover)%>%  replace(is.na(.), 0)
+
+head(longform_plant_percentcover2_tran_40m)
+longform_plant_percentcover2_tran_40m_species<-longform_plant_percentcover2_tran_40m[,c(1:5)]
+longform_plant_percentcover2_tran_40m_species$plant_richness_40m<-specnumber(longform_plant_percentcover2_tran_40m[,-c(1:5)])
+head(longform_plant_percentcover2_tran_40m_species)
+plants_40m<-longform_plant_percentcover2_tran_40m_species[,c(1,6)]
+head(plants_40m)
 
 head(longform_plant_percentcover3_tran_0m)
 
 head(soil_merge_0m)
 habitat_veg_soil_by_tran_0m<-merge(soil_merge_0m, longform_plant_percentcover3_tran_0m, by="unq_plot", all=TRUE)
-View(habitat_veg_soil_by_tran_0m)
+head(habitat_veg_soil_by_tran_0m)
 
 
 # Vegetation isotopes -----------------------------------------------------
@@ -274,7 +289,7 @@ habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM11
 habitat_veg_soil_by_tran_0m$easting[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-539916
 habitat_veg_soil_by_tran_0m$northing[habitat_veg_soil_by_tran_0m$unq_plot=="MM09N1"]<-5766116
 
-View(habitat_veg_soil_by_tran_0m)
+head(habitat_veg_soil_by_tran_0m)
 
 
 # Chris insects diversity -----------------------------------------------------------
@@ -290,7 +305,7 @@ head(chris_insects_master)
 
 # Take out interior plots:
 chris_insects_master_noI<-chris_insects_master %>% filter(plot!="I")
-
+head(chris_insects_master_noI)
 chris_insects_master_wide_tran <-chris_insects_master_noI %>% group_by(unq_tran, SpeciesID) %>% 
   summarise(sum_abundance = sum(Abundance, na.rm=TRUE)) %>% 
   spread(SpeciesID, sum_abundance) %>% 
@@ -584,7 +599,7 @@ head(chris_insects_master_wide_tran_richness_0m)
 
 head(habitat_veg_soil_by_tran_0m)
 by_tran_master_0m<-merge(habitat_veg_soil_by_tran_0m, chris_insects_master_wide_tran_richness_0m, by="unq_tran", all=TRUE)
-View(by_tran_master_0m)
+head(by_tran_master_0m)
 
 
 # Insect isotopes  ---------------------------------------------------------
@@ -642,7 +657,7 @@ by_tran_master_0m_beetles_weevils<-merge(by_tran_master_0m_beetles, chris.isotop
 head(by_tran_master_0m_beetles_weevils)
 
 by_tran_master_0m_beetles_weevils_isopods<-merge(by_tran_master_0m_beetles_weevils, chris.isotopes.tran_ISO[,-2], by="unq_tran", all=TRUE)
-View(by_tran_master_0m_beetles_weevils_isopods)
+head(by_tran_master_0m_beetles_weevils_isopods)
 
 
 #### Add in Chris' gps coordinates
@@ -670,6 +685,13 @@ by_tran_master_0m_final$northing[is.na(by_tran_master_0m_final$northing)]<-0
 
 by_tran_master_0m_final <- by_tran_master_0m_final %>%  mutate(easting = ifelse(easting >0, easting, chris.easting)) %>%  mutate(northing = ifelse(northing >0, northing, chris.northing))
 
-                                                           
+head(by_tran_master_0m_final)
+#### adding in the 40 m stuff
+head(soil_merge_40m)
+head(plants_40m)
+
+by_tran_master_0m_final<-merge(by_tran_master_0m_final, soil_merge_40m, by="unq_tran")
+by_tran_master_0m_final<-merge(by_tran_master_0m_final, plants_40m, by="unq_tran")
+
 write.csv(by_tran_master_0m_final, "C:Food web idea//Data by person//Norah.data/by_tran_master_0m.csv", row.names=FALSE)
-View(by_tran_master_0m_final)
+head(by_tran_master_0m_final)
