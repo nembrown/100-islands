@@ -122,24 +122,24 @@ imps_amelia_richness_40m<-imputationList(imps_richness_40m)
 # Running model and adding survey design ----------------------------------
 
 #run basic empty model then update with survey design
-lavaan_fit_model_richness<-sem(N15_model_simple_centered_alt_richness_40m, data=master_transec_sem_subset_richness_40m_centered)
-summary(lavaan_fit_model_richness)
+lavaan_fit_40_model_richness<-sem(N15_model_simple_centered_alt_richness_40m, data=master_transec_sem_subset_richness_40m_centered)
+summary(lavaan_fit_40_model_richness)
 
-varTable(lavaan_fit_model_richness)
+varTable(lavaan_fit_40_model_richness)
 
 # Survey.design with mitml and amelia - mice wasn't working 
 design_imp_amelia_richness_40m<-svydesign(ids=~unq_isl, strata=~node, data=imps_amelia_richness_40m)
 design_imp_mitml_richness_40m<-svydesign(ids=~unq_isl, strata=~node, data=imputed_mitml_richness_40m)
 
-fit.adj.amelia.richness_40m<-lavaan.survey(lavaan.fit=lavaan_fit_model_richness, survey.design = design_imp_amelia_richness_40m, estimator="MLMVS")
-summary(fit.adj.amelia.richness_40m, standardized=T)
+fit_40.adj.amelia.richness_40m<-lavaan.survey(lavaan.fit=lavaan_fit_40_model_richness, survey.design = design_imp_amelia_richness_40m, estimator="MLMVS")
+summary(fit_40.adj.amelia.richness_40m, standardized=T)
 
-fit.adj.mitml.richness_40m<-lavaan.survey(lavaan.fit=lavaan_fit_model_richness, survey.design = design_imp_mitml_richness_40m, estimator="MLMVS")
- summary(fit.adj.mitml.richness_40m, standardized=T)
+fit_40.adj.mitml.richness_40m<-lavaan.survey(lavaan.fit=lavaan_fit_40_model_richness, survey.design = design_imp_mitml_richness_40m, estimator="MLMVS")
+ summary(fit_40.adj.mitml.richness_40m, standardized=T)
 
  options(max.print=1000)
 #if model Sign can look at these: 
-#plyr::arrange(modificationIndices(fit.adj.amelia.richness_40m),mi, decreasing=TRUE)
+#plyr::arrange(modificationIndices(fit_40.adj.amelia.richness_40m),mi, decreasing=TRUE)
 #######
 
 #semplot
@@ -166,47 +166,47 @@ lay_names_richness_40m<-get_layout(
                           "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","","","",
                           "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","","","wave\nexposure","","","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=6)
 
-semPaths(fit.adj.mitml.richness_40m, what="std",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
+semPaths(fit_40.adj.mitml.richness_40m, what="std",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
          groups=grps_richness_40m, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness_40m, legend=FALSE)
 
-semPaths(fit.adj.mitml.richness_40m, what="path",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
+semPaths(fit_40.adj.mitml.richness_40m, what="path",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
          groups=grps, exoVar = FALSE, color=colour_group, nodeLabels = nodelab_richness_40m, legend=FALSE)
 
 
-fit <- fit.adj.mitml.richness_40m
+fit_40 <- fit_40.adj.mitml.richness_40m
 
-lavaan::standardizedSolution(fit) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
+lavaan::standardizedSolution(fit_40) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
 
 pvalue_cutoff <- 0.06
 
-obj <- semPlot:::semPlotModel(fit)
+obj_40 <- semPlot:::semPlotModel(fit_40)
 
 # save a copy of the original, so we can compare it later and be sure we removed only what we intended to remove
-original_Pars <- obj@Pars
+original_Pars_40 <- obj_40@Pars
 
-check_Pars <- obj@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
-keep_Pars <- obj@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
-test_against <- lavaan::standardizedSolution(fit) %>% dplyr::filter(pvalue < pvalue_cutoff, rhs != lhs)
+check_Pars_40 <- obj_40@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
+keep_Pars_40 <- obj_40@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
+test_against <- lavaan::standardizedSolution(fit_40) %>% dplyr::filter(pvalue < pvalue_cutoff, rhs != lhs)
 test_against_rev <- test_against %>% rename(rhs2 = lhs,   # for some reason, the rhs and lhs are reversed in the standardizedSolution() output, for some of the values
                                             lhs = rhs) %>% # I'll have to reverse it myself, and test against both orders
   rename(rhs = rhs2)
-checked_Pars <-
-  check_Pars %>% semi_join(test_against, by = c("lhs", "rhs")) %>% bind_rows(
-    check_Pars %>% semi_join(test_against_rev, by = c("lhs", "rhs"))
+checked_Pars_40 <-
+  check_Pars_40 %>% semi_join(test_against, by = c("lhs", "rhs")) %>% bind_rows(
+    check_Pars_40 %>% semi_join(test_against_rev, by = c("lhs", "rhs"))
   )
 
-obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
+obj_40@Pars <- keep_Pars_40 %>% bind_rows(checked_Pars_40)
 
-#let's verify by looking at the list of the edges we removed from the object
-anti_join(original_Pars,obj@Pars)
+#let's verify by looking at the list of the edges we removed from the obj_40ect
+anti_join(original_Pars_40,obj_40@Pars)
 # great, let's plot
-semPlot::semPaths(obj, "std",fade = F, residuals = F)
+semPlot::semPaths(obj_40, "std",fade = F, residuals = F)
 
 
-semPaths(obj, what="std",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
+semPaths(obj_40, what="std",  layout=lay_names_richness_40m, intercepts=FALSE, residuals=FALSE,
          groups=grps_richness_40m, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness_40m, legend=FALSE)
 
 
-semPlot::semPaths(fit.adj.mitml.richness_40m, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:27)
-semPlot::semPaths(fit.adj.mitml.richness_40m, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0)
+semPlot::semPaths(fit_40.adj.mitml.richness_40m, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:27)
+semPlot::semPaths(fit_40.adj.mitml.richness_40m, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0)
 
