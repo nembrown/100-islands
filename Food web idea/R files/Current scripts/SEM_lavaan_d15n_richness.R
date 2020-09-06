@@ -152,19 +152,19 @@ grps_richness<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran",
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#539E59", "#00A4EE", "#CD8958")
 
-nodelab_richness<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "midden","shell", 
+nodelab_richness<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "distance\nmidden","shell", 
                        "fish\nbones", "d15N\nsoil",  "canopy\nheight","plant\nrichness", 
-               "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "wiggly", "neighb","beach\nslope",  "wave\nexposure","elevation", 
+               "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "edge\neffects", "neighb","beach\nslope",  "wave\nexposure","elevation", 
                "island\nslope","Bog\narea")
 
 
 lay_names_richness<-get_layout(
-                          "", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","","","", "","","","","", "","","","","", "plant\nrichness", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                          "", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","","","", "","","","","", "","","","","", "","","","","", "plant\nrichness","","","","","","","","","","","","","","","","","","","","","","","","","","",
                           "","","","","","","","","","","","","","","","","","","","","","","","", "","", "","","","", "","","","d15N\nsoil",  "","","", "", "", "", "", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
                           "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                          "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "midden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","","","",
+                          "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","","","",
                           "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","","","",
-                          "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","","","wave\nexposure","","","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","wiggly","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=6)
+                          "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","","","wave\nexposure","","","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=6)
 
 semPaths(fit.adj.mitml.richness, what="std",  layout=lay_names_richness, intercepts=FALSE, residuals=FALSE,
          groups=grps_richness, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness, legend=FALSE)
@@ -177,7 +177,7 @@ fit <- fit.adj.mitml.richness
 
 lavaan::standardizedSolution(fit) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
 
-pvalue_cutoff <- 0.10
+pvalue_cutoff <- 0.06
 
 obj <- semPlot:::semPlotModel(fit)
 
