@@ -177,7 +177,7 @@ fit <- fit.adj.mitml.richness
 
 lavaan::standardizedSolution(fit) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
 
-pvalue_cutoff <- 0.06
+pvalue_cutoff <- 0.10
 
 obj <- semPlot:::semPlotModel(fit)
 
@@ -200,7 +200,7 @@ obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
 #let's verify by looking at the list of the edges we removed from the object
 anti_join(original_Pars,obj@Pars)
 # great, let's plot
-semPlot::semPaths(obj, "std",fade = F, residuals = F)
+#semPlot::semPaths(obj, "std",fade = F, residuals = F)
 
 
 semPaths(obj, what="std",  layout=lay_names_richness, intercepts=FALSE, residuals=FALSE,

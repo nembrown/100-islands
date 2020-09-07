@@ -18,7 +18,7 @@ library(tidyverse)
 
 #load fish data - an output of from ben_fish_cleaning.R
 fish_bycatch_richness_merged_tran_year<- read.csv("C:Biodiversity idea//Output files//fish_bycatch_richness_merged_tran_year.csv")
-
+head(fish_bycatch_richness_merged_tran_year)
 
 # Matching terrestrial transects to beachseine sites ----------------------
 
@@ -26,7 +26,7 @@ fish_bycatch_richness_merged_tran_year<- read.csv("C:Biodiversity idea//Output f
 #This is working with a 2km radius around the transects - pairing beachseine sites to transects within 2km
 hakai_sites_distance_tran<-read.csv("Biodiversity idea//Output files//paired_sites_by_radius.csv")
 length(unique(hakai_sites_distance_tran$unq_tran))
-#274 transects match within 2km! 
+#171 transects match within 2km! (updated after splitting transects properly)
 
 fish_bycatch_richness_merged_tran<-merge(fish_bycatch_richness_merged_tran_year, hakai_sites_distance_tran, by="site")
 
