@@ -49,7 +49,31 @@ length(unique(transects_beach_joined$unq_tran))
 #1km: 140 transects fall within 19 sites
 #500m: 67 transects fall within 16 sites
 
-
+# ##### Beachseine to island-level
+# by_isl_master<-read.csv("C:Food web idea//Data by person//Norah.data//by_isl_master.csv")
+# data_subset2_isl <- by_isl_master[ , c("C_Easting", "C_Northing")]
+# by_isl_master_no_na<- by_isl_master[complete.cases(data_subset2_isl), ]
+# by_isl_master_no_na<-by_isl_master_no_na[!duplicated(by_isl_master_no_na$unq_isl),]
+# df.SF_islands <- st_as_sf(by_isl_master_no_na, coords = c("C_Easting", "C_Northing"), crs = 26909) %>% st_transform(crs = 4326)
+# df.SF_islands_simple<-df.SF_islands[,1]
+# df.SF_islands_simple_new<- df.SF_islands_simple %>% st_transform(3035) 
+# head(df.SF_islands_simple_new)
+# 
+# #Followed code from here: 
+# #https://gis.stackexchange.com/questions/229453/create-a-circle-of-defined-radius-around-a-point-and-then-find-the-overlapping-a
+# 
+# # Buffer circles by 2000m -- creates polygons around the coordinates
+# dat_circles_isl <- st_buffer(df.SF_islands_simple_new, dist = 2000)
+# 
+# #which of the beachseines fall within 2km radius of the transect
+# islands_beach_joined <- st_join(ben_habitat_data_simple.SP_new, dat_circles_isl, left=FALSE)
+# 
+# 
+# islands_beach_joined <-islands_beach_joined  %>% st_set_geometry(NULL)
+# islands_beach_joined<-as.data.frame(islands_beach_joined)
+# write.csv(islands_beach_joined, "C:Biodiversity idea//Output files//paired_sites_by_radius.csv", row.names = FALSE)
+# 
+# length(unique(islands_beach_joined$unq_tran))
 
 # Arch data ---------------------------------------------------------------
 
