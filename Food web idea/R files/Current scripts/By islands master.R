@@ -315,25 +315,26 @@ head(sara_habitat_merged)
 
 sara_habitat_merged_selected<-c("unq_tran","unq_isl", "MEAN_egarea2k",
        "MEAN_kparea2k",
-       "MEAN_rockarea2",
+       "MEAN_rockarea2000",
        "sum_2km" ,
        "SLOPE" ,
        "WIDTH" ,
        "HAB2000" ,
        "SITE_SUM" ,
        "MEAN_egarea100",
-       "WAVE_EXPOSURE")
+       "WAVE_EXPOSURE", "SUBSTRATE")
 
 sara_habitat_merged_simple<-sara_habitat_merged[, colnames(sara_habitat_merged) %in% sara_habitat_merged_selected]
-#head(sara_habitat_merged_simple)
+head(sara_habitat_merged_simple)
 
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="VP"]<-1
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="P"]<-2
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="SP"]<-3
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="SE"]<-4
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="E"]<-5
-levels(sara_habitat_merged_simple$WAVE_EXPOSURE)[levels(sara_habitat_merged_simple$WAVE_EXPOSURE)=="VE"]<-6
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="VP"]<-1
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="P"]<-2
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="SP"]<-3
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="SE"]<-4
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="E"]<-5
+sara_habitat_merged_simple$WAVE_EXPOSURE[sara_habitat_merged_simple$WAVE_EXPOSURE=="VE"]<-6
 sara_habitat_merged_simple$WAVE_EXPOSURE<-as.numeric(sara_habitat_merged_simple$WAVE_EXPOSURE)
+
 
 
 ### add in water area (calculated by Will)
@@ -344,9 +345,13 @@ water_area<-water_area %>% group_by(unq_tran)%>% spread(Radius_m, WaterArea_m2, 
 water_area<-water_area[,c(6,11:17)]
 sara_habitat_merged_simple<-merge(sara_habitat_merged_simple, water_area, by="unq_tran")
 
+sara_habitat_merged_simple$beachy_substrate<- ifelse(grepl("ROCK", sara_habitat_merged_simple$SUBSTRATE), "0", "1")
+sara_habitat_merged_simple$beachy_substrate<-as.character(sara_habitat_merged_simple$beachy_substrate)
+sara_habitat_merged_simple$beachy_substrate<-as.numeric(sara_habitat_merged_simple$beachy_substrate)
+sara_habitat_merged_simple$SLOPE_degrees<-(180*(atan(sara_habitat_merged_simple$SLOPE/100)))/pi
 
 sara_habitat_merged_by_isl <- sara_habitat_merged_simple %>% group_by(unq_isl)%>% summarise_if(is.numeric, mean, na.rm=TRUE)
-# #head(sara_habitat_merged_by_isl )
+head(sara_habitat_merged_by_isl )
 length(sara_habitat_merged_by_isl$unq_isl)
 # str(sara_habitat_merged_by_isl )
 
