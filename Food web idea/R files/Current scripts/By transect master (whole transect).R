@@ -331,12 +331,12 @@ water_area<-water_area[,c(6,11:17)]
 
 sara_habitat_merged<-merge(sara_habitat_merged, water_area, by="unq_tran")
 
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="VP"]<-1
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="P"]<-2
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="SP"]<-3
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="SE"]<-4
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="E"]<-5
-levels(sara_habitat_merged$WAVE_EXPOSURE)[levels(sara_habitat_merged$WAVE_EXPOSURE)=="VE"]<-6
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="VP"]<-1
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="P"]<-2
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="SP"]<-3
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="SE"]<-4
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="E"]<-5
+sara_habitat_merged$WAVE_EXPOSURE[sara_habitat_merged$WAVE_EXPOSURE=="VE"]<-6
 sara_habitat_merged$WAVE_EXPOSURE<-as.numeric(sara_habitat_merged$WAVE_EXPOSURE)
 
 
