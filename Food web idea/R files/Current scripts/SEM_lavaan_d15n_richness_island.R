@@ -149,8 +149,9 @@ semPaths(fit.adj.richness_island, what="std",  layout=lay_names_richness_island,
 
 
 
-semPaths(lavaan_fit_model_richness_island, what="path",  layout=lay_names_richness_island, intercepts=FALSE, residuals=FALSE,
-         groups=grps, exoVar = FALSE, color=colour_group, nodeLabels = nodelab_richness_island, legend=FALSE)
+semPaths(fit.adj.richness_island, what="path",  layout=lay_names_richness_island, intercepts=FALSE, residuals=FALSE,
+         groups=grps_richness_island, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness_island, legend=FALSE)
+
 
 
 fit_isl <- fit.adj.richness_island
