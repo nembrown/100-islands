@@ -164,7 +164,7 @@ lay_names_richness<-get_layout(
                           "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
                           "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","","","",
                           "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","","","",
-                          "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","","","wave\nexposure","","","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=6)
+                           "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","","","wave\nexposure","","","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=6)
 
 semPaths(fit.adj.mitml.richness, what="std",  layout=lay_names_richness, intercepts=FALSE, residuals=FALSE,
          groups=grps_richness, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness, legend=FALSE)
@@ -173,37 +173,37 @@ semPaths(fit.adj.mitml.richness, what="path",  layout=lay_names_richness, interc
          groups=grps, exoVar = FALSE, color=colour_group, nodeLabels = nodelab_richness, legend=FALSE)
 
 
-fit <- fit.adj.mitml.richness
+fit.richness <- fit.adj.mitml.richness
 
-lavaan::standardizedSolution(fit) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
+lavaan::standardizedSolution(fit.richness) %>% dplyr::filter(!is.na(pvalue)) %>% arrange(desc(pvalue)) %>% mutate_if("is.numeric","round",3) %>% select(-ci.lower,-ci.upper,-z)
 
 pvalue_cutoff <- 0.10
 
-obj <- semPlot:::semPlotModel(fit)
+obj.richness <- semPlot:::semPlotModel(fit.richness)
 
 # save a copy of the original, so we can compare it later and be sure we removed only what we intended to remove
-original_Pars <- obj@Pars
+original_Pars <- obj.richness@Pars
 
-check_Pars <- obj@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
-keep_Pars <- obj@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
-test_against <- lavaan::standardizedSolution(fit) %>% dplyr::filter(pvalue < pvalue_cutoff, rhs != lhs)
-test_against_rev <- test_against %>% rename(rhs2 = lhs,   # for some reason, the rhs and lhs are reversed in the standardizedSolution() output, for some of the values
+check_Pars <- obj.richness@Pars %>% dplyr::filter(!(edge %in% c("int","<->") | lhs == rhs)) # this is the list of paramater to sift thru
+keep_Pars <- obj.richness@Pars %>% dplyr::filter(edge %in% c("int","<->") | lhs == rhs) # this is the list of paramater to keep asis
+test_against <- lavaan::standardizedSolution(fit.richness) %>% dplyr::filter(pvalue < pvalue_cutoff, rhs != lhs)
+test_against_rev <- test_against %>% dplyr::rename(rhs2 = lhs,   # for some reason, the rhs and lhs are reversed in the standardizedSolution() output, for some of the values
                                             lhs = rhs) %>% # I'll have to reverse it myself, and test against both orders
-  rename(rhs = rhs2)
+  dplyr::rename(rhs = rhs2)
 checked_Pars <-
   check_Pars %>% semi_join(test_against, by = c("lhs", "rhs")) %>% bind_rows(
     check_Pars %>% semi_join(test_against_rev, by = c("lhs", "rhs"))
   )
 
-obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
+obj.richness@Pars <- keep_Pars %>% bind_rows(checked_Pars)
 
-#let's verify by looking at the list of the edges we removed from the object
-anti_join(original_Pars,obj@Pars)
+#let's verify by looking at the list of the edges we removed from the obj.richnessect
+anti_join(original_Pars,obj.richness@Pars)
 # great, let's plot
-#semPlot::semPaths(obj, "std",fade = F, residuals = F)
+semPlot::semPaths(obj.richness, "std",fade = F, residuals = F)
 
 
-semPaths(obj, what="std",  layout=lay_names_richness, intercepts=FALSE, residuals=FALSE,
+semPaths(obj.richness, what="std",  layout=lay_names_richness, intercepts=FALSE, residuals=FALSE,
          groups=grps_richness, exoVar = FALSE,  color=colour_group, esize=2, nodeLabels = nodelab_richness, legend=FALSE)
 
 
