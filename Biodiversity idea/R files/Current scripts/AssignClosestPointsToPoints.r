@@ -502,6 +502,218 @@ AssignClosestTempPoints8 <- function()
 AssignClosestTempPoints8()
 
 
+# Raven distance ----------------------------------------------------------
+ravens <- read.csv("C:Food web idea//Data by person//Deb.data/ravens.csv")
+head(ravens)
+ravens$PCID<-paste(ravens$island, ravens$point, sept="")
+ravens$PCID<-str_trim(ravens$PCID, "right")
+ravens$PCID<-gsub(" ", "-", ravens$PCID, fixed = TRUE)
+
+raven_data_simple_new<-ravens[ , c("PCID", "easting", "northing")]
+data_raven_subset2_new <- raven_data_simple_new[ , c("easting", "northing")]
+raven_data_simple_new<- raven_data_simple_new[complete.cases(data_raven_subset2_new), ] 
+raven_data_simple_new$PCID<-as.factor(raven_data_simple_new$PCID)
+raven_data_simple_sf_new <- st_as_sf(raven_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+raven_data_simple_st_new_long<-st_transform(x = raven_data_simple_sf_new, crs = 4326)
+raven_data_simple_st_new_long$long<-st_coordinates(raven_data_simple_st_new_long)[,1]
+raven_data_simple_st_new_long$lat<-st_coordinates(raven_data_simple_st_new_long)[,2]
+raven_data_simple_st_new_long<-raven_data_simple_st_new_long %>% st_set_geometry(NULL)
+names(raven_data_simple_st_new_long)[1]<-"raven"
+head(raven_data_simple_st_new_long)
+
+
+soil_merge_0m<- read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+head(soil_merge_0m)
+soil_merge_0m_simple<-soil_merge_0m %>% dplyr::select("unq_tran", "easting", "northing")
+soil_merge_0m_simple<-soil_merge_0m_simple[!duplicated(soil_merge_0m_simple$unq_tran),]
+head(soil_merge_0m_simple)
+
+data_subset2_soil <- soil_merge_0m_simple[ , c("easting", "northing")]
+soil_merge_0m_simple_no_na<- soil_merge_0m_simple[complete.cases(data_subset2_soil), ]
+df_soil_merge_0m_simple <- st_as_sf(soil_merge_0m_simple_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+names(df_soil_merge_0m_simple)[1]<-"site"
+head(df_soil_merge_0m_simple)
+df_soil_merge_0m_simple$long<-st_coordinates(df_soil_merge_0m_simple)[,1] # get coordinates
+df_soil_merge_0m_simple$lat<-st_coordinates(df_soil_merge_0m_simple)[,2]
+df_soil_merge_0m_simple_df<-df_soil_merge_0m_simple %>% st_set_geometry(NULL)
+head(df_soil_merge_0m_simple_df)
+
+#Need:
+head(df_soil_merge_0m_simple_df)
+head(raven_data_simple_st_new_long)
+ 
+
+AssignClosestTempPoints_raven <- function()
+{
+   
+   # Latest version: Assign closest points from a second point set
+   
+   require(sp)
+   
+   
+   # promote the input lists to SpatialPointsDataFrames
+   
+   coordinates(raven_data_simple_st_new_long) <- c("long", "lat")
+   coordinates(df_soil_merge_0m_simple_df) <- c("long", "lat")             
+   
+   
+   #  Define these vectors, used in the loop.
+   
+   closestSiteVec <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   minDistVec     <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   
+   # Get the vector index of the raven station closest to each field station.
+   # Use the spDistsN1 function to compute the distance vector between each
+   # field station site and all of the raven stations. Then, find and
+   # retain the actual raven, and the index of the closest raven
+   # to each transect station.
+   #
+   # spDistsN1 usage: spDistsN1(pointList, pointToMatch, longlat)
+   #
+   # where:
+   #         pointList   : List of candidate points.
+   #         pointToMatch: Single point for which we seek the closest point in pointList.
+   #         longlat     : TRUE  computes Great Circle distance in km,
+   #                       FALSE computes Euclidean distance in units of input geographic coordinates
+   #
+   # We use Great Circle distance to increase distance calculation accuracy at high latitudes
+   # See the discussion of distance units in the header portion of this file
+   #
+   # minDistVec stores the distance from to the closest raven station to each site measurement point.
+   # closestSiteVec stores the index of the closest raven station to each site measurement point.
+   #
+   for (i in 1 : nrow(df_soil_merge_0m_simple_df))
+   {
+      distVec <- spDistsN1(raven_data_simple_st_new_long,df_soil_merge_0m_simple_df[i,],longlat = TRUE)
+      minDistVec[i] <- min(distVec)
+      closestSiteVec[i] <- which.min(distVec)
+   }
+   #
+   # Create the output file: merge the raven point list with the transect point list
+   # into a five-column table by merging the raven point and transect point lists.
+   #
+   PointAssignTemps <- as(raven_data_simple_st_new_long[closestSiteVec,]$raven,"character")
+   FinalTable_raven = data.frame(coordinates(df_soil_merge_0m_simple_df),df_soil_merge_0m_simple_df$site,closestSiteVec,minDistVec,PointAssignTemps)
+   #
+   # Update the FinalTable column names 
+   #
+   names(FinalTable_raven) <- c("Long","Lat","site","CloseTempIndex","Distance","raven")
+   #
+   # And, at the end, write the point assignment file.
+   #
+   message("Write ravenne/site assignment table to disk in .csv format")
+   write.csv(FinalTable_raven,file="C:Biodiversity idea//Output files//Distance_btwn_points_raven_transects.csv", row.names = FALSE)
+}
+
+AssignClosestTempPoints_raven()
+
+
+# eagle distance ----------------------------------------------------------
+eagles <- read.csv("C:Food web idea//Data by person//Deb.data/eagles.csv")
+head(eagles)
+eagles$PCID<-paste(eagles$island, eagles$point, sept="")
+eagles$PCID<-str_trim(eagles$PCID, "right")
+eagles$PCID<-gsub(" ", "-", eagles$PCID, fixed = TRUE)
+
+eagle_data_simple_new<-eagles[ , c("PCID", "easting", "northing")]
+data_eagle_subset2_new <- eagle_data_simple_new[ , c("easting", "northing")]
+eagle_data_simple_new<- eagle_data_simple_new[complete.cases(data_eagle_subset2_new), ] 
+eagle_data_simple_new$PCID<-as.factor(eagle_data_simple_new$PCID)
+eagle_data_simple_sf_new <- st_as_sf(eagle_data_simple_new, coords = c("easting", "northing"), crs = 26909)
+eagle_data_simple_st_new_long<-st_transform(x = eagle_data_simple_sf_new, crs = 4326)
+eagle_data_simple_st_new_long$long<-st_coordinates(eagle_data_simple_st_new_long)[,1]
+eagle_data_simple_st_new_long$lat<-st_coordinates(eagle_data_simple_st_new_long)[,2]
+eagle_data_simple_st_new_long<-eagle_data_simple_st_new_long %>% st_set_geometry(NULL)
+names(eagle_data_simple_st_new_long)[1]<-"eagle"
+head(eagle_data_simple_st_new_long)
+
+
+soil_merge_0m<- read.csv("C:Food web idea\\Data by person\\Norah.data\\soil_merge_0m.csv")
+head(soil_merge_0m)
+soil_merge_0m_simple<-soil_merge_0m %>% dplyr::select("unq_tran", "easting", "northing")
+soil_merge_0m_simple<-soil_merge_0m_simple[!duplicated(soil_merge_0m_simple$unq_tran),]
+head(soil_merge_0m_simple)
+
+data_subset2_soil <- soil_merge_0m_simple[ , c("easting", "northing")]
+soil_merge_0m_simple_no_na<- soil_merge_0m_simple[complete.cases(data_subset2_soil), ]
+df_soil_merge_0m_simple <- st_as_sf(soil_merge_0m_simple_no_na, coords = c("easting", "northing"), crs = 26909) %>% st_transform(crs = 4326)
+names(df_soil_merge_0m_simple)[1]<-"site"
+head(df_soil_merge_0m_simple)
+df_soil_merge_0m_simple$long<-st_coordinates(df_soil_merge_0m_simple)[,1] # get coordinates
+df_soil_merge_0m_simple$lat<-st_coordinates(df_soil_merge_0m_simple)[,2]
+df_soil_merge_0m_simple_df<-df_soil_merge_0m_simple %>% st_set_geometry(NULL)
+head(df_soil_merge_0m_simple_df)
+
+#Need:
+head(df_soil_merge_0m_simple_df)
+head(eagle_data_simple_st_new_long)
+
+
+AssignClosestTempPoints_eagle <- function()
+{
+   
+   # Latest version: Assign closest points from a second point set
+   
+   require(sp)
+   
+   
+   # promote the input lists to SpatialPointsDataFrames
+   
+   coordinates(eagle_data_simple_st_new_long) <- c("long", "lat")
+   coordinates(df_soil_merge_0m_simple_df) <- c("long", "lat")             
+   
+   
+   #  Define these vectors, used in the loop.
+   
+   closestSiteVec <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   minDistVec     <- vector(mode = "numeric",length = nrow(df_soil_merge_0m_simple_df))
+   
+   # Get the vector index of the eagle station closest to each field station.
+   # Use the spDistsN1 function to compute the distance vector between each
+   # field station site and all of the eagle stations. Then, find and
+   # retain the actual eagle, and the index of the closest eagle
+   # to each transect station.
+   #
+   # spDistsN1 usage: spDistsN1(pointList, pointToMatch, longlat)
+   #
+   # where:
+   #         pointList   : List of candidate points.
+   #         pointToMatch: Single point for which we seek the closest point in pointList.
+   #         longlat     : TRUE  computes Great Circle distance in km,
+   #                       FALSE computes Euclidean distance in units of input geographic coordinates
+   #
+   # We use Great Circle distance to increase distance calculation accuracy at high latitudes
+   # See the discussion of distance units in the header portion of this file
+   #
+   # minDistVec stores the distance from to the closest eagle station to each site measurement point.
+   # closestSiteVec stores the index of the closest eagle station to each site measurement point.
+   #
+   for (i in 1 : nrow(df_soil_merge_0m_simple_df))
+   {
+      distVec <- spDistsN1(eagle_data_simple_st_new_long,df_soil_merge_0m_simple_df[i,],longlat = TRUE)
+      minDistVec[i] <- min(distVec)
+      closestSiteVec[i] <- which.min(distVec)
+   }
+   #
+   # Create the output file: merge the eagle point list with the transect point list
+   # into a five-column table by merging the eagle point and transect point lists.
+   #
+   PointAssignTemps <- as(eagle_data_simple_st_new_long[closestSiteVec,]$eagle,"character")
+   FinalTable_eagle = data.frame(coordinates(df_soil_merge_0m_simple_df),df_soil_merge_0m_simple_df$site,closestSiteVec,minDistVec,PointAssignTemps)
+   #
+   # Update the FinalTable column names 
+   #
+   names(FinalTable_eagle) <- c("Long","Lat","site","CloseTempIndex","Distance","eagle")
+   #
+   # And, at the end, write the point assignment file.
+   #
+   message("Write eagle/site assignment table to disk in .csv format")
+   write.csv(FinalTable_eagle,file="C:Biodiversity idea//Output files//Distance_btwn_points_eagle_transects.csv", row.names = FALSE)
+}
+
+AssignClosestTempPoints_eagle()
+
+
 # Any arch vs. transects --------------------------------------------------
 
 arch_data<-read.csv("C:Biodiversity idea//Output files//arch_sites_selected.csv")

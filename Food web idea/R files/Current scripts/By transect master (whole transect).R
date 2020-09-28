@@ -714,10 +714,26 @@ names(chris.isotopes.tran_ISO)[7]<-"cn_isopods"
 names(chris.isotopes.tran_ISO)[8]<-"s_isopods"
 
 
-head(by_tran_master)
+View(by_tran_master)
 by_tran_master<-merge(by_tran_master, chris.isotopes.tran_COL[,-2], by="unq_tran", all.x=TRUE)
 by_tran_master<-merge(by_tran_master, chris.isotopes.tran_CUR[,-2], by="unq_tran", all.x=TRUE)
 by_tran_master<-merge(by_tran_master, chris.isotopes.tran_ISO[,-2], by="unq_tran", all.x=TRUE)
+
+
+##### adding in distance to raven sighting and distance to eagle sighting 
+raven.distance<-read.csv("C:Biodiversity idea//Output files//Distance_btwn_points_raven_transects.csv")
+head(raven.distance)
+raven.distance$distance_raven<-raven.distance$Distance
+raven.distance$unq_tran<-raven.distance$site
+
+
+eagle.distance<-read.csv("C:Biodiversity idea//Output files//Distance_btwn_points_eagle_transects.csv")
+head(eagle.distance)
+eagle.distance$distance_eagle<-eagle.distance$Distance
+eagle.distance$unq_tran<-eagle.distance$site
+
+by_tran_master<- merge(by_tran_master, raven.distance[, c("unq_tran", "distance_raven")],by="unq_tran", all.x=TRUE)
+by_tran_master<- merge(by_tran_master, eagle.distance[, c("unq_tran", "distance_eagle")],by="unq_tran", all.x=TRUE)
 
 
 # Tidying up -------------------------------------------------------------
