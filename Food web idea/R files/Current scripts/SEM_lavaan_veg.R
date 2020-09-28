@@ -58,9 +58,9 @@ N15_model_simple_centered_alt_veg<-'
           
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
           
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
         
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
@@ -136,7 +136,7 @@ summary(fit.adj.mitml.veg, standardized=T)
 parest<-parameterestimates(fit.adj.mitml.veg)
 View(parest)
 #if model Sign can look at these: 
-#plyr::arrange(modificationIndices(fit.adj.amelia.veg),mi, decreasing=TRUE)
+#plyr::arrange(modificationIndices(fit.adj.amelia.veg),mi, decreasing=TRUE)7n
 #######
 
 #semplot
@@ -149,15 +149,19 @@ grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_M
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
 
-nodelab_veg<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "midden","shell", "fish\nbones", "d15N\nsoil", "canopy\nheight", 
+nodelab_veg<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15N\nsoil", "canopy\nheight", 
             "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "edge\neffects", "neighb","beach\nslope",  "wave\nexposure","elevation", 
             "island\nslope","Bog\narea")
 
 lay_names_veg<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","d15N\nsoil",   "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
                       "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                      "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "midden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
+                      "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
                       "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
                       "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
+
+
+semPaths(fit.adj.mitml.veg, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FALSE,
+         groups=grps, color=colour_group, exoCov = FALSE, esize=2, nodeLabels = nodelab_veg, legend=FALSE)
 
 semPaths(fit.adj.mitml.veg, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FALSE,
          groups=grps, color=colour_group, exoCov = FALSE, esize=2, nodeLabels = nodelab_veg, legend=FALSE, 
@@ -180,6 +184,7 @@ semPaths(fit.adj.mitml.veg, what="path",  layout=lay_names_veg, intercepts=FALSE
 # graph_grey$graphAttributes$Edges$curve<- ifelse(graph_grey$Edgelist$bidir, -1, 0)
 # plot(graph_grey)
 
+plot(data=master_transec_sem_subset_richness, ravens~d15n)
 
 
 #plot only significant paths
@@ -348,13 +353,13 @@ grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_M
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
 
-nodelab_veg_40m<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "midden","shell", "fish\nbones", "d15n_40m\nsoil", "canopy\nheight", 
+nodelab_veg_40m<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15n_40m\nsoil", "canopy\nheight", 
                "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "edge\neffects", "neighb","beach\nslope",  "wave\nexposure","elevation", 
                "island\nslope","Bog\narea")
 
 lay_names_veg_40m<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","d15n_40m\nsoil",   "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
                           "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                          "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "midden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
+                          "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
                           "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
                           "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
 
