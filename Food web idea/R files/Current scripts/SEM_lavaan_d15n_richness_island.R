@@ -353,6 +353,9 @@ semPaths(obj_isl, what="std",  layout=lay_names_island, intercepts=FALSE, residu
          groups=grps_island,  color=colour_group, esize=2, nodeLabels = nodelab_island, legend=FALSE,
          filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_isl_sig", width=8, height=4)
 
+semPaths(obj_isl, what="std",  layout=lay_names_island, intercepts=FALSE, residuals=FALSE,
+         groups=grps_island,  color=colour_group, esize=2, nodeLabels = nodelab_island, legend=FALSE)
+
 
 
 semPlot::semPaths(fit.adj.island, "path",fade = F, residuals = F, intercepts=FALSE, label.cex=2, nCharNodes = 0, nodeLabels = 1:21)
