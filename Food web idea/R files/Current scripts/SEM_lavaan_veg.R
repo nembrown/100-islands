@@ -22,9 +22,9 @@ plot(master_transect$log_Area ~ master_transect$PA_norml)
 ## pair down the variables
 sem_variables_names_veg<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                        "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                       "ravens",  "d15n", "distance_to_midden",
+                       "distance_raven",  "d15n", "distance_to_midden",
                        "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                       "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
+                       "pres_marine_invert", "pres_fish", "distance_eagle", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
                        "slope_isl", "CHM_mean_height", "habitat_het", "NDVI_mean")
 
 
@@ -35,8 +35,8 @@ master_transec_sem_subset_veg$unq_isl<-factor(master_transec_sem_subset_veg$unq_
 master_transec_sem_subset_veg$node<-factor(master_transec_sem_subset_veg$node)
 
 master_transec_sem_subset_veg_centered <- stdize(master_transec_sem_subset_veg, 
-                                             omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
-                                                           "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "elevation_max"), 
+                                             omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "distance_raven",  "pres_otter",  
+                                                           "pres_marine_invert", "pres_fish", "distance_eagle", "northing", "easting", "elevation_max"), 
                                              center = TRUE, scale = FALSE)
 
 head(master_transec_sem_subset_veg_centered)
@@ -58,19 +58,19 @@ N15_model_simple_centered_alt_veg<-'
           
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
           
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
         
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height + pres_otter
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
 
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
 
-        c.d15n ~ w1*c.log_site_mean_by_tran + h1*c.distance_to_midden + pres_marine_invert + pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
+        c.d15n ~ w1*c.log_site_mean_by_tran + h1*c.distance_to_midden + pres_marine_invert + pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + pres_otter + distance_raven + distance_eagle + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height + c.PA_norml
 
         c.CHM_mean_height ~ c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 
@@ -87,8 +87,8 @@ N15_model_simple_centered_alt_veg<-'
 fml.veg <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran  + 
                c.d15n + c.distance_to_midden + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
-               pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-               c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height + c.habitat_het ~ 1 )                          # Level 2
+               pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000 + distance_raven + distance_eagle ~ 1 + (1|unq_isl) ,                                                 # Level 1
+               c.log_Bog_area + c.log_Area +  c.PA_norml  + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height + c.habitat_het ~ 1 )                          # Level 2
 
 
 imp.veg <- jomoImpute(master_transec_sem_subset_veg_centered, formula=fml.veg, n.burn=500, n.iter=1000, m=20)
@@ -142,22 +142,22 @@ View(parest)
 #semplot
 grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
            Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max",   "c.slope_isl", "c.CHM_mean_height"),
-           Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "eagles","ravens" ),
+           Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "distance_eagle","distance_raven" ),
            Humans=c("c.distance_to_midden"),
            Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
            outcome=c("c.d15n"))
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
 
-nodelab_veg<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15N\nsoil", "canopy\nheight", 
-            "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "edge\neffects", "neighb","beach\nslope",  "wave\nexposure","elevation", 
+nodelab_veg<-c("fish", "marine\ninvert","otter", "distance\nraven", "distance\neagle" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15N\nsoil", "canopy\nheight", 
+            "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "island\nshape", "neighb","beach\nslope",  "wave\nexposure","elevation", 
             "island\nslope","Bog\narea")
 
 lay_names_veg<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","d15N\nsoil",   "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                      "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                      "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
-                      "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
-                      "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
+                              "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                              "","", "","","","","","","","","","", "distance\neagle","","","","","","","distance\nraven" ,"","","","","","","otter","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
+                              "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
+                              "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","","","","","","","", "transect\nslope","","","","","","island\nshape","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
 
 
 semPaths(fit.adj.mitml.veg, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FALSE,
@@ -184,7 +184,7 @@ semPaths(fit.adj.mitml.veg, what="path",  layout=lay_names_veg, intercepts=FALSE
 # graph_grey$graphAttributes$Edges$curve<- ifelse(graph_grey$Edgelist$bidir, -1, 0)
 # plot(graph_grey)
 
-plot(data=master_transec_sem_subset_richness, ravens~d15n)
+plot(data=master_transec_sem_subset_veg, distance_raven~d15n)
 
 
 #plot only significant paths
@@ -210,7 +210,7 @@ obj@Pars <- keep_Pars %>% bind_rows(checked_Pars)
 anti_join(original_Pars,obj@Pars)
 
 semPaths(obj, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FALSE,          
-         groups=grps,  color=colour_group, esize=2, nodeLabels = nodelab_veg, legend=FALSE,  
+         groups=grps,  color=colour_group, esize=2, nodeLabels = nodelab_veg, legend=FALSE,
          filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_0m_sig", width=8, height=4)
 
 
@@ -227,9 +227,9 @@ semPaths(obj, what="std",  layout=lay_names_veg, intercepts=FALSE, residuals=FAL
 ######################## 40 M
 sem_variables_names_veg_40m<-c("node", "unq_tran","unq_isl", "log_fish_biomass_bym3_mean", "log_bycatch_biomass_bym3_mean",
                            "SLOPE_degrees", "log_Area", "WAVE_EXPOSURE", "beachy_substrate", "slope_degrees",
-                           "ravens",  "d15n_40m", "distance_to_midden",
+                           "distance_raven",  "d15n_40m", "distance_to_midden",
                            "PA_norml", "log_site_mean_by_tran", "log_MEAN_kparea2k", "log_MEAN_egarea2k", "pres_otter", 
-                           "pres_marine_invert", "pres_fish", "eagles", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
+                           "pres_marine_invert", "pres_fish", "distance_eagle", "log_Bog_area", "log_Dist_Near", "log_MEAN_rockarea2000" ,"elevation_max", 
                            "slope_isl", "CHM_mean_height", "habitat_het", "NDVI_mean")
 
 
@@ -240,8 +240,8 @@ master_transec_sem_subset_veg_40m$unq_isl<-factor(master_transec_sem_subset_veg_
 master_transec_sem_subset_veg_40m$node<-factor(master_transec_sem_subset_veg_40m$node)
 
 master_transec_sem_subset_veg_40m_centered <- stdize(master_transec_sem_subset_veg_40m, 
-                                                 omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "ravens",  "pres_otter",  
-                                                               "pres_marine_invert", "pres_fish", "eagles", "northing", "easting", "elevation_max"), 
+                                                 omit.cols = c("node", "unq_tran","unq_isl",  "beachy_substrate", "distance_raven",  "pres_otter",  
+                                                               "pres_marine_invert", "pres_fish", "distance_eagle", "northing", "easting", "elevation_max"), 
                                                  center = TRUE, scale = FALSE)
 
 head(master_transec_sem_subset_veg_40m_centered)
@@ -263,19 +263,19 @@ N15_model_simple_centered_alt_veg_40m<-'
           
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
           
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
 
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
 
-        c.d15n_40m ~ w1*c.log_site_mean_by_tran + h1*c.distance_to_midden + pres_marine_invert + pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + pres_otter + ravens + eagles + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
+        c.d15n_40m ~ w1*c.log_site_mean_by_tran + h1*c.distance_to_midden + pres_marine_invert + pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + pres_otter + distance_raven + distance_eagle + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height+ c.PA_norml
 
         c.CHM_mean_height ~ c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 
@@ -292,8 +292,8 @@ N15_model_simple_centered_alt_veg_40m<-'
 fml.veg_40m <- list( c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean +
                          c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.slope_degrees + c.log_site_mean_by_tran  + 
                          c.d15n_40m + c.distance_to_midden + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + pres_otter +
-                         pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000  ~ 1 + (1|unq_isl) ,                                                 # Level 1
-                 c.log_Bog_area + c.log_Area +  c.PA_norml + ravens + eagles + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height + c.habitat_het ~ 1 )                          # Level 2
+                         pres_marine_invert + pres_fish + c.log_MEAN_rockarea2000 + distance_raven + distance_eagle ~ 1 + (1|unq_isl) ,                                                 # Level 1
+                 c.log_Bog_area + c.log_Area +  c.PA_norml  + c.log_Dist_Near + elevation_max + c.slope_isl  + c.CHM_mean_height + c.habitat_het ~ 1 )                          # Level 2
 
 
 imp.veg_40m <- jomoImpute(master_transec_sem_subset_veg_40m_centered, formula=fml.veg_40m, n.burn=500, n.iter=1000, m=20)
@@ -346,30 +346,29 @@ summary(fit.adj.mitml.veg_40m, standardized=T)
 #semplot
 grps<-list(Algae=c("c.log_MEAN_rockarea2000","c.log_site_mean_by_tran", "c.log_MEAN_kparea2k", "c.log_MEAN_egarea2k" ),
            Islchar=c("c.PA_norml", "c.SLOPE_degrees", "c.log_Area", "c.WAVE_EXPOSURE", "beachy_substrate", "c.slope_degrees","c.log_Bog_area", "c.log_Dist_Near", "elevation_max",   "c.slope_isl", "c.CHM_mean_height"),
-           Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "eagles","ravens" ),
+           Animalvect=c("marine_animal_biomass_shore","pres_otter", "pres_marine_invert", "pres_fish", "distance_eagle","distance_raven" ),
            Humans=c("c.distance_to_midden"),
            Fish=c("c.log_fish_biomass_bym3_mean", "c.log_bycatch_biomass_bym3_mean"),
            outcome=c("c.d15n_40m"))
 
 colour_group=c("#51C5B4", "#C2B3A2", "#EC6D98", "#DEAFFD", "#00A4EE", "#CD8958")
 
-nodelab_veg_40m<-c("fish", "marine\ninvert","otter", "ravens", "eagles" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15n_40m\nsoil", "canopy\nheight", 
-               "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "edge\neffects", "neighb","beach\nslope",  "wave\nexposure","elevation", 
+nodelab_veg_40m<-c("fish", "marine\ninvert","otter", "distance\nraven", "distance\neagle" ,"wrack", "distance\nmidden","shell", "fish\nbones", "d15n_40m\nsoil", "canopy\nheight", 
+               "kelp", "eelgrass", "fucus", "sandy", "Area", "transect\nslope", "island\nshape", "neighb","beach\nslope",  "wave\nexposure","elevation", 
                "island\nslope","Bog\narea")
 
 lay_names_veg_40m<-get_layout("", "", "", "", "", "","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","", "","d15n_40m\nsoil",   "","","", "","","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
                           "wrack","","", "","","","","", "","","","","","", "","", "shell","","","","","","", "fish\nbones", "","", "","","","","","","","","","","","","","","","", "","","","","", "","","","", "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                          "","", "","","","","","","","","","", "eagles","","","","","","","ravens" ,"","","","","","","otter","","","","","","","","","","","","","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
+                          "","", "","","","","","","","","","", "distance\neagle","","","","","","","distance\nraven" ,"","","","","","","otter","","","","","","", "distance\nmidden","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","", "","","","","","","","","","","","","","",
                           "","","","","","","","","","","","","","","marine\ninvert","","","","","","","","","","", "fish","","","","","","","","","","","", "","","","","","","","","","","","","","","","","","","","","","","canopy\nheight","","","","","","","","","","","","","","","","","","","",
-                          "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","", "transect\nslope","","","","","","","","","","","","edge\neffects","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
+                          "fucus","","","", "","","kelp","","","", "","","eelgrass","","","","","","","beach\nslope","","","","","wave\nexposure","","","","", "sandy","","","","","","","","","","","","","", "transect\nslope","","","","","","island\nshape","","","","","","Area","","","", "","","Bog\narea","","","","","", "neighb","","","","","", "elevation", "","","","","", "island\nslope", rows=5)
 
 semPaths(fit.adj.mitml.veg_40m, what="std",  layout=lay_names_veg_40m, intercepts=FALSE, residuals=FALSE,
          groups=grps, color=colour_group, exoCov = FALSE, esize=2, nodeLabels = nodelab_veg_40m, legend=FALSE, 
-         filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_40m_full", width=8, height=4)
+         filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_40m_full", width=8, height=4) 
 
-semPaths(fit.adj.mitml.veg_40m, what="path",  layout=lay_names_veg_40m, intercepts=FALSE, residuals=FALSE,
-         groups=grps, color=colour_group, exoCov=FALSE, nodeLabels = nodelab_veg_40m, legend=FALSE, 
-         filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_40m_grey", width=8, height=4)
+semPaths(fit.adj.mitml.veg_40m, what="std",  layout=lay_names_veg_40m, intercepts=FALSE, residuals=FALSE,
+         groups=grps, color=colour_group, exoCov = FALSE, esize=2, nodeLabels = nodelab_veg_40m, legend=FALSE) 
 
 
 #plot only significant paths
@@ -398,7 +397,8 @@ semPaths(obj_40m, what="std",  layout=lay_names_veg_40m, intercepts=FALSE, resid
          groups=grps,  color=colour_group, esize=2, nodeLabels = nodelab_veg_40m, legend=FALSE,  
          filetype="tiff", filename="Food web idea/Plots/SEM/SEM_dN15_40m_sig", width=8, height=4)
 
-
+semPaths(obj_40m, what="std",  layout=lay_names_veg_40m, intercepts=FALSE, residuals=FALSE,          
+         groups=grps,  color=colour_group, esize=2, nodeLabels = nodelab_veg_40m, legend=FALSE)
 
 
 
@@ -419,19 +419,19 @@ N15_model_wrack<-'
           
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
           
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
 
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
 
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
 
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
 
-        c.d15n ~ w1*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + 0*ravens + 0*eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        c.d15n ~ w1*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + 0*distance_raven + 0*distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
 
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 
@@ -446,13 +446,13 @@ N15_model_human<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + 0*ravens + 0*eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + 0*distance_raven + 0*distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_human<-sem(N15_model_human, data=master_transec_sem_subset_veg_centered)
@@ -464,13 +464,13 @@ N15_model_otter<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + 0*ravens + 0*eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + 0*distance_raven + 0*distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_otter<-sem(N15_model_otter, data=master_transec_sem_subset_veg_centered)
@@ -483,13 +483,13 @@ N15_model_otter_shell<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ 0*eagles + 0*ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ 0*eagles + 0*ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + 0*ravens + 0*eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ 0*distance_eagle + 0*distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ 0*distance_eagle + 0*distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + 0*distance_raven + 0*distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_otter_shell<-sem(N15_model_otter_shell, data=master_transec_sem_subset_veg_centered)
@@ -501,13 +501,13 @@ N15_model_bird_otter_shell<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + ravens + eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + distance_raven + distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_bird_otter_shell<-sem(N15_model_bird_otter_shell, data=master_transec_sem_subset_veg_centered)
@@ -519,13 +519,13 @@ N15_model_bird_shell<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + 0*pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + ravens + eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + 0*pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + pres_marine_invert + pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + distance_raven + distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_bird_shell<-sem(N15_model_bird_shell, data=master_transec_sem_subset_veg_centered)
@@ -537,13 +537,13 @@ N15_model_bird<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden +  0*pres_marine_invert +  0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + ravens + eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden +  0*pres_marine_invert +  0*pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + 0*pres_otter + distance_raven + distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_bird<-sem(N15_model_bird, data=master_transec_sem_subset_veg_centered)
@@ -556,13 +556,13 @@ N15_model_biogeog<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + 0*pres_otter + 0*ravens + 0*eagles + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + 0*pres_otter + 0*distance_raven + 0*distance_eagle + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_biogeog<-sem(N15_model_biogeog, data=master_transec_sem_subset_veg_centered)
@@ -574,13 +574,13 @@ N15_model_vectors<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ 0*c.log_site_mean_by_tran + c.distance_to_midden +  pres_marine_invert +  pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + ravens + eagles + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ 0*c.log_site_mean_by_tran + c.distance_to_midden +  pres_marine_invert +  pres_fish + 0*c.slope_degrees  + 0*c.WAVE_EXPOSURE + pres_otter + distance_raven + distance_eagle + 0*elevation_max + 0*c.slope_isl  + 0*c.log_Bog_area + 0*c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_vectors<-sem(N15_model_vectors, data=master_transec_sem_subset_veg_centered)
@@ -592,13 +592,13 @@ N15_model_passive<-'
         c.log_fish_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000
         c.log_bycatch_biomass_bym3_mean ~ c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate
         pres_otter ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.slope_degrees + c.PA_norml + c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + beachy_substrate + c.SLOPE_degrees + c.WAVE_EXPOSURE + elevation_max
-        ravens ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
-        eagles ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_raven ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
+        distance_eagle ~  c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean + c.log_Area + c.PA_norml + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + elevation_max + c.CHM_mean_height
         c.log_site_mean_by_tran ~  c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.SLOPE_degrees  + c.WAVE_EXPOSURE + beachy_substrate + c.log_Area + c.PA_norml + c.slope_degrees + c.log_MEAN_rockarea2000
         c.distance_to_midden ~ c.log_Dist_Near + c.log_MEAN_kparea2k + c.log_MEAN_egarea2k + c.log_MEAN_rockarea2000 + c.log_fish_biomass_bym3_mean + c.log_bycatch_biomass_bym3_mean  + c.WAVE_EXPOSURE + c.log_Area + c.slope_degrees + c.PA_norml + beachy_substrate + elevation_max 
-        pres_marine_invert ~ eagles + ravens + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
-        pres_fish ~ eagles + ravens + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
-        c.d15n ~ c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + 0*pres_otter + 0*ravens + 0*eagles + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
+        pres_marine_invert ~ distance_eagle + distance_raven + 0*pres_otter + c.log_bycatch_biomass_bym3_mean + c.distance_to_midden
+        pres_fish ~ distance_eagle + distance_raven + pres_otter + c.log_fish_biomass_bym3_mean + c.distance_to_midden
+        c.d15n ~ c.log_site_mean_by_tran + 0*c.distance_to_midden + 0*pres_marine_invert + 0*pres_fish + c.slope_degrees  + c.WAVE_EXPOSURE + 0*pres_otter + 0*distance_raven + 0*distance_eagle + elevation_max + c.slope_isl  + c.log_Bog_area + c.CHM_mean_height
         c.CHM_mean_height ~ c.NDVI_mean + c.log_Area + elevation_max + c.PA_norml + c.slope_isl + c.WAVE_EXPOSURE + c.log_Bog_area 
 '
 lavaan_fit_model_passive<-sem(N15_model_passive, data=master_transec_sem_subset_veg_centered)

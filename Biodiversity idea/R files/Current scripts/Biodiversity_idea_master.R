@@ -91,7 +91,7 @@ by_tran_master_col_names<-c("unq_isl", "unq_tran","plot_cc", "tree_richness" ,
                             "WAVE_EXPOSURE",
                             "SITE_SUM",
                             "SLOPE",
-                            "SUBSTRATE")
+                            "SUBSTRATE", "distance_eagle", "distance_raven")
 
 
 by_tran_master_subset<-by_tran_master[,colnames(by_tran_master) %in% by_tran_master_col_names]
